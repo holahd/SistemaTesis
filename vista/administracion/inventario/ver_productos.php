@@ -24,6 +24,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <!-- Bootstrap CSS -->
     <link href="../../../public/css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../public/css/datatables.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 
     <style>
         body {
@@ -70,6 +72,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                         <img id="imagen_producto" src="../../public/img/default.jpg" alt="Imagen del Producto" class="img-thumbnail" style="max-width: 200px;">
                     </div>
                 </div>
+                <input type="hidden" id="ruta_imagen" name="ruta_imagen" value="">
 
 
                 <!-- Input para subir nueva imagen -->
@@ -88,12 +91,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         <table id="tablaProductos" class="table table-striped">
             <thead>
                 <tr>
-                    <th>producto_id</th>
+                    
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Categoría</th>
                     <th>Subcategoría</th>
                     <th>Imagen</th>
+                    <th>Descontinuado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -104,8 +108,9 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
-    <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
+    <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
+    
 
 </body>
 

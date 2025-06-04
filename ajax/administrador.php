@@ -84,7 +84,7 @@ switch ($_GET["op"]) {
 
     case 'editar':
 
-        $res = $usuarios->editar($_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
+        $res = $usuarios->editar($_POST['usuario_id'],$_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
 
         if ($res) {
             $respuesta['mensaje'] = 'Usuario editado correctamente';

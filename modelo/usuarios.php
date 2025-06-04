@@ -46,9 +46,9 @@ class usuarios{
 		
 	}
 
-	public function editar($n,$a,$e,$r){
+	public function editar($i,$n,$a,$e,$r){
 		
-		$sql="call sp_usuario( 3 , 00, '$n','$a','$e','contraseñajajaj','$r');";
+		$sql="call sp_usuario( 3 , $i, '$n','$a','$e','contraseñajajaj','$r');";
 		
 		return ejecutarConsultaSP($sql);
 		

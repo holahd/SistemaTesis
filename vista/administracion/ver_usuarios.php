@@ -43,6 +43,9 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <div class="mt-4 p-4 bg-success bg-opacity-50 rounded shadow-sm mb-3" style="max-width: 500px; margin: 0 auto;">
     <h3 class="text-center mb-4">Editar Usuario</h3>
     <form id="formEditarUsuario">
+
+    <input type="hidden" id="usuario_id" name="usuario_id" value="">
+
         <div class="form-group mb-3">
             <label for="nombre" class="font-weight-bold">Nombre</label>
             <input type="text" class="form-control" id="nombre" name="nombre" required>

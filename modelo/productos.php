@@ -36,7 +36,7 @@ class productos{
 
     public function eliminar($id){
 
-        $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
+        $sql="call sp_producto(5,$id,'aaaaa','aaaaa',1,'aaaaaa');";
     
         return ejecutarConsultaSP($sql);
     }
@@ -58,6 +58,13 @@ class productos{
 
     public function buscar(){
         $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
+    
+        return ejecutarConsultaSP($sql);
+    }
+
+    public function restaurar($id){
+
+        $sql="call sp_producto(6,$id,'aaaaa','aaaaa',1,'aaaaaa');";
     
         return ejecutarConsultaSP($sql);
     }

@@ -12,7 +12,8 @@ class Lotes {
         
         $fechaCadSQL = empty($fechaCad) ? 'NULL' : "'$fechaCad'";
         $sql = "CALL sp_lote(
-            2, 
+            2,
+            00, 
             '$productoNombre', 
             $numLote, 
             $cantidad, 
@@ -29,10 +30,11 @@ class Lotes {
         return ejecutarConsultaSP($sql);
     }
 
-    public function editar( $productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $proveedor, $precioUnit) {
+    public function editar( $id,$productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $proveedor, $precioUnit) {
         $fechaCadSQL = empty($fechaCad) ? 'NULL' : "'$fechaCad'";
         $sql = "CALL sp_lote(
-            3,  
+            3,
+            $id,  
             '$productoNombre', 
             $numLote, 
             $cantidad, 
@@ -49,7 +51,7 @@ class Lotes {
         return ejecutarConsultaSP($sql);
     }
 	public function listarNombresProductos() {
-    $sql = "CALL sp_lote(5,'', 0, 0, '2000-01-01', '', NULL, 0);";
+    $sql = "CALL sp_lote(5,00,'', 0, 0, '2000-01-01', '', NULL, 0);";
     return ejecutarConsultaSP($sql);
 }
 

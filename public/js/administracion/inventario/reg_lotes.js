@@ -11,7 +11,7 @@ $('#registrarlote').submit(function (e) {
     for (let [key, value] of formulario.entries()) {
         console.log(`${key}:`, value);
     }
-
+ 
     $.ajax({
         url: '../../../ajax/lotes-serv.php?op=registrar',
         type: 'POST',

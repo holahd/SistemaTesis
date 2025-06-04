@@ -22,7 +22,7 @@ $(document).ready(function () {
                                 if (row.rol === 'admin') {
                                     // Si es admin, no mostramos el botón de eliminar
                                     return `
-                                        <button class="btn btn-warning btn-sm editar" data-email="${row.email}" onclick="PonerValoresenCampos('${row.nombre}','${row.apellido}','${row.email}','${row.rol}')">✏️ Editar</button>
+                                        <button class="btn btn-warning btn-sm editar" data-email="${row.email}" onclick="PonerValoresenCampos('${data.usuario_id},${row.nombre}','${row.apellido}','${row.email}','${row.rol}')">✏️ Editar</button>
                                         <button class="btn btn-primary btn-sm resetear" data-email="${row.email}">🔄 Reset Contraseña</button>
                                     `;
                                 } else {
@@ -115,7 +115,8 @@ $(document).ready(function () {
 
 
 
-function PonerValoresenCampos(nombre,apellido , email, rol) {
+function PonerValoresenCampos(id,nombre,apellido , email, rol) {
+    $('#usuario_id').val(id);
     $('#nombre').val(nombre);
     $('#apellido').val(apellido);
     $('#correo').val(email);
