@@ -42,7 +42,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
             <h3 class="text-center mb-4">Editar Producto</h3>
             <form id="formEditarProducto" enctype="multipart/form-data">
 
-
+                  <input type="hidden" id="producto_id" name="producto_id" value="">
                 <div class="form-group mb-3">
                     <label for="nombre" class="font-weight-bold">Nombre</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" required>
@@ -54,11 +54,6 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="precio" class="font-weight-bold">Precio</label>
-                    <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
-                </div>
-
-                <div class="form-group mb-3">
                     <label for="categoria" class="font-weight-bold">Categoría</label>
                     <select class="form-control" id="categoria" name="categoria" required></select>
                 </div>
@@ -66,16 +61,6 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <div class="form-group mb-3">
                     <label for="subcategoria" class="font-weight-bold">Subcategoría</label>
                     <select class="form-control" id="subcategoria" name="subcategoria" required></select>
-                </div>
-
-                <div class="form-group " id="fechaMantenimientoDiv" style="display:none">
-                    <label for="fecha_mantenimiento" class="font-weight-bold">Fecha de Mantenimiento</label>
-                    <input type="date" class="form-control" id="fecha_mantenimiento" name="fecha_mantenimiento">
-                </div>
-
-                <div class="form-group mb-3 mt-3">
-                    <label for="codigo" class="font-weight-bold">Código del Producto</label>
-                    <input type="text" class="form-control" id="codigo" name="codigo" required>
                 </div>
 
                 <!-- Vista Previa de la Imagen -->
@@ -103,13 +88,12 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         <table id="tablaProductos" class="table table-striped">
             <thead>
                 <tr>
+                    <th>producto_id</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Precio</th>
                     <th>Categoría</th>
                     <th>Subcategoría</th>
-                    <th>Fecha de Mantenimiento</th>
-                    <th>Código</th>
+                    <th>Imagen</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -120,7 +104,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
-    <script src="../../../public/js/catalogo/productos.js"></script>
+    <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
+    <script src="../../../public/js/administracion/combosAnidados.js"></script>
 
 </body>
 

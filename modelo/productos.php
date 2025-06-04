@@ -12,7 +12,7 @@ class productos{
 
     public function listar(){
 
-        $sql="call sp_producto(1,00,'aaaaa','aaaaa',1,'aaaaaa');";
+        $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
         
         return ejecutarConsultaSP($sql);
 
@@ -20,23 +20,23 @@ class productos{
 
     public function insertar($no, $des, $cat, $foto){
 
-        $sql="call sp_producto(2,00,'$no','$des', $cat ,'$foto');";
+        $sql="call sp_producto(2,0,'$no','$des', $cat ,'$foto');";
 
         return ejecutarConsultaSP($sql);
 
     }
 
-    public function actualizar($no, $des,  $cat, $foto){
+    public function actualizar($id,$no, $des,  $cat, $foto){
 
         
-            $sql="call sp_producto(1,00,'$no','$des', $cat ,'$foto');";
+            $sql="call sp_producto(3,$id,'$no','$des', $cat ,'$foto');";
     
             return ejecutarConsultaSP($sql);
     }
 
     public function eliminar($id){
 
-        $sql="call sp_producto(1, 00,'aaaaa','aaaaa',1,'aaaaaa');";
+        $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
     
         return ejecutarConsultaSP($sql);
     }
@@ -57,7 +57,7 @@ class productos{
     }
 
     public function buscar(){
-        $sql="call sp_producto(1,00,'aaaaa','aaaaa',1,'aaaaaa');";
+        $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
     
         return ejecutarConsultaSP($sql);
     }
