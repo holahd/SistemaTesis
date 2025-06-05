@@ -25,19 +25,19 @@ switch ($_GET["op"]) {
         $res = $lotes->registrar($Producto, $numLot, $cantidad, $fechIng, $fechCad, $proveedor, $precio);
         echo json_encode(["tipo" => 1, "mensaje" => "Lote registrado correctamente"]);
         break;
-
+ 
     case 'listar':
         $res = $lotes->listar();
         $data = array();
 
         while ($reg = $res->fetch_object()) {
             $data[] = array(
-                "id" => $reg->lote_id,
+                "lote_id" => $reg->lote_id,
                 "producto" => $reg->producto,
                 "numLote" => $reg->numero_lote,
                 "cantidad" => $reg->cantidad,
                 "fechaIngreso" => $reg->fecha_ingreso,
-                "fechaCaducidad" => $reg->fecha_cad,
+                "fechaCaducidad" => $reg->fecha_caducidad,
                 "proveedor" => $reg->proveedor,
                 "precioUnitario" => $reg->precio_unit
             );

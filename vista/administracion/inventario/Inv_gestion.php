@@ -78,7 +78,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
             <a class="nav-link active" href="#" onclick="cambiarPagina(this, 'elegir_reg.php')">Registrar</a>
             <a class="nav-link" href="#" onclick="cambiarPagina(this, 'ver_productos.php')"> Productos existentes</a>
-            <a class="nav-link" href="#" onclick="cambiarPagina(this, 'ver_productos.php')">Lotes existentes</a>
+            <a class="nav-link" href="#" onclick="cambiarPagina(this, 'ver_lotes.php')">Lotes existentes</a>
 
         </div>
     </div>
