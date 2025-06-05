@@ -44,7 +44,7 @@ class Lotes {
             $precioUnit
         );";
         return ejecutarConsultaSP($sql);
-    }
+    } 
 
     public function eliminar($loteId) {
         $sql = "CALL sp_lote(4,  '', $loteId, 0, '2000-01-01', '', NULL, 0);";

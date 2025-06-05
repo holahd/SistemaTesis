@@ -35,7 +35,7 @@ switch ($_GET["op"]) {
                 "lote_id" => $reg->lote_id,
                 "producto" => $reg->producto,
                 "numLote" => $reg->numero_lote,
-                "cantidad" => $reg->cantidad,
+                "cantidad" => $reg->cantidad, 
                 "fechaIngreso" => $reg->fecha_ingreso,
                 "fechaCaducidad" => $reg->fecha_caducidad,
                 "proveedor" => $reg->proveedor,
@@ -47,14 +47,14 @@ switch ($_GET["op"]) {
         break;
 
     case 'editar':
-        $loteId = $_POST["id"];
-        $Producto = $_POST["producto"];
-        $numLot = $_POST["numeroLote"];
-        $cantidad = $_POST["cantidad"];
-        $fechIng = $_POST["fechaIngreso"];
-        $fechCad = $_POST["fechaCaducidad"];
-        $proveedor = $_POST["proveedor"];
-        $precio = $_POST["precioUnitario"];
+        $loteId = $_POST["lote_id"];
+        $Producto = $_POST["productoEditar"];
+        $numLot = $_POST["numeroLoteEditar"];
+        $cantidad = $_POST["unidadesEditar"];
+        $fechIng = $_POST["fechaIngresoEditar"];
+        $fechCad = $_POST["fechaCaducidadEditar"];
+        $proveedor = $_POST["proveedorEditar"];
+        $precio = $_POST["precioUnitarioEditar"];
 
         $fechCad = empty($fechCad) ? null : $fechCad;
 

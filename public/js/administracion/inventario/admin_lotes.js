@@ -10,7 +10,7 @@ $(document).ready(function () {
             columns: [
                 { data: 'producto' },
                 { data: 'numLote' },
-                { data: 'cantidad' },
+                { data: 'cantidad' }, 
                 { data: 'fechaIngreso' },
                 { data: 'proveedor' },
                 { data: 'fechaCaducidad' },
@@ -22,14 +22,14 @@ $(document).ready(function () {
                             return `
                             <button 
                                 class="btn btn-warning btn-sm editar"
-                                data-producto_id="${data.producto_id}"
-                                data-nombre="${row.nombre}"
-                                data-descripcion="${row.descripcion}"
-                                data-categoria_id="${data.categoria_id}"
-                                data-subcategoria_id="${data.subcategoria_id}"
-                                data-foto="${row.foto}"
-                                
-                                
+                                data-producto="${data.producto}"
+                                data-num-lote="${data.numLote}"
+                                data-cantidad="${data.cantidad}"
+                                data-fecha-ingreso="${data.fechaIngreso}"
+                                data-proveedor="${data.proveedor}"
+                                data-fecha-caducidad="${data.fechaCaducidad}"
+                                data-precio-unitario="${data.precioUnitario}"
+                                data-lote_id="${data.lote_id}"
                                 >
                                 ✏️ Editar
                             </button>
@@ -73,46 +73,26 @@ $(document).ready(function () {
         });
     }
 
-    // Evento delegado para botón de eliminar
-    $(document).on('click', '.eliminar', function () {
-        let id = $(this).data('producto_id');
-        let nombre = $(this).data('nombre');
-        eliminarProducto(id, nombre);
-    });
+    
 
     // Evento delegado para botón de editar
     $(document).on('click', '.editar', function () {
-        let producto_id = $(this).data('producto_id');
-        let nombre = $(this).data('nombre');
-        let descripcion = $(this).data('descripcion');
-        let foto = $(this).data('foto');
-        let categoria_id = $(this).data('categoria_id');
-        let subcategoria_id = $(this).data('subcategoria_id');
+        let producto = $(this).data('producto');
+        let numLote = $(this).data('numLote');
+        let cantidad = $(this).data('cantidad');
+        let fechaIngreso = $(this).data('fechaIngreso');
+        let proveedor = $(this).data('proveedor');
+        let fechaCaducidad = $(this).data('fechaCaducidad');
+        let precioUnitario = $(this).data('precioUnitario');
+        let lote_id = $(this).data('lote_id');
 
-        PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, subcategoria_id, foto);
+        PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, precioUnitario, lote_id);
 
     });
 
-    // Vista previa de la imagen cargada
-    $("#input_imagen").change(function (event) {
-        let archivo = event.target.files[0];
-        if (archivo) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                $("#imagen_producto").attr("src", e.target.result);
-            };
-            reader.readAsDataURL(archivo);
-        }
-    });
-
-    $(document).on('click', '.restaurar', function () {
-        let id = $(this).data('producto_id');
-        let nombre = $(this).data('nombre');
-        restaurarProducto(id, nombre);
-    });
 
     // Manejo del formulario de edición
-    $('#formEditarProducto').submit(function (e) {
+    $('#formEditarLote').submit(function (e) {
         e.preventDefault();
 
         var formulario = new FormData(this);
@@ -123,7 +103,7 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: '../../../ajax/catalogo-serv.php?op=editar',
+            url: '../../../ajax/lotes-serv.php?op=editar',
             type: 'POST',
             data: formulario,
             contentType: false,
@@ -135,14 +115,12 @@ $(document).ready(function () {
                 respuesta = JSON.parse(respuesta);
                 console.log('Respuesta recibida:', respuesta.mensaje);
 
-                if (respuesta.tipo === 1) {
+              
                     alert(respuesta.mensaje);
-                    $('#formEditarProducto').trigger('reset');
-                    $('#imagen_producto').attr('src', '../../../img/default.jpg');
-                    $('#tablaProductos').DataTable().ajax.reload(null, false);
-                } else {
-                    alert('Error: ' + respuesta.mensaje);
-                }
+                    $('#formEditarLote').trigger('reset');
+                    $('#tablaLotes').DataTable().ajax.reload(null, false);
+                    $('#fromularioEdicionLote').prop('disabled', true);
+                
             },
             error: function (xhr, status, error) {
                 console.error('Error: ' + error);
@@ -151,65 +129,50 @@ $(document).ready(function () {
     });
 });
 
+
+
 // Cargar valores en campos del formulario
-function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, subcategoria_id, imagen) {
-    $('#producto_id').val(producto_id);
-    $('#nombre').val(nombre);
-    $('#descripcion').val(descripcion);
-    $('#imagen_producto').attr('src', "../../../img/" + imagen);
-    $('#ruta_imagen').val(imagen);
-    alert('Imagen cargada: ' + $('#ruta_imagen').val());
+function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, precioUnitario, lote_id) {
+     $('#fromularioEdicionLote').prop('disabled', false);
+    $('#numeroLoteEditar').val(numLote);
+    $('#unidadesEditar').val(cantidad);
+    $('#fechaIngresoEditar').val(fechaIngreso);
+    $('#proveedorEditar').val(proveedor);
+    if (fechaCaducidad != 'No aplica') {
+         $('#fechaCaducidadEditar').val(fechaCaducidad);
+         $('#esPerecibleEditar').prop('checked', true).trigger('change');
+         
+    }else {
+         $('#fechaCaducidadEditar').val('');
+         $('#esPerecibleEditar').prop('checked', false).trigger('change');
+    }
+    $('#precioUnitarioEditar').val(precioUnitario);
+    $('#lote_id').val(lote_id);
 
-    // Primero cargamos las categorías
+    $(document).ready(function () {
     $.ajax({
-        url: '../../../ajax/catalogo-serv.php?op=categorias',
-        type: 'POST',
-        processData: false,
+        url: '../../../ajax/lotes-serv.php?op=listarproductos',
+        method: 'POST',
         contentType: false,
-        success: function (respuesta) {
-            let data = JSON.parse(respuesta);
-            let $categoria = $('#categoria');
-            $categoria.empty();
-            $categoria.append('<option value="" disabled>Seleccione una categoría</option>');
+        processData: false,
+        success: function (data) {
+            const nombres = JSON.parse(data); 
+            
 
-            data.forEach(function (item) {
-                $categoria.append(`<option value="${item.categoria_id}">${item.nombre}</option>`);
+            const $select = $('#productoEditar');
+            $select.empty();
+            $select.append('<option selected disabled>Seleccione un producto</option>');
+
+            nombres.forEach(function (obj) {
+                $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
             });
-
-            // Establecer categoría seleccionada
-            $categoria.val(categoria_id).trigger('change');
-
-            // Cargar subcategorías una vez se haya establecido la categoría
-            let formulario = new FormData();
-            formulario.append('categoria_id', categoria_id);
-
-            $.ajax({
-                url: '../../../ajax/catalogo-serv.php?op=subcategorias',
-                type: 'POST',
-                data: formulario,
-                contentType: false,
-                processData: false,
-                success: function (respuesta) {
-                    let data = JSON.parse(respuesta);
-                    let $subcategoria = $('#subcategoria');
-                    $subcategoria.empty();
-                    $subcategoria.append('<option value="" disabled>Seleccione una subcategoría</option>');
-
-                    data.forEach(function (item) {
-                        $subcategoria.append(`<option value="${item.categoria_id}">${item.nombre}</option>`);
-                    });
-
-                    // Establecer subcategoría seleccionada
-                    $subcategoria.val(subcategoria_id);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error al cargar subcategorías: ' + error);
-                }
-            });
-
+            $('#productoEditar').val(producto);
         },
         error: function (xhr, status, error) {
-            console.error('Error al cargar categorías: ' + error);
+            console.error('Error al cargar productos:', error);
         }
     });
+});
+
+
 }

@@ -1,11 +1,14 @@
 
 $(document).ready(function () {
+
+    $('#formulario_edicion_usuario').prop('disabled', true);
+
     if ($('#usuarios').length > 0) {
         $.ajax({
             url: '../../ajax/administrador.php?op=listar',
             type: 'POST',
             success: function (respuesta) {
-                
+
 
                 respuesta = JSON.parse(respuesta);
 
@@ -22,13 +25,29 @@ $(document).ready(function () {
                                 if (row.rol === 'admin') {
                                     // Si es admin, no mostramos el botón de eliminar
                                     return `
-                                        <button class="btn btn-warning btn-sm editar" data-email="${row.email}" onclick="PonerValoresenCampos('${data.usuario_id},${row.nombre}','${row.apellido}','${row.email}','${row.rol}')">✏️ Editar</button>
+                                        <button class="btn btn-warning btn-sm editar"
+                                        data-id="${data.usuario_id}"
+                                        data-nombre="${row.nombre}"
+                                        data-apellido="${row.apellido}"
+                                        data-email="${row.email}"
+                                        data-rol="${row.rol}">
+                                     ✏️ Editar
+                                        </button>
+
                                         <button class="btn btn-primary btn-sm resetear" data-email="${row.email}">🔄 Reset Contraseña</button>
                                     `;
                                 } else {
                                     // Si no es admin, mostramos todos los botones
                                     return `
-                                        <button class="btn btn-warning btn-sm editar" data-email="${row.email}" onclick="PonerValoresenCampos('${row.nombre}','${row.apellido}','${row.email}','${row.rol}')"  >✏️ Editar</button>
+                                        <button class="btn btn-warning btn-sm editar"
+                                        data-id="${data.usuario_id}"
+                                        data-nombre="${row.nombre}"
+                                        data-apellido="${row.apellido}"
+                                        data-email="${row.email}"
+                                        data-rol="${row.rol}">
+                                     ✏️ Editar
+                                        </button>
+
                                         <button class="btn btn-primary btn-sm resetear" data-email="${row.email}">🔄 Reset Contraseña</button>
                                         <button class="btn btn-danger btn-sm eliminar" data-email="${row.email}">⛔ Eliminar usuario</button>
                                     `;
@@ -76,6 +95,16 @@ $(document).ready(function () {
 
     // Evento para editar usuario
 
+$(document).on('click', '.editar', function () {
+    const btn = $(this);
+    PonerValoresenCampos(
+        btn.data('id'),
+        btn.data('nombre'),
+        btn.data('apellido'),
+        btn.data('email'),
+        btn.data('rol')
+    );
+});
 
 
     // Evento para eliminar usuario
@@ -84,7 +113,7 @@ $(document).ready(function () {
         if (confirm('¿Seguro que deseas eliminar al usuario con email ' + email + '?')) {
             $.post('../../ajax/administrador.php?op=eliminar', { email: email }, function (respuesta) {
 
-                let datos= JSON.parse(respuesta);
+                let datos = JSON.parse(respuesta);
 
                 alert(datos.mensaje);
                 location.reload();
@@ -97,13 +126,13 @@ $(document).ready(function () {
         let email = $(this).data('email');
         if (confirm('¿Restablecer la contraseña del usuario con email ' + email + '?')) {
 
-          
+
 
 
 
             $.post('../../ajax/administrador.php?op=reestablecerContrasena', { email: email }, function (respuesta) {
 
-              let datos= JSON.parse(respuesta);
+                let datos = JSON.parse(respuesta);
 
                 alert(datos.mensaje);
 
@@ -115,7 +144,8 @@ $(document).ready(function () {
 
 
 
-function PonerValoresenCampos(id,nombre,apellido , email, rol) {
+function PonerValoresenCampos(id, nombre, apellido, email, rol) {
+    $('#formulario_edicion_usuario').prop('disabled', false);
     $('#usuario_id').val(id);
     $('#nombre').val(nombre);
     $('#apellido').val(apellido);
@@ -151,6 +181,7 @@ $('#formEditarUsuario').submit(function (e) {
 
 
                 $('#formEditarUsuario').trigger('reset');
+                $('#formulario_edicion_usuario').prop('disabled', true);
 
             } else {
                 alert('Error: ' + respuesta.mensaje);

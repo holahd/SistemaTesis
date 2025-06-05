@@ -36,8 +36,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         <!-- Formulario de Edición -->
         <div class="mt-4 p-4 bg-warning bg-opacity-50 rounded shadow-sm mb-3" style="max-width: 600px; margin: 0 auto;">
             <h3 class="text-center mb-4">Editar Lote</h3>
-            <form id="formEditarLote">
-
+            <form id="formEditarLote" method="POST">
+            <fieldset id="fromularioEdicionLote">
                 <input type="hidden" id="lote_id" name="lote_id">
 
                 <!-- Producto -->
@@ -91,13 +91,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
+            </fieldset>
             </form>
         </div>
 
         <!-- Tabla de Lotes -->
         <table id="tablaLotes" class="table table-striped">
             <thead>
-                <tr>
+                <tr> 
                     <th>Producto</th>
                     <th>Lote</th>
                     <th>Unidades</th>
@@ -119,9 +120,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <script>
         // Activar/desactivar campo de caducidad según checkbox
-        document.getElementById('esPerecibleEditar').addEventListener('change', function () {
-            document.getElementById('fechaCaducidadEditar').disabled = !this.checked;
-        });
+        $(document).ready(function () {
+    $('#esPerecibleEditar').on('change', function () {
+        $('#fechaCaducidadEditar').prop('disabled', !this.checked);
+    });
+
+    $('#fromularioEdicionLote').prop('disabled', true);
+});
+
     </script>
 </body>
 </html>

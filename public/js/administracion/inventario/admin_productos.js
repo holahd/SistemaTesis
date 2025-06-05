@@ -1,5 +1,8 @@
 
 $(document).ready(function () {
+
+    $('#formulario_edicion').prop('disabled', true);
+
     if ($('#productos2').length > 0) {
         $('#tablaProductos').DataTable({
             ajax: {
@@ -153,6 +156,7 @@ $(document).ready(function () {
                     $('#formEditarProducto').trigger('reset');
                     $('#imagen_producto').attr('src', '../../../img/default.jpg');
                     $('#tablaProductos').DataTable().ajax.reload(null, false);
+                    $('#formulario_edicion').prop('disabled', true);
                 } else {
                     alert('Error: ' + respuesta.mensaje);
                 }
@@ -166,6 +170,7 @@ $(document).ready(function () {
 
 // Cargar valores en campos del formulario
 function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, subcategoria_id, imagen) {
+    $('#formulario_edicion').prop('disabled', false);
     $('#producto_id').val(producto_id);
     $('#nombre').val(nombre);
     $('#descripcion').val(descripcion);
