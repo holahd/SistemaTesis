@@ -19,16 +19,13 @@ $(document).ready(function () {
                             <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
                             <div class="card-body">
                                 <h5 class="card-title">${respuesta.nombre}</h5>
-                                <p class="card-text">${respuesta.descripcion}</p>
-                                <p class="card-text"><strong>$${respuesta.precio}</strong></p>
                                 <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
-                                <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subCategoria}</p>
+                            <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                                  <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
                                    data-nombre="${respuesta.nombre}" 
-                                   data-descripcion="${respuesta.descripcion}"
-                                   data-precio="${respuesta.precio}" 
+                                   data-descripcion="${respuesta.descripcion}"                                  
                                    data-categoria="${respuesta.categoria}" 
-                                   data-subcategoria="${respuesta.subCategoria}"
+                                   data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
                             </div>
                         </div>
@@ -46,9 +43,8 @@ $(document).ready(function () {
                     localStorage.setItem("producto", JSON.stringify({
                         nombre: $(this).data("nombre"),
                         descripcion: $(this).data("descripcion"),
-                        precio: $(this).data("precio"),
                         categoria: $(this).data("categoria"),
-                        subCategoria: $(this).data("subcategoria"),
+                        subcategoria: $(this).data("subcategoria"),
                         foto: $(this).data("foto")
                     }));
 
@@ -87,9 +83,9 @@ $(document).ready(function () {
 
             var categoria = $('#categoria option:selected').text();
 
-            var subCategoria = $('#subcategoria option:selected').text();
+            var subcategoria = $('#subcategoria option:selected').text();
 
-            filtroTarjetasSubCategoria(categoria, subCategoria);
+            filtroTarjetasSubCategoria(categoria, subcategoria);
         });
 
 
@@ -121,16 +117,14 @@ function filtroTarjetasCategoria(categoria) {
                         <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
                         <div class="card-body">
                             <h5 class="card-title">${respuesta.nombre}</h5>
-                            <p class="card-text">${respuesta.descripcion}</p>
-                            <p class="card-text"><strong>$${respuesta.precio}</strong></p>
                             <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
-                            <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subCategoria}</p>
+                            <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                              <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"
-                                   data-precio="${respuesta.precio}" 
+                                  
                                    data-categoria="${respuesta.categoria}" 
-                                   data-subcategoria="${respuesta.subCategoria}"
+                                   data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
                         </div>
                     </div>
@@ -154,9 +148,9 @@ function filtroTarjetasCategoria(categoria) {
                 localStorage.setItem("producto", JSON.stringify({
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
-                    precio: $(this).data("precio"),
+                   
                     categoria: $(this).data("categoria"),
-                    subCategoria: $(this).data("subcategoria"),
+                    subcategoria: $(this).data("subcategoria"),
                     foto: $(this).data("foto")
                 }));
 
@@ -176,7 +170,7 @@ function filtroTarjetasCategoria(categoria) {
 
 }
 
-function filtroTarjetasSubCategoria(categoria, subCategoria) {
+function filtroTarjetasSubCategoria(categoria, subcategoria) {
 
     $.ajax({
 
@@ -189,7 +183,7 @@ function filtroTarjetasSubCategoria(categoria, subCategoria) {
             respuesta.forEach(function (respuesta) {
 
 
-                if (respuesta.categoria === categoria && respuesta.subCategoria === subCategoria || subCategoria === "Seleccione una subcategoría" && respuesta.categoria === categoria) {
+                if (respuesta.categoria === categoria && respuesta.subcategoria === subcategoria || subcategoria === "Seleccione una subcategoría" && respuesta.categoria === categoria) {
 
 
                     // Crear la estructura HTML para cada tarjeta
@@ -200,15 +194,15 @@ function filtroTarjetasSubCategoria(categoria, subCategoria) {
                         <div class="card-body">
                             <h5 class="card-title">${respuesta.nombre}</h5>
                             <p class="card-text">${respuesta.descripcion}</p>
-                            <p class="card-text"><strong>$${respuesta.precio}</strong></p>
+                           
                             <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
-                            <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subCategoria}</p>
+                            <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                              <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"
-                                   data-precio="${respuesta.precio}" 
+                                 
                                    data-categoria="${respuesta.categoria}" 
-                                   data-subcategoria="${respuesta.subCategoria}"
+                                   data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
                         </div>
                     </div>
@@ -230,9 +224,9 @@ function filtroTarjetasSubCategoria(categoria, subCategoria) {
                 localStorage.setItem("producto", JSON.stringify({
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
-                    precio: $(this).data("precio"),
+                    
                     categoria: $(this).data("categoria"),
-                    subCategoria: $(this).data("subcategoria"),
+                    subcategoria: $(this).data("subcategoria"),
                     foto: $(this).data("foto")
                 }));
 
@@ -272,7 +266,7 @@ function buscarProducto() {
         console.error("No se puede acceder al contenido del iframe.");
         return;
     }
-
+ 
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     var productList = iframeDoc.getElementById('product-list'); // Asegúrate de que el div esté dentro del iframe
 
@@ -303,17 +297,15 @@ function buscarProducto() {
                         <div class="card">
                             <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
                             <div class="card-body">
-                                <h5 class="card-title">${respuesta.nombre}</h5>
-                                <p class="card-text">${respuesta.descripcion}</p>
-                                <p class="card-text"><strong>$${respuesta.precio}</strong></p>
+                                <h5 class="card-title">${respuesta.nombre}</h5>                            
                                 <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
-                                <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subCategoria}</p>
+                                <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                                  <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
                                    data-nombre="${respuesta.nombre}" 
-                                   data-descripcion="${respuesta.descripcion}"
-                                   data-precio="${respuesta.precio}" 
+                                   
+                                   
                                    data-categoria="${respuesta.categoria}" 
-                                   data-subcategoria="${respuesta.subCategoria}"
+                                   data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
                             </div>
                         </div>
@@ -330,9 +322,8 @@ function buscarProducto() {
                 localStorage.setItem("producto", JSON.stringify({
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
-                    precio: $(this).data("precio"),
                     categoria: $(this).data("categoria"),
-                    subCategoria: $(this).data("subcategoria"),
+                    subcategoria: $(this).data("subcategoria"),
                     foto: $(this).data("foto")
                 }));
 
@@ -356,10 +347,9 @@ $(document).ready(function () {
 
         if (producto) {
             $("#nombre").text(producto.nombre);
-            $("#descripcion").text(producto.descripcion);
-            $("#precio").text("$" + producto.precio);
+            $("#descripcion").html(producto.descripcion.replace(/\n/g, "<br>"));
             $("#categoria").text(producto.categoria);
-            $("#subCategoria").text(producto.subCategoria);
+            $("#subcategoria").text(producto.subcategoria);
             $("#foto").attr("src", "../" + producto.foto);
         } else {
             alert("No hay producto seleccionado.");

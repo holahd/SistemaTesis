@@ -28,7 +28,7 @@
         <div class="col-md-6">
             <h2 id="nombre">Nombre del Producto</h2>
             <p id="descripcion" class="text-muted">Descripción detallada del producto con sus características principales.</p>
-            <h4 class="text-primary" id="precio">$99.99</h4>
+
             <div class="d-flex">
                 <span class="badge bg-info me-2" id="categoria">Categoría</span>
                 <span class="badge bg-warning" id="subCategoria">Subcategoría</span>
@@ -38,7 +38,7 @@
                 <input type="number" id="cantidad" class="form-control w-50" min="1" value="1">
             </div>
             <div class="mt-3">
-                <button class="btn btn-success mt-3" id="cotizarYa">Cotizar</button>
+                
                 <button class="btn btn-warning mt-3 btn-add-lista" id="añadirLista">Agregar a la lista</button>
             </div>
         </div>

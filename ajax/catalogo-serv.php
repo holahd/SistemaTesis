@@ -48,7 +48,7 @@ switch ($_GET["op"]) {
         break;
 
     case 'subcategorias':
-        if (isset($_POST['categoria_id'])) {
+        
             $categoria_id = $_POST['categoria_id'];
 
             $res = $productos->listarSubCategorias($categoria_id);
@@ -62,9 +62,7 @@ switch ($_GET["op"]) {
             }
 
             echo json_encode($data);
-        } else {
-            echo json_encode(['error' => 'ID de categoría no enviado']);
-        }
+        
         break;
 
     case 'registrarProducto':
