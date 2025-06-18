@@ -1,51 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Inicio de sesión</title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="../../public/css/bootstrap.css">
+
+    <!-- Estilos personalizados -->
+    <style>
+    body {
+        background: linear-gradient(to right, #e3f2fd, #e8f5e9);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    form#fom1 {
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        margin: auto;
+        padding: 2rem 2rem 2.5rem;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        font-weight: bold;
+    }
+
+    .logo-container {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .logo-container img {
+        max-width: 80px;
+        height: auto;
+    }
+
+    .system-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #d32f2f;
+    }
+</style>
 
 </head>
 
 <body>
-
     <form id="fom1" name="fom1">
-        <div class="container my-5">
+        <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="container p-4 shadow rounded-2 bg-success-subtle">
-                        <h4 class="text-center mb-4">Iniciar sesión</h4>
-                            <div class="mb-3 row-cols-4">
-                                <label for="correo" class="form-label">Correo&nbsp;</label>
-                                <input type="mail" class="form-control" id="correo" name="correo" required
-                                    placeholder="Ingresa tu Correo">
-                            </div>
-                            <div class="mb-3 row-cols-4">
-                                <label for="contraseña" class="form-label">Contraseña&nbsp;</label>
-                                <input type="password" class="form-control" id="contraseña" name="contraseña" required
-                                    placeholder="Ingresa tu contraseña">
-                            </div>
-                            <div class="d-grid gap-2">
-                               
-                            </div>
-                            <div class="d-flex justify-content-center">
-                                <button type="submit" class="btn btn-primary col-md-6">Iniciar sesión</button>
-                            </div>
+                <div class="col-md-6 col-lg-5">
+                    <div class="login-card p-5">
+
+                        <!-- Logo y nombre del sistema -->
+                        <div class="logo-container">
+                            <img src="./../../public/img/administrador/Pyro_emblem_RED.png" alt="Logo FireSafe">
+                            <div class="system-name mt-2">FireSafe</div>
+                        </div>
+
+                        <h3 class="text-center mb-4 text-primary">Iniciar sesión</h3>
+
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">Correo electrónico</label>
+                            <input type="mail" class="form-control" id="correo" name="correo" required
+                                placeholder="ejemplo@correo.com">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="contraseña" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="contraseña" name="contraseña" required
+                                placeholder="********">
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
     </form>
 
+    <!-- Scripts -->
+    <script src="../../public/js/bootstrap.js"></script>
+    <script src="../../public/js/jquery-3.7.1.min.js"></script>
+    <script src="../../public/js/administracion/login.js"></script>
 </body>
-<script src="../../public/js/bootstrap.js"></script>
-<script src="../../public/js/jquery-3.7.1.min.js"></script>
-<script src="../../public/js/administracion/login.js"></script>
 
 </html>

@@ -127,16 +127,14 @@ switch ($_GET["op"]) {
 
         $data = array();
 
-        while ($reg = $res->fetch_object()) {
+        while ($reg = $res->fetch_object()) { 
             $data[] = array(
-                "id" => $reg->id,
+                "producto_id" => $reg->producto_id,
                 "nombre" => $reg->nombre,
                 "descripcion" => $reg->descripcion,
-                "precio" => $reg->precio,
                 "categoria" => $reg->categoria,
-                "subCategoria" => $reg->sub_categoria,
-                "fecha_caducidad" => ($reg->fecha_caducidad == null) ? "No aplica" : $reg->fecha_caducidad,
-                "foto" => $reg->foto
+                "subcategoria" => $reg->subcategoria,
+                "foto" => $reg->imagen
             );
         }
 

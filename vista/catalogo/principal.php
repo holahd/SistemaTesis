@@ -2,6 +2,10 @@
 <html lang="es">
 
 <head>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo</title>
@@ -36,10 +40,10 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Imagen al lado izquierdo -->
             <div>
-                <img src="../../public/img/catalogo/Pyro_emblem_RED.png" alt="Logo" class="img-fluid" width="64" height="64" id="logo">
+                <img src="../../public/img/catalogo/Pyro_emblem_RED.png" title="Logo" alt="Logo" class="img-fluid" width="64" height="64" id="logo">
 
             </div>
-
+ 
             <!-- Título centrado -->
             <h1 class="text-center" style="font-size: 20px;">FireSafe - Catálogo de seguridad contra incendios</h1>
 

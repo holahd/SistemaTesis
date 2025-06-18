@@ -15,6 +15,7 @@ $(document).ready(function () {
     actualizarEstadoBoton();
     // 🛒 Añadir a la lista de cotización
     $(document).on("click", "#añadirLista", function () {
+        let id= $("#producto_id").val();
         let nombre = $("#nombre").text();
         let descripcion = $("#descripcion").html();
         console.log(descripcion);
@@ -25,7 +26,7 @@ $(document).ready(function () {
 
         // Verificar si el producto ya está en la lista
         if (!listaProductos.some(p => p.nombre === nombre)) {
-            listaProductos.push({ nombre, descripcion, cantidad });
+            listaProductos.push({ id ,nombre, descripcion, cantidad });
 
             // Guardar la lista actualizada en localStorage
             localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));

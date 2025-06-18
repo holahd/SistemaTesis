@@ -22,6 +22,7 @@ $(document).ready(function () {
                                 <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
                             <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                                  <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
+                                      data-producto_id="${respuesta.producto_id}"
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"                                  
                                    data-categoria="${respuesta.categoria}" 
@@ -41,6 +42,7 @@ $(document).ready(function () {
 
                     // Guardar datos en localStorage
                     localStorage.setItem("producto", JSON.stringify({
+                        producto_id: $(this).data("producto_id"),
                         nombre: $(this).data("nombre"),
                         descripcion: $(this).data("descripcion"),
                         categoria: $(this).data("categoria"),
@@ -120,9 +122,9 @@ function filtroTarjetasCategoria(categoria) {
                             <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
                             <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                              <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
+                                      data-producto_id="${respuesta.producto_id}"
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"
-                                  
                                    data-categoria="${respuesta.categoria}" 
                                    data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
@@ -146,6 +148,7 @@ function filtroTarjetasCategoria(categoria) {
 
                 // Guardar datos en localStorage
                 localStorage.setItem("producto", JSON.stringify({
+                    producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
                    
@@ -198,6 +201,7 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                             <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
                             <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                              <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
+                                      data-id="${respuesta.producto_id}"
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"
                                  
@@ -222,6 +226,7 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
 
                 // Guardar datos en localStorage
                 localStorage.setItem("producto", JSON.stringify({
+                    producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
                     
@@ -260,15 +265,20 @@ $('#buscarProducto').click(function () {
 
 function buscarProducto() {
     var buscar = $('#barraBusqueda').val();
-    var iframe = document.getElementById('product-frame'); // Asegúrate de tener el ID correcto del iframe
+    if (!buscar) {
+        alert("Por favor, ingresa un término de búsqueda.");
+        return;
+    }
+
+    var iframe = document.getElementById('product-frame');
 
     if (!iframe || !iframe.contentWindow || !iframe.contentDocument) {
         console.error("No se puede acceder al contenido del iframe.");
         return;
     }
- 
+
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    var productList = iframeDoc.getElementById('product-list'); // Asegúrate de que el div esté dentro del iframe
+    var productList = iframeDoc.getElementById('product-list');
 
     if (!productList) {
         console.error("No se encontró #product-list dentro del iframe.");
@@ -282,8 +292,6 @@ function buscarProducto() {
         type: 'POST',
         data: { buscar: buscar },
         success: function (respuesta) {
-            console.log("Respuesta recibida:", respuesta); // Para depuración
-
             try {
                 respuesta = JSON.parse(respuesta);
             } catch (e) {
@@ -300,10 +308,10 @@ function buscarProducto() {
                                 <h5 class="card-title">${respuesta.nombre}</h5>                            
                                 <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
                                 <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
-                                 <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
+                                <a href="detalle_producto.php" class="btn btn-primary ver-mas"
+                                      data-producto_id="${respuesta.producto_id}"
                                    data-nombre="${respuesta.nombre}" 
-                                   
-                                   
+                                   data-descripcion="${respuesta.descripcion}"
                                    data-categoria="${respuesta.categoria}" 
                                    data-subcategoria="${respuesta.subcategoria}"
                                    data-foto="${respuesta.foto}">Ver más</a>
@@ -314,29 +322,34 @@ function buscarProducto() {
                 productList.innerHTML += tarjetaHTML;
             });
 
-            // Evento para capturar clic en "Ver más"
-            $(".ver-mas").click(function (e) {
-                e.preventDefault(); // Evita que el enlace recargue la página
+          
+            const verMasBtns = iframeDoc.querySelectorAll(".ver-mas");
+            verMasBtns.forEach(function (btn) {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
 
-                // Guardar datos en localStorage
-                localStorage.setItem("producto", JSON.stringify({
-                    nombre: $(this).data("nombre"),
-                    descripcion: $(this).data("descripcion"),
-                    categoria: $(this).data("categoria"),
-                    subcategoria: $(this).data("subcategoria"),
-                    foto: $(this).data("foto")
-                }));
+                    localStorage.setItem("producto", JSON.stringify({
+                        producto_id: btn.dataset.producto_id,
+                        nombre: btn.dataset.nombre,
+                        descripcion: btn.dataset.descripcion,
+                        categoria: btn.dataset.categoria,
+                        subcategoria: btn.dataset.subcategoria,
+                        foto: btn.dataset.foto
+                    }));
 
-                // Redirigir a la página de detalles
-                window.location.href = "detalle_producto.php";
+                    document.getElementById("product-frame").src = "detalle_producto.php";
+
+                });
             });
         },
+
         error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Error en la petición AJAX:", textStatus, errorThrown);
-            productList.innerHTML = '<p class="text-center text-danger">Hubo un error al cargar los productos.</p>';
+            console.error("Error en la búsqueda:", textStatus, errorThrown);
+            productList.innerHTML = '<p class="text-center text-danger">Error al buscar productos.</p>';
         }
     });
 }
+
 
 $(document).ready(function () {
 
@@ -346,10 +359,11 @@ $(document).ready(function () {
         let producto = JSON.parse(localStorage.getItem("producto"));
 
         if (producto) {
+            $("#producto_id").val(producto.producto_id); // Asigna el ID del producto al campo oculto
             $("#nombre").text(producto.nombre);
             $("#descripcion").html(producto.descripcion.replace(/\n/g, "<br>"));
             $("#categoria").text(producto.categoria);
-            $("#subcategoria").text(producto.subcategoria);
+            $("#subCategoria").text(producto.subcategoria);
             $("#foto").attr("src", "../" + producto.foto);
         } else {
             alert("No hay producto seleccionado.");

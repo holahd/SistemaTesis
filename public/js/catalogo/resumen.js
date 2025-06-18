@@ -1,4 +1,4 @@
- function actualizarEstadoBoton() {
+function actualizarEstadoBoton() {
     const lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
 
     // Buscar el botón en el documento padre
@@ -9,18 +9,18 @@
         botonCotizar.prop("disabled", lista.length === 0);
     }
 }
- 
- $(document).ready(function () {
-console.log(localStorage.getItem("listaCotizacion"));
-            function cargarResumen() {
-                let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
-                let html = "";
 
-                if (lista.length === 0) {
-                    html = `<tr><td colspan="4" class="text-center">No hay productos en la lista.</td></tr>`;
-                } else {
-                    lista.forEach((item, index) => {
-                        html += `
+$(document).ready(function () {
+    console.log(localStorage.getItem("listaCotizacion"));
+    function cargarResumen() {
+        let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let html = "";
+
+        if (lista.length === 0) {
+            html = `<tr><td colspan="4" class="text-center">No hay productos en la lista.</td></tr>`;
+        } else {
+            lista.forEach((item, index) => {
+                html += `
                             <tr data-index="${index}">
                                 <td>${item.nombre}</td>
                                 <td>${item.descripcion.replace(/\n/g, "<br>")}</td>
@@ -36,78 +36,86 @@ console.log(localStorage.getItem("listaCotizacion"));
                                 </td>
                             </tr>
                         `;
-                    });
-                }
+            });
+        }
 
-                $("#tablaResumen").html(html);
-            }
+        $("#tablaResumen").html(html);
+    }
 
+    cargarResumen();
+
+    // Aumentar cantidad
+    $(document).on("click", ".btn-sumar", function () {
+        let index = $(this).closest("tr").data("index");
+        let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        lista[index].cantidad = parseInt(lista[index].cantidad) + 1;
+        localStorage.setItem("listaCotizacion", JSON.stringify(lista));
+        cargarResumen();
+    });
+
+    // Disminuir cantidad
+    $(document).on("click", ".btn-restar", function () {
+        let index = $(this).closest("tr").data("index");
+        let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        if (lista[index].cantidad > 1) {
+            lista[index].cantidad = parseInt(lista[index].cantidad) - 1;
+            localStorage.setItem("listaCotizacion", JSON.stringify(lista));
             cargarResumen();
+        }
+    });
 
-            // Aumentar cantidad
-            $(document).on("click", ".btn-sumar", function () {
-                let index = $(this).closest("tr").data("index");
-                let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
-                lista[index].cantidad = parseInt(lista[index].cantidad) + 1;
-                localStorage.setItem("listaCotizacion", JSON.stringify(lista));
-                cargarResumen();
-            });
+    // Eliminar producto
+    $(document).on("click", ".btn-eliminar", function () {
+        let index = $(this).closest("tr").data("index");
+        let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        lista.splice(index, 1);
+        localStorage.setItem("listaCotizacion", JSON.stringify(lista));
+        cargarResumen();
+        actualizarEstadoBoton();
+    });
 
-            // Disminuir cantidad
-            $(document).on("click", ".btn-restar", function () {
-                let index = $(this).closest("tr").data("index");
-                let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
-                if (lista[index].cantidad > 1) {
-                    lista[index].cantidad = parseInt(lista[index].cantidad) - 1;
-                    localStorage.setItem("listaCotizacion", JSON.stringify(lista));
+    // Enviar cotización
+    $("#enviarCotizacion").click(function () {
+        let correo = $("#correoContacto").val().trim();
+        let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+
+        if (!correo) {
+            alert("Por favor, ingresa un correo de contacto.");
+            return;
+        }
+
+        if (lista.length === 0) {
+            alert("No hay productos en la lista.");
+            return;
+        }
+
+        $.ajax({
+            url: './../../ajax/cotizacion-serv.php?op=solicitar',
+            type: 'POST',
+            data: {
+                email: correo,
+                productos: JSON.stringify(lista)
+            },
+            dataType: 'json',
+            success: function (respuesta) {
+                if (respuesta.status === 'ok') {
+                    alert("Solicitud de cotización enviada correctamente.");
+
+                    // Limpiar todo
+                    localStorage.removeItem("listaCotizacion");
                     cargarResumen();
+                    $("#correoContacto").val("");
+                    actualizarEstadoBoton();
+                } else {
+                    alert("Hubo un error al procesar la cotización.");
+                    console.error("Error del servidor:", respuesta);
                 }
-            });
-
-            // Eliminar producto
-            $(document).on("click", ".btn-eliminar", function () {
-                let index = $(this).closest("tr").data("index");
-                let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
-                lista.splice(index, 1);
-                localStorage.setItem("listaCotizacion", JSON.stringify(lista));
-                cargarResumen();
-                actualizarEstadoBoton();
-            });
-
-            // Enviar cotización
-            $("#enviarCotizacion").click(function () {
-                let correo = $("#correoContacto").val().trim();
-                let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
-
-                if (!correo) {
-                    alert("Por favor, ingresa un correo de contacto.");
-                    return;
-                }
-
-                if (lista.length === 0) {
-                    alert("No hay productos en la lista.");
-                    return;
-                }
-
-                // Aquí deberás hacer tu lógica para enviar al backend
-                // Por ejemplo:
-                /*
-                $.post("guardarCotizacion.php", {
-                    correo: correo,
-                    productos: JSON.stringify(lista)
-                }, function (respuesta) {
-                    alert("Cotización enviada correctamente");
-                });
-                */
-
-                console.log("Correo:", correo);
-                console.log("Productos:", lista);
-
-                // Limpiar todo
-                localStorage.removeItem("listaCotizacion");
-                cargarResumen();
-                $("#correoContacto").val("");
-                alert("Solicitud de cotización enviada.");
-                actualizarEstadoBoton();
-            });
+            },
+            error: function (error) {
+                alert("Error al conectar con el servidor.");
+                console.error(error);
+            }
         });
+
+    });
+});

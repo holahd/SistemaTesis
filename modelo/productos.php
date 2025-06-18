@@ -56,8 +56,8 @@ class productos{
 
     }
 
-    public function buscar(){
-        $sql="call sp_producto(1,0,'aaaaa','aaaaa',1,'aaaaaa');";
+    public function buscar($b){
+        $sql="call  sp_buscar_producto('$b');";
     
         return ejecutarConsultaSP($sql);
     }

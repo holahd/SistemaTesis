@@ -76,13 +76,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <div class="container mt-3 ">
         <div class="nav-tabs-custom">
 
-            <a class="nav-link" href="#" onclick="cambiarPagina(this, 'registrar_productos.php')">Registrar productos</a>
-            <a class="nav-link active" href="#" onclick="cambiarPagina(this, 'ver_productos.php')">Ver productos</a>
+            <a class="nav-link active" href="#" onclick="cambiarPagina(this, 'cotizaciones_pend.php')">Solicitudes pendientes</a>
+            <a class="nav-link " href="#" onclick="cambiarPagina(this, 'ver_productos.php')">Ver productos</a>
 
         </div>
     </div>
 
-    <iframe id="contentFrame" src="ver_productos.php" style="width: 100%; height: 85vh; border: none;"></iframe>
+    <iframe id="contentFrame" src="cotizaciones_pend.php" style="width: 100%; height: 85vh; border: none;"></iframe>
 
     <script src="../../public/js/bootstrap.js"></script>
     <script>

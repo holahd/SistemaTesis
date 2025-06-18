@@ -22,6 +22,7 @@
     </div>
 
     <div class="row">
+        <h6 hidden id="producto_id">12345</h6>
         <div class="col-md-6">
             <img id="foto" src="ruta_de_la_imagen.jpg" class="img-fluid border rounded" alt="Producto">
         </div>
@@ -31,7 +32,7 @@
 
             <div class="d-flex">
                 <span class="badge bg-info me-2" id="categoria">Categoría</span>
-                <span class="badge bg-warning" id="subCategoria">Subcategoría</span>
+                <span class="badge bg-dark" id="subCategoria">Subcategoría</span>
             </div>
             <div class="mt-3">
                 <label for="cantidad" class="form-label">Cantidad:</label>
