@@ -75,7 +75,7 @@ $(document).ready(function () {
 
     
 
-    // Evento delegado para botón de editar
+   
     $(document).on('click', '.editar', function () {
         let producto = $(this).data('producto');
         let numLote = $(this).data('numLote');

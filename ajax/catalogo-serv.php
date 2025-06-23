@@ -26,7 +26,8 @@ switch ($_GET["op"]) {
                 "categoria_id" => $reg->categoria_id,
                 "subcategoria_id" => $reg->subcategoria_id,
                 "descontinuado" => $reg->descontinuado,
-                "foto" => $reg->imagen
+                "foto" => $reg->imagen,
+                "stock_total" => $reg->stock_total
             );
         }
 
@@ -146,20 +147,20 @@ switch ($_GET["op"]) {
 
         $rutaBD = null;
 
-        // Ruta de la imagen actual (viene desde un campo oculto del formulario)
+        
         $imagenActual = isset($_POST['ruta_imagen']) ? $_POST['ruta_imagen'] : null;
 
-        // Verificar si se subió una nueva imagen
+        
         if (isset($_FILES["input_imagen"]) && $_FILES["input_imagen"]["error"] === UPLOAD_ERR_OK) {
             $nombreArchivo = time() . "_" . basename($_FILES["input_imagen"]["name"]);
             $rutaDestino = "../public/img/" . $nombreArchivo;
             $rutaBD = $rutaDestino;
 
             if (move_uploaded_file($_FILES["input_imagen"]["tmp_name"], $rutaDestino)) {
-                // Dar permisos
+                
                 exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
 
-                // Eliminar imagen anterior si existe
+                
                 if (!empty($imagenActual) && file_exists($imagenActual)) {
                     unlink($imagenActual);
                 }
@@ -171,7 +172,7 @@ switch ($_GET["op"]) {
             }
         }
 
-        // Llamar al método actualizar (si no se subió imagen, $rutaBD queda null)
+     
         $res = $productos->actualizar(
             $_POST['producto_id'],
             $_POST['nombre'],
@@ -219,7 +220,7 @@ switch ($_GET["op"]) {
         break;
 
     default:
-        // Acción no reconocida
+        
         $respuesta['mensaje'] = 'Acción no válida.';
         echo json_encode($respuesta);
         break;

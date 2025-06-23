@@ -28,7 +28,7 @@ $('#registroProducto').submit(function (e) {
                 $caracteristicasObligatoriasDiv.empty();
                 $categoriaSelect.val('');
                 if (confirm('Producto registrado correctamente. ¿Desea registrar un lote para este producto?')) {
-                    // Redirigir a la página de registro de lote
+                    
                      window.location.href = './../../../../vista/administracion/inventario/registrar_lote.php';
                 }
 
@@ -48,12 +48,12 @@ $(document).ready(function () {
 
     if ($('#reg_productos').length > 0)
         document.getElementById('foto').addEventListener('change', function () {
-            const file = this.files[0]; // Obtener el archivo seleccionado
-            const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+            const file = this.files[0]; 
+            const maxSize = 2 * 1024 * 1024; 
 
             if (file && file.size > maxSize) {
                 alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
-                this.value = ''; // Vaciar el input para que no envíe la imagen
+                this.value = ''; 
             } else {
 
             }
@@ -67,12 +67,12 @@ $(document).ready(function () {
 
     if ($('#reg_productos').length > 0)
         document.getElementById('foto').addEventListener('change', function () {
-            const file = this.files[0]; // Obtener el archivo seleccionado
-            const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+            const file = this.files[0]; 
+            const maxSize = 2 * 1024 * 1024; 
 
             if (file && file.size > maxSize) {
                 document.getElementById('errorMensaje').style.display = 'block';
-                this.value = ''; // Vaciar el input para que no envíe la imagen
+                this.value = ''; 
             } else {
                 document.getElementById('errorMensaje').style.display = 'none';
             }
@@ -88,7 +88,7 @@ const $caracteristicasExtrasDiv = $("#caracteristicasExtras");
 const $btnAgregar = $("#agregarCaracteristica");
 let extrasCount = 0;
 
-// Características obligatorias por categoría
+
 const obligatorias = {
     1: ["Tipo de agente", "Capacidad", "Color", "Presión"],
     2: ["Tallas disponibles", "Material", "Color", "Tipo de protección"]
@@ -117,7 +117,7 @@ function crearCampo(nombre, esObligatorio = false) {
     return $group;
 }
 
-// Al cambiar categoría, mostrar campos obligatorios
+
 $categoriaSelect.on("change", function () {
     const categoria = $(this).val();
     $caracteristicasObligatoriasDiv.empty();
@@ -127,10 +127,10 @@ $categoriaSelect.on("change", function () {
             $caracteristicasObligatoriasDiv.append($campo);
         });
     }
-    // Opcional: aquí podrías resetear extrasCount o limpiar extras si quieres
+   
 });
 
-// Agregar campos extra dinámicamente
+
 $btnAgregar.on("click", function () {
     if (extrasCount >= 3) return;
     const $campoExtra = crearCampo("", false);

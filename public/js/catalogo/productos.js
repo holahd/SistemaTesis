@@ -12,8 +12,8 @@ $(document).ready(function () {
 
                 respuesta.forEach(function (respuesta) {
 
-                    // Crear la estructura HTML para cada tarjeta
-                    var tarjetaHTML = `
+                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0) {
+                        var tarjetaHTML = `
                     <div class="col-md-4 mb-3">
                         <div class="card">
                             <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
@@ -33,11 +33,12 @@ $(document).ready(function () {
                     </div>
                 `;
 
-                    // Insertar la tarjeta en el div con id 'product-list'
-                    $('#product-list').append(tarjetaHTML);
+                        
+                        $('#product-list').append(tarjetaHTML);
+                    }
                 });
 
-                // Evento para capturar clic en "Ver más"
+                
                 $(".ver-mas").click(function (e) {
 
                     // Guardar datos en localStorage
@@ -50,7 +51,7 @@ $(document).ready(function () {
                         foto: $(this).data("foto")
                     }));
 
-                    // Redirigir a la página de detalles
+                   
                     window.location.href = "detalle_producto.php";
                 });
 
@@ -63,7 +64,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
 
-    if ($('#productos').length > 0) { 
+    if ($('#productos').length > 0) {
 
 
 
@@ -112,8 +113,8 @@ function filtroTarjetasCategoria(categoria) {
 
 
 
-                    // Crear la estructura HTML para cada tarjeta
-                    var tarjetaHTML = `
+                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0) {
+                        var tarjetaHTML = `
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
@@ -133,31 +134,30 @@ function filtroTarjetasCategoria(categoria) {
                 </div>
             `;
 
-                    // Insertar la tarjeta en el div con id 'product-list'
-                    $('#product-list').append(tarjetaHTML);
-                } else {
-                    return;
+                        
+                        $('#product-list').append(tarjetaHTML);
+                    } else {
+                        return;
+
+                    }
 
                 }
-
             });
 
-            // Evento para capturar clic en "Ver más"
+            
             $(".ver-mas").click(function (e) {
-                e.preventDefault(); // Evita que el enlace recargue la página
-
-                // Guardar datos en localStorage
+                e.preventDefault(); 
                 localStorage.setItem("producto", JSON.stringify({
                     producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
-                   
+
                     categoria: $(this).data("categoria"),
                     subcategoria: $(this).data("subcategoria"),
                     foto: $(this).data("foto")
                 }));
 
-                // Redirigir a la página de detalles
+               
                 window.location.href = "detalle_producto.php";
             });
 
@@ -189,7 +189,7 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                 if (respuesta.categoria === categoria && respuesta.subcategoria === subcategoria || subcategoria === "Seleccione una subcategoría" && respuesta.categoria === categoria) {
 
 
-                    // Crear la estructura HTML para cada tarjeta
+                    if (respuesta.descontinuado==="no" && respuesta.stock_total > 0) {
                     var tarjetaHTML = `
                 <div class="col-md-4 mb-3">
                     <div class="card">
@@ -213,29 +213,26 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                 </div>
             `;
 
-                    // Insertar la tarjeta en el div con id 'product-list'
+                    
                     $('#product-list').append(tarjetaHTML);
-                } else {
+                }} else {
                     return;
                 }
             });
 
-            // Evento para capturar clic en "Ver más"
+           
             $(".ver-mas").click(function (e) {
-                e.preventDefault(); // Evita que el enlace recargue la página
-
-                // Guardar datos en localStorage
+                e.preventDefault(); 
                 localStorage.setItem("producto", JSON.stringify({
                     producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
                     descripcion: $(this).data("descripcion"),
-                    
+
                     categoria: $(this).data("categoria"),
                     subcategoria: $(this).data("subcategoria"),
                     foto: $(this).data("foto")
                 }));
 
-                // Redirigir a la página de detalles
                 window.location.href = "detalle_producto.php";
             });
 
@@ -285,7 +282,7 @@ function buscarProducto() {
         return;
     }
 
-    productList.innerHTML = ""; // Limpiar antes de agregar nuevos resultados
+    productList.innerHTML = ""; 
 
     $.ajax({
         url: '../../ajax/catalogo-serv.php?op=buscar',
@@ -300,6 +297,7 @@ function buscarProducto() {
             }
 
             respuesta.forEach(function (respuesta) {
+                if (respuesta.descontinuado==="no" && respuesta.stock_total > 0) {
                 var tarjetaHTML = `
                     <div class="col-md-4 mb-3">
                         <div class="card">
@@ -320,9 +318,9 @@ function buscarProducto() {
                     </div>
                 `;
                 productList.innerHTML += tarjetaHTML;
-            });
+        }});
 
-          
+
             const verMasBtns = iframeDoc.querySelectorAll(".ver-mas");
             verMasBtns.forEach(function (btn) {
                 btn.addEventListener("click", function (e) {
@@ -359,7 +357,7 @@ $(document).ready(function () {
         let producto = JSON.parse(localStorage.getItem("producto"));
 
         if (producto) {
-            $("#producto_id").val(producto.producto_id); // Asigna el ID del producto al campo oculto
+            $("#producto_id").val(producto.producto_id); 
             $("#nombre").text(producto.nombre);
             $("#descripcion").html(producto.descripcion.replace(/\n/g, "<br>"));
             $("#categoria").text(producto.categoria);
@@ -367,7 +365,7 @@ $(document).ready(function () {
             $("#foto").attr("src", "../" + producto.foto);
         } else {
             alert("No hay producto seleccionado.");
-            window.location.href = "catalogo.php"; // Redirige si no hay datos
+            window.location.href = "catalogo.php";
         }
 
     }

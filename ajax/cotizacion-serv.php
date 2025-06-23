@@ -13,7 +13,7 @@ switch ($_GET["op"]) {
 
         $email = $_POST['email'];
         $productos = json_decode($_POST['productos'], true);
-        $idCot = $cotizacion->registrarCotizacion($email); // retorna el LAST_INSERT_ID()
+        $idCot = $cotizacion->registrarCotizacion($email); 
 
         if (!$idCot) {
             echo json_encode(['status' => 'error', 'message' => 'Error al registrar la cotización'.$idCot]);
@@ -61,7 +61,7 @@ switch ($_GET["op"]) {
                 "producto" => $reg->producto,
                 "cantidad" => $reg->cantidad_solicitada,
                 "stock" => $reg->stock_total,
-                "precio" => $reg->precio_unitario_mayor
+                "precio" => $reg->precio_unitario_crudo
             );
         }
 
@@ -69,10 +69,11 @@ switch ($_GET["op"]) {
 
         break;
 
-    case 'eliminar':
-        $loteId = $_POST["id"];
-        $res = $lotes->eliminar($loteId);
-        echo json_encode(["status" => "ok", "mensaje" => "Lote eliminado"]);
+    case 'listarUmbrales':
+        
+
+        
+
         break;
 
     case 'listarproductos':

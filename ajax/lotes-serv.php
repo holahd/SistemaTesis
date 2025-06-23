@@ -79,7 +79,7 @@ switch ($_GET["op"]) {
         $data = array();
 
         while ($reg = $res->fetch_object()) {
-            $data[] = array("producto" => $reg->nombre); // Asegúrate de que se llame "nombre"
+            $data[] = array("producto" => $reg->nombre); 
         }
 
         if (empty($data)) {

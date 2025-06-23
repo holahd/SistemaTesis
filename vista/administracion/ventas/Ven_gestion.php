@@ -20,7 +20,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuarios</title>
-    <link href="../../public/css/bootstrap.css" rel="stylesheet">
+    <link href="../../../public/css/bootstrap.css" rel="stylesheet">
 
     <style>
         /* Contenedor en forma de pestañas */
@@ -76,23 +76,23 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <div class="container mt-3 ">
         <div class="nav-tabs-custom">
 
-            <a class="nav-link active" href="#" onclick="cambiarPagina(this, 'cotizaciones_pend.php')">Solicitudes pendientes</a>
-            <a class="nav-link " href="#" onclick="cambiarPagina(this, 'ver_productos.php')">Ver productos</a>
+            <a class="nav-link active" href="#" onclick="cambiarPagina(this, 'cotizaciones_pendientes.php')">Solicitudes pendientes</a>
+            <a class="nav-link " href="#" onclick="cambiarPagina(this, 'cotizaciones_enviadas.php')">Solicitudes enviadas</a>
+            <a class="nav-link " href="#" onclick="cambiarPagina(this, 'cotizaciones_vendidas.php')">Solicitudes confirmadas</a>
 
         </div>
     </div>
 
-    <iframe id="contentFrame" src="cotizaciones_pend.php" style="width: 100%; height: 85vh; border: none;"></iframe>
+    <iframe id="contentFrame" src="cotizaciones_pendientes.php" style="width: 100%; height: 85vh; border: none;"></iframe>
 
-    <script src="../../public/js/bootstrap.js"></script>
+    <script src="../../../public/js/bootstrap.js"></script>
     <script>
         function cambiarPagina(element, url) {
             document.getElementById('contentFrame').src = url;
 
-            // Quita la clase "active" de todas las pestañas
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
-            // Agrega "active" solo a la pestaña clickeada
+            
             element.classList.add('active');
         }
     </script>

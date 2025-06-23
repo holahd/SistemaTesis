@@ -89,14 +89,14 @@ $(document).ready(function () {
         });
     }
 
-    // Evento delegado para botón de eliminar
+   
     $(document).on('click', '.eliminar', function () {
         let id = $(this).data('producto_id');
         let nombre = $(this).data('nombre');
         eliminarProducto(id, nombre);
     });
 
-    // Evento delegado para botón de editar
+    
     $(document).on('click', '.editar', function () {
         let producto_id = $(this).data('producto_id');
         let nombre = $(this).data('nombre');
@@ -109,7 +109,7 @@ $(document).ready(function () {
 
     });
 
-    // Vista previa de la imagen cargada
+   
     $("#input_imagen").change(function (event) {
         let archivo = event.target.files[0];
         if (archivo) {
@@ -127,7 +127,7 @@ $(document).ready(function () {
         restaurarProducto(id, nombre);
     });
 
-    // Manejo del formulario de edición
+   
     $('#formEditarProducto').submit(function (e) {
         e.preventDefault();
 
@@ -168,7 +168,7 @@ $(document).ready(function () {
     });
 });
 
-// Cargar valores en campos del formulario
+
 function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, subcategoria_id, imagen) {
     $('#formulario_edicion').prop('disabled', false);
     $('#producto_id').val(producto_id);
@@ -178,7 +178,7 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
     $('#ruta_imagen').val(imagen);
     alert('Imagen cargada: ' + $('#ruta_imagen').val());
 
-    // Primero cargamos las categorías
+  
     $.ajax({
         url: '../../../ajax/catalogo-serv.php?op=categorias',
         type: 'POST',
@@ -194,10 +194,10 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
                 $categoria.append(`<option value="${item.categoria_id}">${item.nombre}</option>`);
             });
 
-            // Establecer categoría seleccionada
+           
             $categoria.val(categoria_id).trigger('change');
 
-            // Cargar subcategorías una vez se haya establecido la categoría
+            
             let formulario = new FormData();
             formulario.append('categoria_id', categoria_id);
 
@@ -217,7 +217,7 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
                         $subcategoria.append(`<option value="${item.categoria_id}">${item.nombre}</option>`);
                     });
 
-                    // Establecer subcategoría seleccionada
+                    
                     $subcategoria.val(subcategoria_id);
                 },
                 error: function (xhr, status, error) {
@@ -232,7 +232,7 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
     });
 }
 
-// Eliminar producto
+
 function eliminarProducto(id, nombre) {
     if (confirm('¿Seguro que deseas descontinuar el producto "' + nombre + '"?')) {
         $.post('../../../ajax/catalogo-serv.php?op=eliminar', { codigo: id }, function (respuesta) {
@@ -246,7 +246,7 @@ function eliminarProducto(id, nombre) {
 }
 
 
-// Función para restaurar producto
+
 function restaurarProducto(id, nombre) {
     if (confirm(`¿Seguro que deseas restaurar el producto "${nombre}"?`)) {
         $.post('../../../ajax/catalogo-serv.php?op=restaurar', { codigo: id }, function (respuesta) {
