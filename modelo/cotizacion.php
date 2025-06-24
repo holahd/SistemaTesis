@@ -33,37 +33,15 @@ class Cotizacion
 }
 
 
-    public function editar($id, $productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $proveedor, $precioUnit)
-    {
-        $fechaCadSQL = empty($fechaCad) ? 'NULL' : "'$fechaCad'";
-        $sql = "CALL sp_lote(
-            3,
-            $id,  
-            '$productoNombre', 
-            $numLote, 
-            $cantidad, 
-            '$fechaIngreso', 
-            '$proveedor', 
-            $fechaCadSQL, 
-            $precioUnit
-        );";
-        return ejecutarConsultaSP($sql);
-    }
-
-    public function eliminar($loteId)
-    {
-        $sql = "CALL sp_lote(4,  '', $loteId, 0, '2000-01-01', '', NULL, 0);";
-        return ejecutarConsultaSP($sql);
-    }
     public function listarNombresProductos()
     {
         $sql = "CALL sp_lote(5,00,'', 0, 0, '2000-01-01', '', NULL, 0);";
         return ejecutarConsultaSP($sql);
     }
 
-    public function listar_pendientes(){
+    public function listar($estado){
 
-         $sql = "CALL sp_cotizacion(5, 0, ' ', NULL, 'espera', NULL);";
+         $sql = "CALL sp_cotizacion(5, 0, ' ', NULL, '$estado', NULL);";
          return ejecutarConsultaSP($sql);
     }
 
@@ -72,4 +50,26 @@ class Cotizacion
         $sql = "CALL sp_cotizacion(6, $idCot, ' ', NULL, 'espera', NULL);";
         return ejecutarConsultaSP($sql);
     }
+
+    public function cambio_estado($idVen, $idcot, $estado){
+
+        $sql = "CALL sp_cotizacion(3, $idcot, ' ', NULL, '$estado', $idVen);";
+        return ejecutarConsultaSP($sql);
+
+        
+    }
+
+    public function colocar_precio($id, $precio, $sTotal)
+    {
+        $sql = "CALL sp_detalle_cotizacion(3, $id, NULL , NULL, NULL , $precio, $sTotal);";
+        return ejecutarConsultaSP($sql);
+    }
+
+
+    public function listar_detalle_completo($id)
+    {
+        $sql = "CALL sp_detalle_cotizacion(1, NULL, $id , NULL, NULL , NULL, NULL);";
+        return ejecutarConsultaSP($sql);
+    }
+
 }

@@ -1,10 +1,12 @@
 <?php
 
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require("../modelo/usuarios.php");
 
 $usuarios = new usuarios();
@@ -19,14 +21,14 @@ switch ($_GET["op"]) {
         $_SESSION['correo'] = $_POST['correo'];
 
         while ($reg = $res->fetch_object()) {
-
+            $_SESSION['usuario_id'] = $reg->usuario_id;
             $_SESSION['nombre'] = $reg->nombre;
             $_SESSION['rol'] = $reg->rol;
             $_SESSION['estado'] = $reg->estado;
         }
 
         if ($res->num_rows > 0) {
-            $respuesta['mensaje'] = 'Bienvenido '. $_SESSION['nombre'];
+            $respuesta['mensaje'] = 'Bienvenido ' . $_SESSION['nombre'];
             $respuesta['tipo'] = 1;
             $respuesta['estado'] = $_SESSION['estado'];
         } else {
@@ -84,7 +86,7 @@ switch ($_GET["op"]) {
 
     case 'editar':
 
-        $res = $usuarios->editar($_POST['usuario_id'],$_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
+        $res = $usuarios->editar($_POST['usuario_id'], $_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
 
         if ($res) {
             $respuesta['mensaje'] = 'Usuario editado correctamente';
@@ -119,7 +121,7 @@ switch ($_GET["op"]) {
         $res = $usuarios->reestablecerContrasena($_POST['email']);
 
         if ($res) {
-            
+
             $respuesta['mensaje'] = 'Contraseña reestablecida correctamente';
             $respuesta['tipo'] = 1;
         } else {
@@ -133,8 +135,12 @@ switch ($_GET["op"]) {
 
     case 'logout':
 
-        session_destroy();
-        header("Location: ../vista/login.html");
+        session_unset();     // Limpia todas las variables de sesión
+        session_destroy();   // Destruye la sesión
+
+        // Redirige al login o página principal
+        header("Location: ../vista/administracion/login.html");
+        exit();
 
         break;
 
@@ -143,4 +149,3 @@ switch ($_GET["op"]) {
         $respuesta['mensaje'] = 'Acción no válida.';
         break;
 }
-?>

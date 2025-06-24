@@ -3,6 +3,7 @@ session_start();
 $_SESSION['acceso_permitido'] = true;
 if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
     header("Location: login.html");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -123,9 +124,12 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
                 <i class="bi bi-graph-up-arrow"></i> Umbral de ganancia
             </a>
         <?php } ?>
+        <a href="#" data-page="inicio.php" onclick="cerrarSesion()">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </a>
         <div class="spacer"></div>
         <div class="footer">
-            <?php echo $_SESSION['nombre']; ?> | <?php echo $_SESSION['rol']; ?>
+            <?php echo $_SESSION['nombre']; ?> | <?php echo $_SESSION['rol']; ?> 
         </div>
     </div>
 
@@ -156,31 +160,62 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
         });
 
         function cargarPagina(elemento, page) {
-    if (hayCambiosPendientes) {
-        Swal.fire({
-            title: 'Cambios sin guardar',
-            text: "Tienes cambios sin guardar. ¿Seguro que quieres cambiar de sección y perderlos?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, continuar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                hayCambiosPendientes = false;
+            if (hayCambiosPendientes) {
+                Swal.fire({
+                    title: 'Cambios sin guardar',
+                    text: "Tienes cambios sin guardar. ¿Seguro que quieres cambiar de sección y perderlos?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, continuar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        hayCambiosPendientes = false;
+                        document.getElementById('mainFrame').src = page;
+                        document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+                        elemento.classList.add('active');
+                    }
+                    // Si cancela, no hace nada, se queda en la página actual
+                });
+            } else {
                 document.getElementById('mainFrame').src = page;
                 document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
                 elemento.classList.add('active');
             }
-            // Si cancela, no hace nada, se queda en la página actual
-        });
-    } else {
-        document.getElementById('mainFrame').src = page;
-        document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-        elemento.classList.add('active');
-    }
-}
-
+        }
+    </script>
+    <script>
+        function cerrarSesion() {
+            Swal.fire({
+                title: 'Cerrar sesión',
+                text: "¿Estás seguro de que quieres cerrar sesión?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: './../../ajax/administrador.php?op=logout',
+                        type: 'POST',
+                        
+                        success: function(response) {
+                            if (response.status === 'ok') {
+                                window.location.href = 'login.html';
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'No se pudo cerrar la sesión. Inténtalo de nuevo.', 'error');
+                        }
+                    });
+                    
+                }
+            });
+        }
     </script>
 </body>
 

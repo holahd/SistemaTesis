@@ -75,7 +75,8 @@ function abrirDetalle(id, email) {
                 <input type="number" class="form-control form-control-sm precio_final" min="0" step="0.01"
                   name="precio_final_${index}" placeholder="Ej: 25.00"
                   data-precio="${item.precio}" data-cantidad="${item.cantidad}">
-              </td>
+                  <input type="hidden" name="detalle_id_${index}" value="${item.id}">
+               </td>
             </tr>
           `;
         });
@@ -84,6 +85,7 @@ function abrirDetalle(id, email) {
               </tbody>
             </table>
           </div>
+          <input type="hidden" id="cotizacion_id_oculto" value="${id}">
           <div class="mt-3">
             <label class="form-label">Correo electrónico del cliente:</label>
             <div id="correo"><strong>${email}</strong></div>
@@ -138,15 +140,97 @@ function abrirDetalle(id, email) {
 
 
 function enviarCotizacion() {
-  // Aquí recolectarás datos, generarás PDF y enviarás correo
-  alert("Función de envío en desarrollo...");
+  const productos = [];
+  let errores = [];
+
+  $('#detalle-modal-body table tbody tr').each(function (i) {
+    const $fila = $(this);
+    const nombre = $fila.find('td:eq(0)').text();
+    const cantidad = parseInt($fila.find('td:eq(1)').text());
+    const precioBase = parseFloat($fila.find('input.precio_final').data('precio'));
+    const precioFinalStr = $fila.find('input.precio_final').val();
+    const precioFinal = parseFloat(precioFinalStr);
+    const detalleId = $fila.find('input[type="hidden"]').val();
+    
+
+    // Validaciones
+    if (precioFinalStr.trim() === '') {
+      errores.push(`El precio del producto "${nombre}" no puede estar vacío.`);
+    } else if (isNaN(precioFinal)) {
+      errores.push(`El precio del producto "${nombre}" no es válido.`);
+    } else if (precioFinal <= 0) {
+      errores.push(`El precio del producto "${nombre}" debe ser mayor que cero.`);
+    } else if (precioFinal < precioBase) {
+      errores.push(`El precio del producto "${nombre}" no puede ser menor al precio de compra ($${precioBase.toFixed(2)}).`);
+    } else if (precioFinal > precioBase * 5) {
+      errores.push(`El precio del producto "${nombre}" parece demasiado alto. Verifique el valor ingresado.`);
+    }
+
+    const subtotal = (cantidad * precioFinal).toFixed(2);
+    productos.push({
+      producto: nombre,
+      cantidad: cantidad,
+      precio_final: precioFinal,
+      subtotal: parseFloat(subtotal),
+      id: detalleId
+    });
+  });
+
+  if (errores.length > 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Errores en los precios',
+      html: '<ul style="text-align:left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>'
+    });
+    return;
+  }
+
+  const email = $('#correo').text().trim();
+  const cotizacionId = $('#cotizacion_id_oculto').val();
+  // Confirmar antes de enviar
+  Swal.fire({
+    title: '¿Enviar cotización?',
+    text: "Se enviará la cotización al cliente.",
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#28a745',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, enviar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: '../../../ajax/cotizacion-serv.php?op=enviarCotizacion',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          correo: email,
+          asunto: 'Cotización solicitada',
+          cotizacion_id: cotizacionId,
+          productos: productos
+        }),
+        success: function (response) {
+          const r = JSON.parse(response);
+          if (r.success) {
+            Swal.fire('Éxito', 'La cotización fue enviada correctamente.', 'success');
+          } else {
+            Swal.fire('Error', 'No se pudo enviar el correo: ' + r.error, 'error');
+          }
+        },
+        error: function () {
+          Swal.fire('Error', 'Falló la conexión con el servidor.', 'error');
+        }
+      });
+      
+    }
+  });
 }
+
 
 function mostrarDetalleConfirmacion(id, correo) {
   correo = decodeURIComponent(correo);
 
   $.ajax({
-    url: '../../../ajax/cotizacion-serv.php?op=listarDetalle',
+    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleCompleto',
     method: 'POST',
     data: { id },
     success: function (data) {
@@ -158,7 +242,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <table class="table table-bordered">
             <thead class="table-light">
               <tr>
-                <th>Producto</th><th>Cantidad</th><th>Precio</th>
+                <th>Producto</th><th>Cantidad</th><th>Precio</th><th>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -170,6 +254,7 @@ function mostrarDetalleConfirmacion(id, correo) {
             <td>${d.producto}</td>
             <td>${d.cantidad}</td>
             <td>$${d.precio}</td>
+            <td>$${d.total}</td>
           </tr>`;
       });
 
@@ -202,33 +287,6 @@ function mostrarDetalleConfirmacion(id, correo) {
   });
 }
 
-function enviarCotizacion() {
-  const datos = {
-    cotizacion_id: $('#cotizacion_id').val(),
-    nombre: $('#nombre').val(),
-    identificacion: $('#identificacion').val(),
-    direccion: $('#direccion').val(),
-    correo: $('#correo').val(),
-    telefono: $('#telefono').val()
-  };
-
-  if (Object.values(datos).some(v => !v.trim())) {
-    alert('Completa todos los campos');
-    return;
-  }
-
-  $.ajax({
-    url: '../../../ajax/cotizacion-serv.php?op=confirmarVenta',
-    method: 'POST',
-    data: datos,
-    success: () => {
-      alert('Venta confirmada correctamente');
-      $('#modalDetalle').modal('hide');
-      cargarCotizaciones('../../../ajax/cotizacion-serv.php?op=listarPendientes', '#cotizaciones-container', 'mostrarDetalleConfirmacion');
-    },
-    error: () => alert('Error al confirmar venta')
-  });
-}
 
 
 function mostrarDetalleVendida(id, correo) {

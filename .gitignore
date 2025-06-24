@@ -1,0 +1,5 @@
+/temp/
+vendor/
+config/clave_secreta.php
+*.log
+pest/

@@ -2,9 +2,10 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+session_start();
 
 require("../modelo/cotizacion.php");
-
+require("../mail/mailer.php");
 $cotizacion = new Cotizacion();
 
 switch ($_GET["op"]) {
@@ -37,7 +38,37 @@ switch ($_GET["op"]) {
         break;
 
     case 'listarPendientes':
-        $res = $cotizacion->listar_pendientes();
+        $res = $cotizacion->listar("espera");
+        $data = array();
+
+        while ($reg = $res->fetch_object()) {
+            $data[] = array(
+                "cotizacion_id" => $reg->cotizacion_id,
+                "correo" => $reg->email_cliente,
+                "productos_solicitados" => $reg->productos_solicitados
+            );
+        }
+
+        echo json_encode($data);
+        break;
+    
+    case 'listarEnviados':
+        $res = $cotizacion->listar("enviado");
+        $data = array();
+
+        while ($reg = $res->fetch_object()) {
+            $data[] = array(
+                "cotizacion_id" => $reg->cotizacion_id,
+                "correo" => $reg->email_cliente,
+                "productos_solicitados" => $reg->productos_solicitados
+            );
+        }
+
+        echo json_encode($data);
+        break;
+    
+    case 'listarConfirmados':
+        $res = $cotizacion->listar("vendido");
         $data = array();
 
         while ($reg = $res->fetch_object()) {
@@ -58,6 +89,7 @@ switch ($_GET["op"]) {
 
         while ($reg = $res->fetch_object()) {
             $data[] = array(
+                "id" => $reg->detalle_id,
                 "producto" => $reg->producto,
                 "cantidad" => $reg->cantidad_solicitada,
                 "stock" => $reg->stock_total,
@@ -69,12 +101,25 @@ switch ($_GET["op"]) {
 
         break;
 
-    case 'listarUmbrales':
-        
+        case 'listarDetalleCompleto':
 
-        
+        $res = $cotizacion->listar_detalle_Completo($_POST['id']);
+        $data = array();
+
+        while ($reg = $res->fetch_object()) {
+            $data[] = array(
+                "id" => $reg->detalle_id,
+                "producto" => $reg->producto,
+                "cantidad" => $reg->cantidad,
+                "precio" => $reg->pvp,
+                "total" => $reg->total
+            );
+        }
+
+        echo json_encode($data);
 
         break;
+
 
     case 'listarproductos':
         $res = $lotes->listarNombresProductos();
@@ -97,4 +142,28 @@ switch ($_GET["op"]) {
         }
 
         break;
+
+    case 'enviarCotizacion':
+
+        $datos = json_decode(file_get_contents('php://input'), true);
+
+        
+
+        $productos = $datos['productos'];
+
+        $idCot = $datos['cotizacion_id'];
+
+        foreach ($productos as $producto) {
+            $idProducto = $producto['id'];
+            $precio = $producto['precio_final'];
+            $subtotal = $producto['subtotal'];
+
+            $cotizacion->colocar_precio($idProducto, $precio, $subtotal);
+        }
+
+        $cotizacion->cambio_estado($_SESSION['usuario_id'], $idCot, 'enviado');
+
+        echo json_encode(enviarCorreo($datos));
+        break;
+        
 }
