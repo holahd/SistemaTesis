@@ -81,6 +81,8 @@ switch ($_GET["op"]) {
 
         echo json_encode($data);
         break;
+    
+    
 
     case 'listarDetalle':
 
@@ -165,5 +167,28 @@ switch ($_GET["op"]) {
 
         echo json_encode(enviarCorreo($datos));
         break;
+    
+    case 'confirmarVenta':
+        
+        $confirmar = $cotizacion -> confirmar_datos_cot(
+            $_POST['cotizacion_id'],
+            $_POST['nombre'],
+            $_POST['identificacion'],
+            $_POST['direccion'],
+            $_POST['correo'],
+            $_POST['telefono']
+        );
+
+        if (!$confirmar) {
+            echo json_encode(['status' => 'error', 'message' => 'Error al confirmar la cotización']);
+            exit;
+        }
+        else {
+            $cotizacion->cambio_estado($_SESSION['usuario_id'], $_POST['cotizacion_id'], 'vendido');
+            echo json_encode(['status' => 'ok', 'message' => 'Cotización confirmada con éxito']);
+        }
+
+
+    break;
         
 }

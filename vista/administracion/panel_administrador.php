@@ -128,8 +128,10 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
             <i class="bi bi-box-arrow-right"></i> Cerrar sesión
         </a>
         <div class="spacer"></div>
+
+
         <div class="footer">
-            <?php echo $_SESSION['nombre']; ?> | <?php echo $_SESSION['rol']; ?> 
+            <?php echo $_SESSION['nombre']; ?> | <?php echo $_SESSION['rol']; ?>
         </div>
     </div>
 
@@ -137,86 +139,59 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
         <iframe id="mainFrame" src="inicio.php"></iframe>
     </div>
 
-    <script src="../../public/js/bootstrap.bundle.js"></script>
-    <script src="../../public/js/jquery-3.7.1.min.js"></script>
-    <script src="./../../public/js/sweetalert2.all.js"></script>
-    <script>
-        let hayCambiosPendientes = false;
 
-        window.addEventListener('beforeunload', function(e) {
-            if (hayCambiosPendientes) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
+    <div id="noti-popup" style="
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #fefefe;
+  border: 1px solid #888;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  padding: 15px;
+  z-index: 9999;
+  min-width: 250px;
+">
+  <div style="display:flex; justify-content: space-between; align-items: center;">
+    <strong>🔔 Notificación</strong>
+    <button id="noti-popup-close" style="
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+    ">✖</button>
+  </div>
+  <p id="noti-popup-msg" style="margin: 10px 0 0;"></p>
+</div>
 
-        window.addEventListener('message', function(event) {
-            console.log("Mensaje recibido en panel padre:", event.data);
-            if (event.data === 'cambiosPendientes') {
-                hayCambiosPendientes = true;
-            } else if (event.data === 'cambiosGuardados') {
-                hayCambiosPendientes = false;
-            }
-        });
 
-        function cargarPagina(elemento, page) {
-            if (hayCambiosPendientes) {
-                Swal.fire({
-                    title: 'Cambios sin guardar',
-                    text: "Tienes cambios sin guardar. ¿Seguro que quieres cambiar de sección y perderlos?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, continuar',
-                    cancelButtonText: 'Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        hayCambiosPendientes = false;
-                        document.getElementById('mainFrame').src = page;
-                        document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-                        elemento.classList.add('active');
-                    }
-                    // Si cancela, no hace nada, se queda en la página actual
-                });
-            } else {
-                document.getElementById('mainFrame').src = page;
-                document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-                elemento.classList.add('active');
-            }
-        }
-    </script>
-    <script>
-        function cerrarSesion() {
-            Swal.fire({
-                title: 'Cerrar sesión',
-                text: "¿Estás seguro de que quieres cerrar sesión?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: './../../ajax/administrador.php?op=logout',
-                        type: 'POST',
-                        
-                        success: function(response) {
-                            if (response.status === 'ok') {
-                                window.location.href = 'login.html';
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        },
-                        error: function() {
-                            Swal.fire('Error', 'No se pudo cerrar la sesión. Inténtalo de nuevo.', 'error');
-                        }
-                    });
-                    
-                }
-            });
-        }
-    </script>
+    <!-- Botón flotante y lista de notificaciones -->
+    <div id="notificaciones-container" style="position: fixed; top: 20px; right: 20px; z-index: 9998;">
+        <button class="btn btn-light border shadow-sm position-relative" onclick="toggleNotificaciones()">
+            <i class="bi bi-bell-fill"></i>
+            <span id="badge-noti" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">1+</span>
+        </button>
+
+        <div id="lista-notificaciones" class="bg-white border rounded shadow mt-2 p-2" style="display: none; width: 300px; max-height: 300px; overflow-y: auto;">
+            <strong>🔔 Notificaciones</strong>
+            <ul id="notificaciones-lista" class="list-unstyled mt-2 mb-2 small"></ul>
+            <button onclick="eliminarTodas()" class="btn btn-sm btn-outline-danger w-100">Eliminar todas</button>
+        </div>
+
+    </div>
+
 </body>
+<script>
+  const USER_ROLE = '<?php echo $_SESSION['rol']; ?>'; // "ventas", "inventario" o "admin"
+</script>
+<script src="../../public/js/bootstrap.bundle.js"></script>
+<script src="../../public/js/jquery-3.7.1.min.js"></script>
+<script src="./../../public/js/sweetalert2.all.js"></script>
+<script src="./../../public/js/administracion/panel_Admin.js"></script>
+
+<script src="./../../public/js/administracion/notificaciones.js"></script>
+
 
 </html>

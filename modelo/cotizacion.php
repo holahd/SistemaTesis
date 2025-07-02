@@ -72,4 +72,9 @@ class Cotizacion
         return ejecutarConsultaSP($sql);
     }
 
+    public function confirmar_datos_cot($idCot, $nombre, $identificacion, $direccion, $correo, $telefono)
+    {
+        $sql = "CALL confirmar_cot('$correo' , '$nombre', '$identificacion', '$direccion','$telefono' , $idCot);";
+        return ejecutarConsultaSP($sql);
+    }
 }

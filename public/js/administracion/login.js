@@ -19,14 +19,23 @@ $('#fom1').submit(function (e) {
 
             if (respuesta.tipo === 1) {
                 if (respuesta.estado === "1") {
-                    alert(respuesta.mensaje);
+                    Swal.fire({
+                        title: 'Inicio de sesión',
+                        text: respuesta.mensaje,
+                        icon: 'success'
+                    }).then((result) => {
                     window.location.href = 'panel_administrador.php';
+                    });
                 } else {
                     alert('Cambie su contraseña');
                     window.location.href = 'log_cambioContra.php';
                 }
             } else {
-                alert('Error: ' + respuesta.mensaje);
+                Swal.fire({
+                        title: 'Error',
+                        text: respuesta.mensaje,
+                        icon: 'error'
+                    })
             }
         },
         error: function (xhr, status, error) {

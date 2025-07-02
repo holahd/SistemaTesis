@@ -64,7 +64,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <script>
     $(document).ready(function() {
         cargarCotizaciones(
-  '../../../ajax/cotizacion-serv.php?op=listarVendidas',
+  '../../../ajax/cotizacion-serv.php?op=listarConfirmados',
   '#cotizaciones-container',
   'mostrarDetalleVendida'
 );

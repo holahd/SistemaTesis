@@ -2,12 +2,12 @@
 
 
 
-require('../config/conexion.php');
+require_once('../config/conexion.php');
 
 class usuarios{
 	
 	public function construct(){
-		}
+	}
 		
 
 

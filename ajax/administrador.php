@@ -7,9 +7,11 @@ error_reporting(E_ALL);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require("../modelo/usuarios.php");
+require_once("../modelo/usuarios.php");
+require_once("../modelo/notificaciones.php");
 
 $usuarios = new usuarios();
+
 
 switch ($_GET["op"]) {
     case 'login':
@@ -138,9 +140,23 @@ switch ($_GET["op"]) {
         session_unset();     // Limpia todas las variables de sesión
         session_destroy();   // Destruye la sesión
 
-        // Redirige al login o página principal
-        header("Location: ../vista/administracion/login.html");
-        exit();
+        break;
+
+    case 'notificaciones':
+
+        $notificaciones = new notificaciones();
+        $cotizaciones = $notificaciones->listar_notificaciones($_POST['UmbralExpiracion'], $_POST['UmbralStock']);
+
+        $respuesta = [];
+        while ($fila = $cotizaciones->fetch_object()) {
+            $respuesta[] = [
+                'mensaje' => $fila->mensaje,
+                'tipo' => $fila->tipo,
+                'id_ref' => $fila->ref_id
+            ];
+        }
+        echo json_encode($respuesta);
+
 
         break;
 

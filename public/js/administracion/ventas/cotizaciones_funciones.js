@@ -151,7 +151,7 @@ function enviarCotizacion() {
     const precioFinalStr = $fila.find('input.precio_final').val();
     const precioFinal = parseFloat(precioFinalStr);
     const detalleId = $fila.find('input[type="hidden"]').val();
-    
+
 
     // Validaciones
     if (precioFinalStr.trim() === '') {
@@ -220,7 +220,7 @@ function enviarCotizacion() {
           Swal.fire('Error', 'Falló la conexión con el servidor.', 'error');
         }
       });
-      
+
     }
   });
 }
@@ -262,10 +262,10 @@ function mostrarDetalleConfirmacion(id, correo) {
       <h5>Datos del cliente</h5>
       <form id="form-confirmacion">
         <input type="hidden" id="cotizacion_id" value="${id}">
-        <div class="mb-2"><label class="form-label">Nombre / Razón Social</label>
+        <div class="mb-2"><label class="form-label">Nombre</label>
           <input type="text" class="form-control" id="nombre" required>
         </div>
-        <div class="mb-2"><label class="form-label">Cédula o RUC</label>
+        <div class="mb-2"><label class="form-label">Cédula</label>
           <input type="text" class="form-control" id="identificacion" required>
         </div>
         <div class="mb-2"><label class="form-label">Dirección</label>
@@ -287,18 +287,86 @@ function mostrarDetalleConfirmacion(id, correo) {
   });
 }
 
+function confirmarventa() {
+  const errores = [];
+
+  const nombre = $('#nombre').val().trim();
+  const identificacion = $('#identificacion').val().trim();
+  const direccion = $('#direccion').val().trim();
+  const correo = $('#correo').val().trim();
+  const telefono = $('#telefono').val().trim();
+  const cotizacionId = $('#cotizacion_id').val();
+
+  // Validaciones básicas
+  if (nombre === '') {
+    errores.push('El nombre o razón social no puede estar vacío.');
+  }
+  if (identificacion === '') {
+    errores.push('La cédula no puede estar vacía.');
+  } else if (!/^\d{10,13}$/.test(identificacion)) {
+    errores.push('La cédula debe tener entre 10 y 10 dígitos');
+  }
+  if (direccion === '') {
+    errores.push('La dirección no puede estar vacía.');
+  }
+  if (correo === '') {
+    errores.push('El correo no puede estar vacío.');
+  } else if (!/^\S+@\S+\.\S+$/.test(correo)) {
+    errores.push('El formato del correo no es válido.');
+  }
+  if (telefono === '') {
+    errores.push('El teléfono no puede estar vacío.');
+  } else if (!/^\d{10}$/.test(telefono)) {
+    errores.push('El teléfono debe tener 10 dígitos.');
+
+  }
+  if (errores.length > 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Errores en los datos del cliente',
+      html: '<ul style="text-align:left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>'
+    });
+    return;
+  }
+
+  // Enviar datos por AJAX
+  $.ajax({
+    url: '../../../ajax/cotizacion-serv.php?op=confirmarVenta',
+    method: 'POST',
+    data: {
+      cotizacion_id: cotizacionId,
+      nombre: nombre,
+      identificacion: identificacion,
+      direccion: direccion,
+      correo: correo,
+      telefono: telefono
+    },
+    success: function (response) {
+      const r = JSON.parse(response);
+      if (r.status === 'ok') {
+        Swal.fire('Éxito', r.message, 'success');
+        location.reload();
+      } else {
+        Swal.fire('Error', r.message, 'error');
+      }
+    },
+    error: function () {
+      Swal.fire('Error', 'Falló la conexión con el servidor.', 'error');
+    }
+  });
+}
 
 
 function mostrarDetalleVendida(id, correo) {
   correo = decodeURIComponent(correo);
 
   $.ajax({
-    url: '../../../ajax/cotizacion-serv.php?op=detalleVenta',
+    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleCompleto',
     method: 'POST',
     data: { id },
     success: function (data) {
       const venta = JSON.parse(data);
-      if (!venta || !venta.productos) return;
+      
 
       let tabla = `
         <div class="table-responsive mb-3">
@@ -327,7 +395,7 @@ function mostrarDetalleVendida(id, correo) {
         <h5>Datos del cliente</h5>
         <ul>
           <li><strong>Nombre:</strong> ${venta.cliente.nombre}</li>
-          <li><strong>Cédula/RUC:</strong> ${venta.cliente.identificacion}</li>
+          <li><strong>Cédula:</strong> ${venta.cliente.identificacion}</li>
           <li><strong>Correo:</strong> ${venta.cliente.correo}</li>
           <li><strong>Dirección:</strong> ${venta.cliente.direccion}</li>
           <li><strong>Teléfono:</strong> ${venta.cliente.telefono}</li>
