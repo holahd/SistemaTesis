@@ -112,13 +112,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
       <!-- Número de lote -->
       <div class="mb-3">
         <label for="numeroLote" class="form-label">Número de lote</label>
-        <input type="number" class="form-control" id="numeroLote" name="numeroLote" required>
+        <input type="text" class="form-control solo-numeros" id="numeroLote" name="numeroLote" required>
       </div>
 
       <!-- Unidades -->
       <div class="mb-3">
         <label for="unidades" class="form-label">Unidades</label>
-        <input type="number" class="form-control" id="unidades" name="cantidad" min="1" required>
+        <input type="text" class="form-control solo-numeros" id="unidades" name="cantidad" min="1" required>
       </div>
 
       <!-- Fecha de ingreso -->
@@ -150,8 +150,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
       <!-- Precio por unidad -->
       <div class="mb-3">
-        <label for="precioUnidad" class="form-label">Precio por unidad (antes de PVP)</label>
-        <input type="number" step="0.01" class="form-control" id="precioUnidad" name="precioUnitario" required>
+        <label for="precioUnidad" class="form-label ">Precio por unidad (antes de PVP)</label>
+        <input type="text" step="0.01" class="form-control solo-decimales" id="precioUnidad" name="precioUnitario" required>
       </div>
 
 
@@ -177,6 +177,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 </body>
 <script src="../../../public/js/jquery-3.7.1.min.js"></script>
 <script src="../../../public/js/bootstrap.js"></script>
+<script src="../../../public/js/sweetalert2.all.js"></script>
+<script src="../../../public/js/validaciones.js"></script>
 <script src="../../../public/js/administracion/inventario/reg_lotes.js"></script>
 
 </html>

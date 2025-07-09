@@ -80,7 +80,22 @@ $(document).ready(function () {
         let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
 
         if (!correo) {
-            alert("Por favor, ingresa un correo de contacto.");
+           swal.fire({
+                title: 'Error',
+                text: 'Por favor, ingrese un correo electrónico.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        if (!esEmailValido(correo)) {
+            swal.fire({
+                title: 'Error',
+                text: 'El correo electrónico ingresado no es válido.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
             return;
         }
 

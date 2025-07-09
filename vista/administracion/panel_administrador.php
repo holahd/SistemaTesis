@@ -21,6 +21,7 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
             background-color: #f8f9fa;
+            overflow-x: hidden;
         }
 
         .sidebar {
@@ -92,6 +93,14 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
             color: #6c757d;
             padding: 10px;
         }
+
+        .main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+            /* Esto evita que el iframe fuerce un ancho mayor */
+        }
     </style>
 </head>
 
@@ -153,18 +162,18 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
   z-index: 9999;
   min-width: 250px;
 ">
-  <div style="display:flex; justify-content: space-between; align-items: center;">
-    <strong>🔔 Notificación</strong>
-    <button id="noti-popup-close" style="
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <strong>🔔 Notificación</strong>
+            <button id="noti-popup-close" style="
       background: transparent;
       border: none;
       font-size: 1.2rem;
       line-height: 1;
       cursor: pointer;
     ">✖</button>
-  </div>
-  <p id="noti-popup-msg" style="margin: 10px 0 0;"></p>
-</div>
+        </div>
+        <p id="noti-popup-msg" style="margin: 10px 0 0;"></p>
+    </div>
 
 
     <!-- Botón flotante y lista de notificaciones -->
@@ -184,7 +193,7 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
 
 </body>
 <script>
-  const USER_ROLE = '<?php echo $_SESSION['rol']; ?>'; // "ventas", "inventario" o "admin"
+    const USER_ROLE = '<?php echo $_SESSION['rol']; ?>'; // "ventas", "inventario" o "admin"
 </script>
 <script src="../../public/js/bootstrap.bundle.js"></script>
 <script src="../../public/js/jquery-3.7.1.min.js"></script>

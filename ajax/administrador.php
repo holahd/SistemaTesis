@@ -140,6 +140,8 @@ switch ($_GET["op"]) {
         session_unset();     // Limpia todas las variables de sesión
         session_destroy();   // Destruye la sesión
 
+        
+
         break;
 
     case 'notificaciones':

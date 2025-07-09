@@ -99,7 +99,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                             </span>
                         </label>
                         <div class="input-group">
-                            <input type="number" class="form-control" id="margen_ganancia" name="margen_ganancia" step="0.01" min="0" required>
+                            <input type="text" class="form-control solo-numeros" id="margen_ganancia" name="margen_ganancia" step="0.01" min="0" required>
                             <span class="input-group-text">%</span>
                         </div>
                     </div>
@@ -135,7 +135,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="number" class="form-control cantidad_minima" name="cantidad_minima[]" required min="1">
+                                <input type="text" class="form-control cantidad_minima solo-numeros" name="cantidad_minima[]" required min="1">
                                 <span class="input-group-text">unidades</span>
                             </div>
                         </div>
@@ -147,7 +147,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="number" class="form-control descuento" name="descuento[]" step="0.01" min="0" required>
+                                <input type="text" class="form-control descuento solo-numeros" name="descuento[]" step="0.01" min="0" required>
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
@@ -165,6 +165,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <script src="../../public/js/bootstrap.bundle.js"></script>
     <script src="../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../public/js/sweetalert2.all.js"></script>
+    <script src="../../public/js/validaciones.js"></script>
     <script src="../../public/js/administracion/ajustar_desc.js"></script>
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

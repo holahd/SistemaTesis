@@ -103,9 +103,9 @@ switch ($_GET["op"]) {
 
         break;
 
-        case 'listarDetalleCompleto':
+        case 'listarDetalleEnviado':
 
-        $res = $cotizacion->listar_detalle_Completo($_POST['id']);
+        $res = $cotizacion->listar_detalle_enviado($_POST['id']);
         $data = array();
 
         while ($reg = $res->fetch_object()) {
@@ -113,6 +113,7 @@ switch ($_GET["op"]) {
                 "id" => $reg->detalle_id,
                 "producto" => $reg->producto,
                 "cantidad" => $reg->cantidad,
+                "stock" => $reg->stock_total,
                 "precio" => $reg->pvp,
                 "total" => $reg->total
             );
@@ -122,6 +123,54 @@ switch ($_GET["op"]) {
 
         break;
 
+
+
+        case 'listarDetalleVendido':
+
+        
+    $id = $_POST['id'];
+
+    // 1. Obtener detalles vendidos
+    $resDetalle = $cotizacion->listar_detalle_vendido($id);
+    $detalles = [];
+
+    while ($reg = $resDetalle->fetch_object()) {
+        $detalles[] = array(
+            "id" => $reg->detalle_id,
+            "producto" => $reg->producto,
+            "cantidad" => $reg->cantidad,
+            "stock" => $reg->stock_total,
+            "precio" => $reg->pvp,
+            "total" => $reg->total
+        );
+    }
+
+
+    // 2. Obtener datos del cliente
+    $resCliente = $cotizacion->listar_datos_cliente($id);
+    $cliente = null;
+
+    if ($row = $resCliente->fetch_object()) {
+        $cliente = array(
+            "nombre" => $row->nombre_cliente,
+            "correo" => $row->email_cliente,
+            "telefono" => $row->telefono_cliente,
+            "direccion" => $row->direccion_cliente,
+            "cedula" => $row->cedula_cliente
+            // agrega más campos si los tienes
+        );
+    }
+
+
+    // 3. Unir en una sola respuesta
+    $respuesta = array(
+        "detalles" => $detalles,
+        "cliente" => $cliente
+    );
+
+    echo json_encode($respuesta);
+
+        break;
 
     case 'listarproductos':
         $res = $lotes->listarNombresProductos();

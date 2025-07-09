@@ -2,6 +2,16 @@ $('#form_registro').submit(function (e) {
     e.preventDefault();
     var formulario = new FormData(this);
 
+    if (!esEmailValido('#email')) {
+        swal.fire({
+            title: 'Error',
+            text: 'El email ingresado no es válido.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+
     $.ajax({
         url: '../../ajax/administrador.php?op=register',
         type: 'POST',
@@ -14,12 +24,25 @@ $('#form_registro').submit(function (e) {
         success: function (respuesta) {
 
             respuesta = JSON.parse(respuesta);
-            console.log('Respuesta recibcorreoa:', respuesta.mensaje);
+            
 
             if (respuesta.tipo === 1) {
-                alert(respuesta.mensaje);
+                swal.fire({
+                    title: 'Éxito',
+                    text: respuesta.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                })
+                
+                
+
             } else {
-                alert('Error: ' + respuesta.mensaje);
+                swal.fire({
+                    title: 'Error',
+                    text: respuesta.mensaje,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             }
         },
         error: function (xhr, status, error) {

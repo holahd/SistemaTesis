@@ -51,13 +51,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <!-- Número de lote -->
                 <div class="form-group mb-3">
                     <label for="numeroLoteEditar" class="form-label">Número de lote</label>
-                    <input type="number" class="form-control" id="numeroLoteEditar" name="numeroLoteEditar" required>
+                    <input type="text" class="form-control solo-numeros" id="numeroLoteEditar" name="numeroLoteEditar" required>
                 </div>
 
                 <!-- Unidades -->
                 <div class="form-group mb-3">
                     <label for="unidadesEditar" class="form-label">Unidades</label>
-                    <input type="number" class="form-control" id="unidadesEditar" name="unidadesEditar" min="1" required>
+                    <input type="text" class="form-control solo-numeros" id="unidadesEditar" name="unidadesEditar" min="1" required>
                 </div>
 
                 <!-- Fecha ingreso -->
@@ -87,7 +87,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <!-- Precio unitario -->
                 <div class="form-group mb-3">
                     <label for="precioUnitarioEditar" class="form-label">Precio por unidad</label>
-                    <input type="number" class="form-control" step="0.01" id="precioUnitarioEditar" name="precioUnitarioEditar" required>
+                    <input type="text" class="form-control solo-decimales" step="0.01" id="precioUnitarioEditar" name="precioUnitarioEditar" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
@@ -115,6 +115,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/datatables.js"></script>
+    <script src="../../../public/js/sweetalert2.all.js"></script>
+    <script src="../../../public/js/validaciones.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_lotes.js"></script>
 

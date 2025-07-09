@@ -149,7 +149,10 @@ switch ($_GET["op"]) {
 
         
         $imagenActual = isset($_POST['ruta_imagen']) ? $_POST['ruta_imagen'] : null;
-
+  $caracteristicasTexto = '';
+            $caracteristicas = [];
+            $nombreArr = $_POST['caracteristica_nombre'] ?? [];
+            $descArr = $_POST['caracteristica_descripcion'] ?? [];
         
         if (isset($_FILES["input_imagen"]) && $_FILES["input_imagen"]["error"] === UPLOAD_ERR_OK) {
             $nombreArchivo = time() . "_" . basename($_FILES["input_imagen"]["name"]);
@@ -172,11 +175,19 @@ switch ($_GET["op"]) {
             }
         }
 
+        for ($i = 0; $i < count($nombreArr); $i++) {
+                    $nombre = trim($nombreArr[$i]);
+                    $desc = trim($descArr[$i]);
+                    if ($nombre !== '' && $desc !== '') {
+                        $caracteristicas[] = "$nombre: $desc";
+                    }
+                    $caracteristicasTexto = implode("\n", $caracteristicas);
+                }
      
         $res = $productos->actualizar(
             $_POST['producto_id'],
             $_POST['nombre'],
-            $_POST['descripcion'],
+             $caracteristicasTexto,
             $_POST['subcategoria'],
             $rutaBD
         );

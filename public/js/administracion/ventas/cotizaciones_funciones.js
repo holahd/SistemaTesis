@@ -72,7 +72,7 @@ function abrirDetalle(id, email) {
               <td>${item.stock}</td>
               <td>$${item.precio}</td>
               <td>
-                <input type="number" class="form-control form-control-sm precio_final" min="0" step="0.01"
+                <input type="text" class="form-control form-control-sm precio_final solo-decimales" min="0" step="0.01"
                   name="precio_final_${index}" placeholder="Ej: 25.00"
                   data-precio="${item.precio}" data-cantidad="${item.cantidad}">
                   <input type="hidden" name="detalle_id_${index}" value="${item.id}">
@@ -147,6 +147,7 @@ function enviarCotizacion() {
     const $fila = $(this);
     const nombre = $fila.find('td:eq(0)').text();
     const cantidad = parseInt($fila.find('td:eq(1)').text());
+    const stock = parseInt($fila.find('td:eq(2)').text());
     const precioBase = parseFloat($fila.find('input.precio_final').data('precio'));
     const precioFinalStr = $fila.find('input.precio_final').val();
     const precioFinal = parseFloat(precioFinalStr);
@@ -155,15 +156,25 @@ function enviarCotizacion() {
 
     // Validaciones
     if (precioFinalStr.trim() === '') {
+      $fila.addClass('table-danger');
       errores.push(`El precio del producto "${nombre}" no puede estar vacío.`);
     } else if (isNaN(precioFinal)) {
+      $fila.addClass('table-danger');
       errores.push(`El precio del producto "${nombre}" no es válido.`);
     } else if (precioFinal <= 0) {
+      $fila.addClass('table-danger');
       errores.push(`El precio del producto "${nombre}" debe ser mayor que cero.`);
     } else if (precioFinal < precioBase) {
+      $fila.addClass('table-danger');
       errores.push(`El precio del producto "${nombre}" no puede ser menor al precio de compra ($${precioBase.toFixed(2)}).`);
     } else if (precioFinal > precioBase * 5) {
+      $fila.addClass('table-danger');
       errores.push(`El precio del producto "${nombre}" parece demasiado alto. Verifique el valor ingresado.`);
+    }
+
+    if (cantidad > stock) {
+      $fila.addClass('table-danger');
+      errores.push(`No hay suficiente stock para el producto "${nombre}". Solicitado: ${cantidad}, disponible: ${stock}.`);
     }
 
     const subtotal = (cantidad * precioFinal).toFixed(2);
@@ -230,7 +241,7 @@ function mostrarDetalleConfirmacion(id, correo) {
   correo = decodeURIComponent(correo);
 
   $.ajax({
-    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleCompleto',
+    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleEnviado',
     method: 'POST',
     data: { id },
     success: function (data) {
@@ -242,7 +253,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <table class="table table-bordered">
             <thead class="table-light">
               <tr>
-                <th>Producto</th><th>Cantidad</th><th>Precio</th><th>Total</th>
+                <th>Producto</th><th>Cantidad</th><th>Stock disponible</th><th>Precio</th><th>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -253,7 +264,8 @@ function mostrarDetalleConfirmacion(id, correo) {
           <tr>
             <td>${d.producto}</td>
             <td>${d.cantidad}</td>
-            <td>$${d.precio}</td>
+            <td>${d.stock}</td>
+            <td>$${d.precio}</td>           
             <td>$${d.total}</td>
           </tr>`;
       });
@@ -266,7 +278,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <input type="text" class="form-control" id="nombre" required>
         </div>
         <div class="mb-2"><label class="form-label">Cédula</label>
-          <input type="text" class="form-control" id="identificacion" required>
+          <input type="text" class="form-control solo-numeros" id="identificacion" required>
         </div>
         <div class="mb-2"><label class="form-label">Dirección</label>
           <input type="text" class="form-control" id="direccion" required>
@@ -275,7 +287,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <input type="email" class="form-control" id="correo" value="${correo}" required>
         </div>
         <div class="mb-2"><label class="form-label">Teléfono</label>
-          <input type="text" class="form-control" id="telefono" required>
+          <input type="text" class="form-control solo-numeros" id="telefono" required>
         </div>
       </form>
       `;
@@ -320,6 +332,17 @@ function confirmarventa() {
     errores.push('El teléfono debe tener 10 dígitos.');
 
   }
+  $('#detalle-modal-body table tbody tr').each(function () {
+    const $fila = $(this);
+    const nombreProducto = $fila.find('td:eq(0)').text().trim();
+    const cantidad = parseInt($fila.find('td:eq(1)').text());
+    const stock = parseInt($fila.find('td:eq(2)').text());
+
+    if (cantidad > stock) {
+      $fila.addClass('table-danger');
+      errores.push(`No hay suficiente stock para el producto "${nombreProducto}". Solicitado: ${cantidad}, disponible: ${stock}.`);
+    }
+  });
   if (errores.length > 0) {
     Swal.fire({
       icon: 'warning',
@@ -361,12 +384,13 @@ function mostrarDetalleVendida(id, correo) {
   correo = decodeURIComponent(correo);
 
   $.ajax({
-    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleCompleto',
+    url: '../../../ajax/cotizacion-serv.php?op=listarDetalleVendido',
     method: 'POST',
     data: { id },
     success: function (data) {
       const venta = JSON.parse(data);
-      
+      const productos = venta.detalles;
+      const cliente = venta.cliente;
 
       let tabla = `
         <div class="table-responsive mb-3">
@@ -377,7 +401,7 @@ function mostrarDetalleVendida(id, correo) {
             <tbody>
       `;
 
-      venta.productos.forEach(prod => {
+      productos.forEach(prod => {
         const total = (prod.precio * prod.cantidad).toFixed(2);
         tabla += `
           <tr>
@@ -394,17 +418,22 @@ function mostrarDetalleVendida(id, correo) {
         </div>
         <h5>Datos del cliente</h5>
         <ul>
-          <li><strong>Nombre:</strong> ${venta.cliente.nombre}</li>
-          <li><strong>Cédula:</strong> ${venta.cliente.identificacion}</li>
-          <li><strong>Correo:</strong> ${venta.cliente.correo}</li>
-          <li><strong>Dirección:</strong> ${venta.cliente.direccion}</li>
-          <li><strong>Teléfono:</strong> ${venta.cliente.telefono}</li>
+          <li><strong>Nombre:</strong> ${cliente.nombre}</li>
+          <li><strong>Cédula:</strong> ${cliente.cedula ?? 'No disponible'}</li>
+          <li><strong>Correo:</strong> ${cliente.correo}</li>
+          <li><strong>Dirección:</strong> ${cliente.direccion}</li>
+          <li><strong>Teléfono:</strong> ${cliente.telefono}</li>
         </ul>
       `;
 
       $('#detalle-modal-body').html(tabla);
       new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+    },
+    error: function (xhr, status, error) {
+      console.error("Error al cargar detalle vendido:", error);
+      console.log(xhr.responseText);
     }
   });
 }
+
 

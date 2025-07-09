@@ -19,6 +19,12 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
   <title>Registrar Producto</title>
   <link rel="stylesheet" href="../../../public/css/bootstrap.css">
   <style>
+    .swal2-select-bootstrap {
+  max-width: 100%;
+  width: auto;
+  min-width: 200px;
+}
+
     body {
       background-color: #f8f9fa;
     }
@@ -54,7 +60,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <div class="container">
   <h2 class="text-center mb-4">Registrar Nuevo Producto</h2>
 
-  <form id="registroProducto" method="POST" enctype="multipart/form-data">
+  <form id="registroProducto" method="POST" enctype="multipart/form-data" class="validable">
     <!-- Nombre del producto -->
     <div class="mb-3">
       <label for="nombre" class="form-label">Nombre del Producto</label>
@@ -114,6 +120,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
+    <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/administracion/inventario/reg_productos.js"></script>
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
 </body>

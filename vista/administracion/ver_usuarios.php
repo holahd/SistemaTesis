@@ -104,6 +104,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <!-- DataTables JS -->
 <script src="../../public/js/datatables.js"></script>
 <script src="../../public/js/bootstrap.js"></script>
+<script src="../../public/js/sweetalert2.all.js"></script>
+<script src="../../public/js/validaciones.js"></script>
 <script src="../../public/js/administracion/usuarios.js"></script>
 
 </html>
