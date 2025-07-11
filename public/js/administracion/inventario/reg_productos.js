@@ -1,8 +1,8 @@
 $('#registroProducto').submit(function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
 
-     // Unir capacidad con unidad
+  // Unir capacidad con unidad
   $(".capacidad-input").each(function () {
     const unidad = $(this).closest(".input-group").find(".capacidad-unidad").val();
     this.value = `${this.value} ${unidad}`;
@@ -15,83 +15,96 @@ $('#registroProducto').submit(function (e) {
     }
   });
 
-    var formulario = new FormData(this);
+  var formulario = new FormData(this);
 
-    for (let [key, value] of formulario.entries()) {
-        console.log(`${key}:`, value);
+  for (let [key, value] of formulario.entries()) {
+    console.log(`${key}:`, value);
+  }
+
+  $.ajax({
+    url: '../../../ajax/catalogo-serv.php?op=registrarProducto',
+    type: 'POST',
+    data: formulario,
+    contentType: false,
+    processData: false,
+    beforeSend: function () {
+      console.log('Enviando datos...');
+    },
+    success: function (respuesta) {
+
+      respuesta = JSON.parse(respuesta);
+
+
+      if (respuesta.tipo === 1) {
+        $('#registroProducto').trigger('reset');
+        $caracteristicasExtrasDiv.empty();
+        extrasCount = 0;
+        $caracteristicasObligatoriasDiv.empty();
+        $categoriaSelect.val('');
+
+        swal.fire({
+          title: 'Producto registrado correctamente',
+          icon: 'success',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, registrar lote',
+          cancelButtonText: 'No, gracias'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = './../../../../vista/administracion/inventario/registrar_lote.php';
+          }
+        });
+
+      } else {
+        swal.fire({
+          title: 'Error',
+          text: 'Error: ' + respuesta.mensaje,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      }
+
+    },
+    error: function (xhr, status, error) {
+      console.error('Error: ' + error);
     }
 
-    $.ajax({
-        url: '../../../ajax/catalogo-serv.php?op=registrarProducto',
-        type: 'POST',
-        data: formulario,
-        contentType: false,
-        processData: false,
-        beforeSend: function () {
-            console.log('Enviando datos...');
-        },
-        success: function (respuesta) {
-
-            respuesta = JSON.parse(respuesta);
+  });
+});
 
 
-            if (respuesta.tipo === 1) {
-                
-                $('#registroProducto').trigger('reset');
-                $caracteristicasExtrasDiv.empty(); 
-                extrasCount = 0; 
-                $caracteristicasObligatoriasDiv.empty();
-                $categoriaSelect.val('');
-                if (confirm('Producto registrado correctamente. ¿Desea registrar un lote para este producto?')) {
-                    
-                     window.location.href = './../../../../vista/administracion/inventario/registrar_lote.php';
-                }
+$(document).ready(function () {
 
-            } else {
-                alert('Error: ' + respuesta.mensaje);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error('Error: ' + error);
-        }
+  if ($('#reg_productos').length > 0)
+    document.getElementById('foto').addEventListener('change', function () {
+      const file = this.files[0];
+      const maxSize = 2 * 1024 * 1024;
+
+      if (file && file.size > maxSize) {
+        alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
+        this.value = '';
+      } else {
+
+      }
 
     });
-});
-
-
-$(document).ready(function () {
-
-    if ($('#reg_productos').length > 0)
-        document.getElementById('foto').addEventListener('change', function () {
-            const file = this.files[0]; 
-            const maxSize = 2 * 1024 * 1024; 
-
-            if (file && file.size > maxSize) {
-                alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
-                this.value = ''; 
-            } else {
-
-            }
-
-        });
 
 
 });
 
 $(document).ready(function () {
 
-    if ($('#reg_productos').length > 0)
-        document.getElementById('foto').addEventListener('change', function () {
-            const file = this.files[0]; 
-            const maxSize = 2 * 1024 * 1024; 
+  if ($('#reg_productos').length > 0)
+    document.getElementById('foto').addEventListener('change', function () {
+      const file = this.files[0];
+      const maxSize = 2 * 1024 * 1024;
 
-            if (file && file.size > maxSize) {
-                document.getElementById('errorMensaje').style.display = 'block';
-                this.value = ''; 
-            } else {
-                document.getElementById('errorMensaje').style.display = 'none';
-            }
-        });
+      if (file && file.size > maxSize) {
+        document.getElementById('errorMensaje').style.display = 'block';
+        this.value = '';
+      } else {
+        document.getElementById('errorMensaje').style.display = 'none';
+      }
+    });
 
 
 
@@ -129,7 +142,7 @@ function crearCampo(nombre = "", esObligatorio = false, tipo = "texto") {
       .addClass("form-control")
       .attr("placeholder", "nombre")
       .attr("tabindex", "-1")
-        .css("pointer-events", "none")
+      .css("pointer-events", "none")
       .attr("name", "caracteristica_nombre[]")
       .val(nombre)
       .prop("readonly", esObligatorio)
@@ -160,9 +173,9 @@ function crearCampo(nombre = "", esObligatorio = false, tipo = "texto") {
       `);
       break;
 
-      case "numero":
-  $inputDesc = $(`<input type="text" class="form-control solo-numero" name="caracteristica_descripcion[]" placeholder="Ingrese valor numérico" />`);
-  break;
+    case "numero":
+      $inputDesc = $(`<input type="text" class="form-control solo-numero" name="caracteristica_descripcion[]" placeholder="Ingrese valor numérico" />`);
+      break;
 
     case "tallas":
       $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="Ej: S, M, L" />`);

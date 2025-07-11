@@ -10,18 +10,19 @@ $(document).ready(function () {
             columns: [
                 { data: 'producto' },
                 { data: 'numLote' },
-                { data: 'cantidad' }, 
+                { data: 'cantidad' },
                 { data: 'fechaIngreso' },
                 { data: 'proveedor' },
                 { data: 'fechaCaducidad' },
-                { data: 'precioUnitario'},
+                { data: 'precioUnitario' },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        
-                            return `
+
+                        return `
                             <button 
-                                class="btn btn-warning btn-sm editar"
+                                class="btn btn-outline-warning btn-sm me-1 editar"
+                                title="Editar lote"
                                 data-producto="${data.producto}"
                                 data-num-lote="${data.numLote}"
                                 data-cantidad="${data.cantidad}"
@@ -31,7 +32,7 @@ $(document).ready(function () {
                                 data-precio-unitario="${data.precioUnitario}"
                                 data-lote_id="${data.lote_id}"
                                 >
-                                ✏️ Editar
+                                 <i class="bi bi-pencil-square"></i>
                             </button>
                         `;
                     }
@@ -73,9 +74,9 @@ $(document).ready(function () {
         });
     }
 
-    
 
-   
+
+
     $(document).on('click', '.editar', function () {
         let producto = $(this).data('producto');
         let numLote = $(this).data('numLote');
@@ -115,12 +116,31 @@ $(document).ready(function () {
                 respuesta = JSON.parse(respuesta);
                 console.log('Respuesta recibida:', respuesta.mensaje);
 
-              
-                    alert(respuesta.mensaje);
+                if (respuesta.tipo === 1) {
+                    swal.fire({
+                        title: 'Éxito',
+                        text: respuesta.mensaje,
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        $('#registrarlote').trigger('reset');
+                    });
+
                     $('#formEditarLote').trigger('reset');
                     $('#tablaLotes').DataTable().ajax.reload(null, false);
                     $('#fromularioEdicionLote').prop('disabled', true);
-                
+                }
+                else {
+                    swal.fire({
+                        title: 'Error',
+                        text: respuesta.mensaje,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+
+
+
             },
             error: function (xhr, status, error) {
                 console.error('Error: ' + error);
@@ -133,46 +153,49 @@ $(document).ready(function () {
 
 // Cargar valores en campos del formulario
 function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, precioUnitario, lote_id) {
-     $('#fromularioEdicionLote').prop('disabled', false);
+    $('#fromularioEdicionLote').prop('disabled', false);
     $('#numeroLoteEditar').val(numLote);
     $('#unidadesEditar').val(cantidad);
     $('#fechaIngresoEditar').val(fechaIngreso);
     $('#proveedorEditar').val(proveedor);
     if (fechaCaducidad != 'No aplica') {
-         $('#fechaCaducidadEditar').val(fechaCaducidad);
-         $('#esPerecibleEditar').prop('checked', true).trigger('change');
-         
-    }else {
-         $('#fechaCaducidadEditar').val('');
-         $('#esPerecibleEditar').prop('checked', false).trigger('change');
+        $('#fechaCaducidadEditar').val(fechaCaducidad);
+        $('#esPerecibleEditar').prop('checked', true).trigger('change');
+
+    } else {
+        $('#fechaCaducidadEditar').val('');
+        $('#esPerecibleEditar').prop('checked', false).trigger('change');
     }
     $('#precioUnitarioEditar').val(precioUnitario);
     $('#lote_id').val(lote_id);
 
+
+    const modal = new bootstrap.Modal(document.getElementById('modalEditarLote'));
+
     $(document).ready(function () {
-    $.ajax({
-        url: '../../../ajax/lotes-serv.php?op=listarproductos',
-        method: 'POST',
-        contentType: false,
-        processData: false,
-        success: function (data) {
-            const nombres = JSON.parse(data); 
-            
+        $.ajax({
+            url: '../../../ajax/lotes-serv.php?op=listarproductos',
+            method: 'POST',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                const nombres = JSON.parse(data);
 
-            const $select = $('#productoEditar');
-            $select.empty();
-            $select.append('<option selected disabled>Seleccione un producto</option>');
 
-            nombres.forEach(function (obj) {
-                $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
-            });
-            $('#productoEditar').val(producto);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error al cargar productos:', error);
-        }
+                const $select = $('#productoEditar');
+                $select.empty();
+                $select.append('<option selected disabled>Seleccione un producto</option>');
+
+                nombres.forEach(function (obj) {
+                    $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
+                });
+                $('#productoEditar').val(producto);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar productos:', error);
+            }
+        });
     });
-});
-
+    modal.show();
 
 }

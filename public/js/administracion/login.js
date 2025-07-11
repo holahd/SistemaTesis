@@ -27,7 +27,16 @@ $('#fom1').submit(function (e) {
                     window.location.href = 'panel_administrador.php';
                     });
                 } else {
-                    alert('Cambie su contraseña');
+                    Swal.fire({
+                        title: 'Atención',
+                        text: "Cambie su contraseña",
+                        icon: 'info'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'log_cambioContra.php';
+                        }
+                    });
+                    
                     window.location.href = 'log_cambioContra.php';
                 }
             } else {

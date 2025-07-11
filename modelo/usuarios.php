@@ -24,7 +24,7 @@ class usuarios{
 		
 		$sql="call sp_usuario( 2 , 00, '$n','$a','$e','jajaj imaginate ver esto','$r');";
 		
-		return ejecutarConsultaSP($sql);
+		return ejecutarConsultaSPConError($sql);
 		
 	}
 
@@ -50,7 +50,7 @@ class usuarios{
 		
 		$sql="call sp_usuario( 3 , $i, '$n','$a','$e','contraseñajajaj','$r');";
 		
-		return ejecutarConsultaSP($sql);
+		return ejecutarConsultaSPConError($sql);
 		
 	}
 

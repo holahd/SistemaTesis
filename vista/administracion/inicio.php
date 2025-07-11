@@ -71,19 +71,24 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <?php
 
-    $role = $_SESSION['rol'] ?? 'editor';
+    $role = $_SESSION['rol'] ;
 
     if ($role === 'admin') {
         echo "<div class='welcome-container'>";
         echo  "<img src='../../public/img/administrador/Pyro_emblem_RED.png' alt='Logo de la Página' class='logo'>";
         echo "<h1 class='title'>¡Bienvenido, Administrador!</h1>";
         echo "<p class='subtitle'>Tienes el control total del sistema.</p>";
-    } else {
+    } else if ($role === 'inventario') {
         echo "<div class='welcome-container'>";
         echo  "<img src='../../public/img/administrador/Pyro_emblem_RED.png' alt='Logo de la Página' class='logo'>";
-        echo "<h1 class='title'>¡Bienvenido, Editor!</h1>";
-        echo "<p class='subtitle'>Gestiona contenidos y haz crecer la plataforma.</p>";
-    }
+        echo "<h1 class='title'>¡Bienvenido, encargado de inventario!</h1>";
+        echo "<p class='subtitle'>Gestiona el inventario y los lotes entrantes.</p>";
+    } else if ($role === 'ventas') {
+        echo "<div class='welcome-container'>";
+        echo  "<img src='../../public/img/administrador/Pyro_emblem_RED.png' alt='Logo de la Página' class='logo'>";
+        echo "<h1 class='title'>¡Bienvenido, encargado de ventas!</h1>";
+        echo "<p class='subtitle'>Gestiona las solicitudes de cotización y envíalasa los clientes.</p>";
+    } 
     ?>
     </div>
 

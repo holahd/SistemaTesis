@@ -45,11 +45,15 @@ switch ($_GET["op"]) {
 
         $res = $usuarios->registrar($_POST['nombre'], $_POST['apellido'], $_POST['email'], $_POST['rol']);
 
-        if ($res) {
+        if ($res['ok']) {
             $respuesta['mensaje'] = 'Usuario registrado correctamente';
             $respuesta['tipo'] = 1;
         } else {
-            $respuesta['mensaje'] = 'Error al registrar usuario';
+            if ($res['error'] == 1062) {
+                $respuesta['mensaje'] = 'El correo ingresado ya está registrado.';
+            } else {
+                $respuesta['mensaje'] = 'Error al registrar usuario';
+            }
             $respuesta['tipo'] = 0;
         }
 
@@ -90,11 +94,15 @@ switch ($_GET["op"]) {
 
         $res = $usuarios->editar($_POST['usuario_id'], $_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
 
-        if ($res) {
+        if ($res['ok']) {
             $respuesta['mensaje'] = 'Usuario editado correctamente';
             $respuesta['tipo'] = 1;
         } else {
-            $respuesta['mensaje'] = 'Error al editar usuario';
+            if ($res['error'] == 1062) {
+                $respuesta['mensaje'] = 'El correo ingresado ya está registrado.';
+            } else {
+                $respuesta['mensaje'] = 'Error al registrar usuario';
+            }
             $respuesta['tipo'] = 0;
         }
 
@@ -140,7 +148,7 @@ switch ($_GET["op"]) {
         session_unset();     // Limpia todas las variables de sesión
         session_destroy();   // Destruye la sesión
 
-        
+
 
         break;
 

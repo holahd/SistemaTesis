@@ -2,7 +2,7 @@ $('#registrarlote').submit(function (e) {
     e.preventDefault();
     var formulario = new FormData(this);
 
-     for (let [key, value] of formulario.entries()) {
+    for (let [key, value] of formulario.entries()) {
         console.log(`${key}:`, value);
     }
 
@@ -11,7 +11,7 @@ $('#registrarlote').submit(function (e) {
     for (let [key, value] of formulario.entries()) {
         console.log(`${key}:`, value);
     }
- 
+
     $.ajax({
         url: '../../../ajax/lotes-serv.php?op=registrar',
         type: 'POST',
@@ -27,10 +27,23 @@ $('#registrarlote').submit(function (e) {
 
 
             if (respuesta.tipo === 1) {
-                alert(respuesta.mensaje);
-                $('#registrarlote').trigger('reset');
-            
-            } 
+                swal.fire({
+                    title: 'Éxito',
+                    text: respuesta.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    $('#registrarlote').trigger('reset');
+                });
+            }
+            else {
+                swal.fire({
+                    title: 'Error',
+                    text: respuesta.mensaje,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         },
         error: function (xhr, status, error) {
             console.error('Error: ' + error);
@@ -46,8 +59,8 @@ $(document).ready(function () {
         contentType: false,
         processData: false,
         success: function (data) {
-            const nombres = JSON.parse(data); 
-            
+            const nombres = JSON.parse(data);
+
 
             const $select = $('#producto');
             $select.empty();

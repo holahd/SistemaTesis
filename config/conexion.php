@@ -54,5 +54,31 @@ function ejecutarConsultaSP( $sql ) {
 
 }
 
+function ejecutarConsultaSPConError($sql) {
+  $Cn = Fn_getConnectSiDB();
+
+  $resultado = [
+    'ok' => false,
+    'data' => null,
+    'error' => null
+  ];
+
+   try {
+        $query = $Cn->query($sql);
+        if ($query) {
+            $resultado['ok'] = true;
+            $resultado['data'] = $query;
+        }
+    } catch (mysqli_sql_exception $e) {
+        $resultado['error'] = $Cn->errno;
+        $resultado['error_msg'] = $e->getMessage();
+    }
+
+
+  $Cn->close();
+  return $resultado;
+}
+
+
 
 ?>

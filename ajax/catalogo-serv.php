@@ -49,21 +49,21 @@ switch ($_GET["op"]) {
         break;
 
     case 'subcategorias':
-        
-            $categoria_id = $_POST['categoria_id'];
 
-            $res = $productos->listarSubCategorias($categoria_id);
+        $categoria_id = $_POST['categoria_id'];
 
-            $data = array();
-            while ($reg = $res->fetch_object()) {
-                $data[] = array(
-                    "categoria_id" => $reg->categoria_id,
-                    "nombre" => $reg->nombre,
-                );
-            }
+        $res = $productos->listarSubCategorias($categoria_id);
 
-            echo json_encode($data);
-        
+        $data = array();
+        while ($reg = $res->fetch_object()) {
+            $data[] = array(
+                "categoria_id" => $reg->categoria_id,
+                "nombre" => $reg->nombre,
+            );
+        }
+
+        echo json_encode($data);
+
         break;
 
     case 'registrarProducto':
@@ -102,11 +102,15 @@ switch ($_GET["op"]) {
 
                 );
 
-                if ($res) {
-                    $respuesta['mensaje'] = 'Producto registrado correctamente.';
+                if ($res['ok']) {
+                    $respuesta['mensaje'] = 'Producto registrado correctamente';
                     $respuesta['tipo'] = 1;
                 } else {
-                    $respuesta['mensaje'] = 'Error al registrar el producto.';
+                    if ($res['error'] == 1062) {
+                        $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
+                    } else {
+                        $respuesta['mensaje'] = 'Error al registrar producto.';
+                    }
                     $respuesta['tipo'] = 0;
                 }
             } else {
@@ -128,7 +132,7 @@ switch ($_GET["op"]) {
 
         $data = array();
 
-        while ($reg = $res->fetch_object()) { 
+        while ($reg = $res->fetch_object()) {
             $data[] = array(
                 "producto_id" => $reg->producto_id,
                 "nombre" => $reg->nombre,
@@ -147,23 +151,23 @@ switch ($_GET["op"]) {
 
         $rutaBD = null;
 
-        
+
         $imagenActual = isset($_POST['ruta_imagen']) ? $_POST['ruta_imagen'] : null;
-  $caracteristicasTexto = '';
-            $caracteristicas = [];
-            $nombreArr = $_POST['caracteristica_nombre'] ?? [];
-            $descArr = $_POST['caracteristica_descripcion'] ?? [];
-        
+        $caracteristicasTexto = '';
+        $caracteristicas = [];
+        $nombreArr = $_POST['caracteristica_nombre'] ?? [];
+        $descArr = $_POST['caracteristica_descripcion'] ?? [];
+
         if (isset($_FILES["input_imagen"]) && $_FILES["input_imagen"]["error"] === UPLOAD_ERR_OK) {
             $nombreArchivo = time() . "_" . basename($_FILES["input_imagen"]["name"]);
             $rutaDestino = "../public/img/" . $nombreArchivo;
             $rutaBD = $rutaDestino;
 
             if (move_uploaded_file($_FILES["input_imagen"]["tmp_name"], $rutaDestino)) {
-                
+
                 exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
 
-                
+
                 if (!empty($imagenActual) && file_exists($imagenActual)) {
                     unlink($imagenActual);
                 }
@@ -176,24 +180,33 @@ switch ($_GET["op"]) {
         }
 
         for ($i = 0; $i < count($nombreArr); $i++) {
-                    $nombre = trim($nombreArr[$i]);
-                    $desc = trim($descArr[$i]);
-                    if ($nombre !== '' && $desc !== '') {
-                        $caracteristicas[] = "$nombre: $desc";
-                    }
-                    $caracteristicasTexto = implode("\n", $caracteristicas);
-                }
-     
+            $nombre = trim($nombreArr[$i]);
+            $desc = trim($descArr[$i]);
+            if ($nombre !== '' && $desc !== '') {
+                $caracteristicas[] = "$nombre: $desc";
+            }
+            $caracteristicasTexto = implode("\n", $caracteristicas);
+        }
+
         $res = $productos->actualizar(
             $_POST['producto_id'],
             $_POST['nombre'],
-             $caracteristicasTexto,
+            $caracteristicasTexto,
             $_POST['subcategoria'],
             $rutaBD
         );
 
-        $respuesta['mensaje'] = $res ? 'Producto actualizado correctamente.' : 'Error al actualizar el producto.';
-        $respuesta['tipo'] = $res ? 1 : 0;
+        if ($res['ok']) {
+                    $respuesta['mensaje'] = 'Producto actualizado correctamente';
+                    $respuesta['tipo'] = 1;
+                } else {
+                    if ($res['error'] == 1062) {
+                        $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
+                    } else {
+                        $respuesta['mensaje'] = 'Error al editar producto.';
+                    }
+                    $respuesta['tipo'] = 0;
+                }
 
         echo json_encode($respuesta);
         break;
@@ -215,7 +228,7 @@ switch ($_GET["op"]) {
         echo json_encode($respuesta);
 
         break;
-    
+
     case 'restaurar':
         $res = $productos->restaurar($_POST['codigo']);
 
@@ -231,7 +244,7 @@ switch ($_GET["op"]) {
         break;
 
     default:
-        
+
         $respuesta['mensaje'] = 'Acción no válida.';
         echo json_encode($respuesta);
         break;

@@ -22,7 +22,7 @@ class productos{
 
         $sql="call sp_producto(2,0,'$no','$des', $cat ,'$foto');";
 
-        return ejecutarConsultaSP($sql);
+        return ejecutarConsultaSPConError($sql);
 
     }
 
@@ -31,7 +31,7 @@ class productos{
         
             $sql="call sp_producto(3,$id,'$no','$des', $cat ,'$foto');";
     
-            return ejecutarConsultaSP($sql);
+            return ejecutarConsultaSPConError($sql);
     }
 
     public function eliminar($id){

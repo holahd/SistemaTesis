@@ -23,7 +23,23 @@ switch ($_GET["op"]) {
         }
 
         $res = $lotes->registrar($Producto, $numLot, $cantidad, $fechIng, $fechCad, $proveedor, $precio);
-        echo json_encode(["tipo" => 1, "mensaje" => "Lote registrado correctamente"]);
+
+
+        
+        if ($res['ok']) {
+            $respuesta['mensaje'] = 'lote registrado correctamente';
+            $respuesta['tipo'] = 1;
+        } else {
+            if ($res['error'] == 1062) {
+                $respuesta['mensaje'] = 'El numero de lote ingresado ya está registrado.';
+            } else {
+                $respuesta['mensaje'] = 'Error al registrar lote';
+            }
+            $respuesta['tipo'] = 0;
+        }
+
+
+        echo json_encode($respuesta);
         break;
  
     case 'listar':
@@ -52,14 +68,32 @@ switch ($_GET["op"]) {
         $numLot = $_POST["numeroLoteEditar"];
         $cantidad = $_POST["unidadesEditar"];
         $fechIng = $_POST["fechaIngresoEditar"];
-        $fechCad = $_POST["fechaCaducidadEditar"];
+        $fechCad = isset($_POST["fechaCaducidadEditar"])? $_POST["fechaCaducidadEditar"] : null;
         $proveedor = $_POST["proveedorEditar"];
         $precio = $_POST["precioUnitarioEditar"];
 
-        $fechCad = empty($fechCad) ? null : $fechCad;
+        if (isset($_POST["fechaCaducidadEditar"])) {
+            $fechCad = empty($fechCad) ? null : $fechCad;
+        }
+       
 
         $res = $lotes->editar($loteId, $Producto, $numLot, $cantidad, $fechIng, $fechCad, $proveedor, $precio);
-        echo json_encode(["status" => "ok", "mensaje" => "Lote editado correctamente"]);
+
+
+        if ($res['ok']) {
+            $respuesta['mensaje'] = 'Lote editado correctamente';
+            $respuesta['tipo'] = 1;
+        } else {
+            if ($res['error'] == 1062) {
+                $respuesta['mensaje'] = 'El numero de lote ingresado ya está registrado.';
+            } else {
+                $respuesta['mensaje'] = 'Error al editar lote';
+            }
+            $respuesta['tipo'] = 0;
+        }
+
+
+        echo json_encode($respuesta);
         break;
 
     case 'eliminar':

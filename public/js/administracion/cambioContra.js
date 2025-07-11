@@ -22,7 +22,14 @@ $('#cambiocontra').submit(function (e) {
             console.log('Respuesta recibida:', respuesta.mensaje);
 
             if (respuesta.tipo === 1) {
-                alert(respuesta.mensaje);
+                Swal.fire({
+                    title: 'Éxito',
+                    text: respuesta.mensaje,
+                    icon: 'success'
+                }).then((result) => {
+                    window.location.href = 'panel_administrador.php';
+                });
+                
                 window.location.href = 'panel_administrador.php';
             } else {
                 alert('Error: ' + respuesta.mensaje);

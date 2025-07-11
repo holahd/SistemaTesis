@@ -22,7 +22,7 @@ class Lotes {
             $fechaCadSQL, 
             $precioUnit
         );";
-        return ejecutarConsultaSP($sql);
+        return ejecutarConsultaSPConError($sql);
     }
 
     public function listar() {
@@ -43,7 +43,7 @@ class Lotes {
             $fechaCadSQL, 
             $precioUnit
         );";
-        return ejecutarConsultaSP($sql);
+        return ejecutarConsultaSPConError($sql);
     } 
 
     public function eliminar($loteId) {
