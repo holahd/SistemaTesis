@@ -50,8 +50,11 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                     <!-- Contenido dinámico -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" onclick="enviarCotizacion()">Enviar Cotización</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger" id="btn-rechazar-stock">Rechazar por falta de stock</button>
+                        <button type="button" class="btn btn-success" onclick="enviarCotizacion()">Enviar Cotización</button>
+                    </div>
 
                 </div>
             </div>
@@ -67,8 +70,9 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <script src="./../../../public/js/administracion/ventas/cotizaciones_funciones.js"></script>
 <script>
     $(document).ready(function() {
-         cargarCotizaciones('../../../ajax/cotizacion-serv.php?op=listarPendientes', '#cotizaciones-container', 'abrirDetalle');
+        cargarCotizaciones('../../../ajax/cotizacion-serv.php?op=listarPendientes', '#cotizaciones-container', 'abrirDetalle');
     });
 </script>
 <script src="./../../../public/js/administracion/correo.js"></script>
+
 </html>

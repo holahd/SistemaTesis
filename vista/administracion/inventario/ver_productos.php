@@ -27,7 +27,12 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
             padding: 20px;
         }
 
-        
+
+        /* Asegura que el dropdown de select2 tenga un z-index alto para estar encima del modal */
+        .select2-container--open {
+            z-index: 10550 !important;
+            /* más alto que el modal bootstrap que está en 1050 */
+        }
 
 
         .table-bordered th,
@@ -37,7 +42,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         }
 
         .table thead th {
-            background-color:rgb(182, 1, 1);
+            background-color: rgba(33, 37, 41, 1);
             /* oscuro elegante */
             color: #fff;
         }
@@ -138,14 +143,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                             <!-- Características obligatorias -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Características del Producto</label>
-                                <div id="caracteristicasObligatoriasEditar" class="mb-2"></div>
+                                <div id="caracteristicasObligatorias" class="mb-2"></div>
                             </div>
 
                             <!-- Características adicionales -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Características adicionales (máx. 3)</label>
-                                <div id="caracteristicasExtrasEditar" class="mb-2"></div>
-                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="agregarCaracteristicaEditar">
+                                <div id="caracteristicasExtras" class="mb-2"></div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="agregarCaracteristica">
                                     <i class="bi bi-plus-circle"></i> Agregar característica
                                 </button>
                             </div>
@@ -185,31 +190,33 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     </div>
 
 
-   <!-- Modal para mostrar imagen ampliada -->
-<!-- Modal para mostrar imagen ampliada -->
-<div class="modal fade" id="modalImagenAmpliada" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content bg-dark text-white">
-      <div class="modal-header border-0">
-        <h6 class="modal-title" id="tituloImagenAmpliada" style="font-size: 1rem;">Nombre del producto</h6>
-        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center p-2">
-        <img id="imagenAmpliada" src="" alt="Imagen ampliada" class="img-fluid rounded shadow" style="max-height: 300px;">
-      </div>
+    <!-- Modal para mostrar imagen ampliada -->
+    <!-- Modal para mostrar imagen ampliada -->
+    <div class="modal fade" id="modalImagenAmpliada" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-0">
+                    <h6 class="modal-title" id="tituloImagenAmpliada" style="font-size: 1rem;">Nombre del producto</h6>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center p-2">
+                    <img id="imagenAmpliada" src="" alt="Imagen ampliada" class="img-fluid rounded shadow" style="max-height: 300px;">
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Scripts -->
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/datatables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
+    <script src="../../../public/js/administracion/inventario/características.js"></script>
 
 </body>
 

@@ -46,6 +46,25 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
       height: 0;
     }
 
+    .select2-container .select2-selection--single {
+      height: 38px !important;
+      padding: 6px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 24px;
+      color: #495057;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 36px;
+      right: 10px;
+    }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -104,7 +123,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
       <!-- Producto -->
       <div class="mb-3">
         <label for="producto" class="form-label">Producto</label>
-        <select class="form-select" id="producto" name="producto" required>
+        <select class="form-control" id="producto" name="producto" required>
           <option selected disabled>Seleccione un producto</option>
         </select>
       </div>
@@ -150,7 +169,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
       <!-- Precio por unidad -->
       <div class="mb-3">
-        <label for="precioUnidad" class="form-label ">Precio por unidad (antes de PVP)</label>
+        <label for="precioUnidad" class="form-label ">Precio de compra por unidad</label>
         <input type="text" step="0.01" class="form-control solo-decimales" id="precioUnidad" name="precioUnitario" required>
       </div>
 
@@ -175,7 +194,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
   </script>
 
 </body>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+
 <script src="../../../public/js/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="../../../public/js/bootstrap.js"></script>
 <script src="../../../public/js/sweetalert2.all.js"></script>
 <script src="../../../public/js/validaciones.js"></script>

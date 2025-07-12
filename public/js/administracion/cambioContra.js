@@ -3,7 +3,11 @@ $('#cambiocontra').submit(function (e) {
     var formulario = new FormData(this);
 
     if ($('#nueva_contrasena').val() != $('#confirmar_contrasena').val()) {
-        alert('Las contraseñas no coinciden');
+        Swal.fire({
+            icon: 'error',
+            title: 'Contraseñas no coinciden',
+            text: 'Por favor, asegúrate de que ambas contraseñas sean iguales.'
+        });
         return false;
     }
 
@@ -32,7 +36,11 @@ $('#cambiocontra').submit(function (e) {
                 
                 window.location.href = 'panel_administrador.php';
             } else {
-                alert('Error: ' + respuesta.mensaje);
+                swal.fire({
+                    title: 'Error',
+                    text: respuesta.mensaje,
+                    icon: 'error'
+                });
             }
         },
         error: function (xhr, status, error) {

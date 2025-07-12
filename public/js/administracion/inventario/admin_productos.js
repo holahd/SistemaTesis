@@ -51,7 +51,7 @@ $(document).ready(function () {
                         } else {
                             return `
                              <button 
-                    class="btn btn-outline-warning btn-sm me-1 editar"
+                    class="btn btn-outline-dark btn-sm me-1 editar"
                     title="Editar producto"
                     data-producto_id="${data.producto_id}"
                     data-nombre="${row.nombre}"
@@ -112,12 +112,12 @@ $(document).ready(function () {
         });
     }
 
-   $(document).on("click", ".imagen-miniatura", function () {
-    const src = $(this).data("src");
-    const nombre = $(this).data("nombre");
-    $("#imagenAmpliada").attr("src", "../../"+src);
-    $("#tituloImagenAmpliada").text(nombre || "Producto");
-});
+    $(document).on("click", ".imagen-miniatura", function () {
+        const src = $(this).data("src");
+        const nombre = $(this).data("nombre");
+        $("#imagenAmpliada").attr("src", "../../" + src);
+        $("#tituloImagenAmpliada").text(nombre || "Producto");
+    });
 
 
     $(document).on('click', '.eliminar', function () {
@@ -208,6 +208,10 @@ $(document).ready(function () {
                         $('#imagen_producto').attr('src', '../../../img/default.jpg');
                         $('#tablaProductos').DataTable().ajax.reload(null, false);
                         $('#formulario_edicion').prop('disabled', true);
+                        // Cerrar modal
+                        $('#modalEditarProducto').modal('hide');
+                        //actualizar la tabla
+                        $('#tablaProductos').DataTable().ajax.reload(null, false);
                     });
                 } else {
                     swal.fire({
@@ -255,6 +259,8 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
 
             data.forEach(function (item) {
                 $categoria.append(`<option value="${item.categoria_id}">${item.nombre}</option>`);
+
+
             });
 
 
@@ -286,35 +292,55 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
                     // Procesar características desde descripción
                     const lineas = descripcion.split("\n").filter(Boolean);
 
-                    $caracteristicasObligatoriasEditar.empty();
-                    $caracteristicasExtrasEditar.empty();
+                    $caracteristicasObligatorias.empty();
+                    $caracteristicasExtras.empty();
                     extrasEditarCount = 0;
 
-                    const obligatoriasCategoria = obligatoriasEditar[categoria_id] || [];
+                    const obligatoriasCategoria = obligatorias[categoria_id] || [];
+
+                    console.log("Descripción cruda:", descripcion);
+                    console.log("Líneas detectadas:", lineas);
 
                     lineas.forEach(linea => {
                         const partes = linea.split(":");
                         if (partes.length < 2) return;
 
-                        const nombre = partes[0].trim();
-                        const descripcion = partes.slice(1).join(":").trim();
+                        const nombreCampo = partes[0].trim();
+                        const valorCampo = partes.slice(1).join(":").trim();
 
-                        // Buscar si este nombre es una característica obligatoria y su tipo
-                        const campoObligatorio = obligatoriasCategoria.find(obj => obj.nombre === nombre);
+                        const campoObligatorio = obligatoriasCategoria.find(obj => obj.nombre.toLowerCase() === nombreCampo.toLowerCase());
 
                         if (campoObligatorio) {
-                            $caracteristicasObligatoriasEditar.append(
-                                crearCampoEditar(nombre, descripcion, true, campoObligatorio.tipo)
-                            );
+                            const $campo = crearCampo(campoObligatorio.nombre, true, campoObligatorio.tipo, subcategoria_id);
+                            asignarValorCampo($campo, valorCampo, campoObligatorio.tipo);
+                            $caracteristicasObligatorias.append($campo);
                         } else if (extrasEditarCount < 3) {
-                            // Deduce tipo del extra
-                            const tipo = isNaN(parseFloat(descripcion)) ? "texto" : "numero";
-                            $caracteristicasExtrasEditar.append(
-                                crearCampoEditar(nombre, descripcion, false, tipo)
-                            );
+                            const tipoExtra = isNaN(parseFloat(valorCampo)) ? "texto" : "numero";
+                            const $campoExtra = crearCampo(nombreCampo, false, tipoExtra, subcategoria_id);
+
+                            asignarValorCampo($campoExtra, valorCampo, tipoExtra);
+
+                            // --- Agregar botón de eliminar igual que en el add handler ---
+                            const $btnEliminar = $("<button>")
+                                .attr("type", "button")
+                                .addClass("btn btn-outline-danger btn-sm eliminarCaracteristica")
+                                .text("Eliminar");
+
+                            const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
+                            $campoExtra.append($colEliminar);
+                            // -------------------------------------------------------------
+
+                            $caracteristicasExtras.append($campoExtra);
                             extrasEditarCount++;
                         }
+
+
+                        console.log("Procesando línea:", linea);
+                        console.log("Nombre detectado:", nombreCampo);
+                        console.log("Valor detectado:", valorCampo);
+
                     });
+
 
 
 
@@ -338,10 +364,20 @@ function eliminarProducto(id, nombre) {
     if (confirm('¿Seguro que deseas descontinuar el producto "' + nombre + '"?')) {
         $.post('../../../ajax/catalogo-serv.php?op=eliminar', { codigo: id }, function (respuesta) {
             respuesta = JSON.parse(respuesta);
-            alert(respuesta.mensaje);
+            swal.fire({
+                title: 'Éxito',
+                text: respuesta.mensaje,
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
             $('#tablaProductos').DataTable().ajax.reload(null, false);
         }).fail(function () {
-            alert("Error al descontinuar el producto.");
+            swal.fire({
+                title: 'Error',
+                text: 'No se pudo descontinuar el producto. Inténtalo más tarde.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         });
     }
 }
@@ -352,125 +388,62 @@ function restaurarProducto(id, nombre) {
     if (confirm(`¿Seguro que deseas restaurar el producto "${nombre}"?`)) {
         $.post('../../../ajax/catalogo-serv.php?op=restaurar', { codigo: id }, function (respuesta) {
             respuesta = JSON.parse(respuesta);
-            alert(respuesta.mensaje);
+            swal.fire({
+                title: 'Éxito',
+                text: respuesta.mensaje,
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+
             $('#tablaProductos').DataTable().ajax.reload(null, false);
         }).fail(function () {
-            alert("Error al restaurar el producto.");
+            swal.fire({
+                title: 'Error',
+                text: 'No se pudo restaurar el producto. Inténtalo más tarde.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         });
     }
 }
 
-const $caracteristicasObligatoriasEditar = $("#caracteristicasObligatoriasEditar");
-const $caracteristicasExtrasEditar = $("#caracteristicasExtrasEditar");
-const $btnAgregarEditar = $("#agregarCaracteristicaEditar");
+const $categoria = $("#categoria");
+const $subcategoria = $("#subcategoria");
+const $caracteristicasObligatorias = $("#caracteristicasObligatorias");
+const $caracteristicasExtras = $("#caracteristicasExtras");
+const $btnAgregar = $("#agregarCaracteristica");
 
 let extrasEditarCount = 0;
 
-const obligatoriasEditar = {
-    1: [
-        { nombre: "Tipo de agente", tipo: "texto" },
-        { nombre: "Capacidad", tipo: "capacidad" },
-        { nombre: "Color", tipo: "texto" },
-        { nombre: "Presión", tipo: "presion" }
-    ],
-    2: [
-        { nombre: "Tallas disponibles", tipo: "tallas" },
-        { nombre: "Material", tipo: "texto" },
-        { nombre: "Color", tipo: "texto" },
-        { nombre: "Tipo de protección", tipo: "texto" }
-    ]
-};
+// Mostrar campos obligatorios (como en registrar)
+$("#categoria").on("change", function () {
+    const categoria = $(this).val();
+    $caracteristicasObligatorias.empty();
 
-function crearCampoEditar(nombre = "", descripcion = "", esObligatorio = false, tipo = "texto") {
-    descripcion = descripcion || "";
-    const $row = $("<div>").addClass("row mb-2 caracteristica-group align-items-center");
-
-    const $colNombre = $("<div>").addClass("col-md-5").append(
-        $("<input>")
-            .attr("type", "text")
-            .addClass("form-control")
-            .attr("placeholder", "nombre")
-            .attr("name", "caracteristica_nombre[]")
-            .val(nombre)
-            .prop("readonly", esObligatorio)
-            .attr("tabindex", esObligatorio ? "-1" : "0")
-            .css("pointer-events", esObligatorio ? "none" : "")
-    );
-
-    const $colDesc = $("<div>").addClass("col-md-5");
-    let $inputDesc;
-
-    switch (tipo) {
-        case "capacidad": {
-            // Extraer número y unidad (kg o litros)
-            let numero = descripcion.match(/[\d.]+/)?.[0] || "";
-            let unidad = descripcion.includes("litros") ? "litros" : "kg";
-
-            $inputDesc = $(`
-        <div class="input-group">
-          <input type="text" class="form-control capacidad-input" name="caracteristica_descripcion[]" placeholder="Ej: 10" />
-          <select class="form-select input-group-text capacidad-unidad">
-            <option value="kg">kg</option>
-            <option value="litros">litros</option>
-          </select>
-        </div>
-      `);
-
-            $inputDesc.find("input").val(numero);
-            $inputDesc.find("select").val(unidad);
-            break;
-        }
-
-        case "presion": {
-            // Extraer número (sin PSI)
-            let numero = descripcion.match(/[\d.]+/)?.[0] || "";
-
-            $inputDesc = $(`
-        <div class="input-group">
-          <input type="text" class="form-control presion-input" name="caracteristica_descripcion[]" placeholder="Ej: 150" />
-          <span class="input-group-text">PSI</span>
-        </div>
-      `);
-
-            $inputDesc.find("input").val(numero);
-            break;
-        }
-
-        case "tallas": {
-            $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="Ej: S, M, L" />`).val(descripcion);
-            break;
-        }
-
-        case "numero": {
-            $inputDesc = $(`<input type="text" class="form-control solo-numero" name="caracteristica_descripcion[]" placeholder="Ingrese valor numérico" />`).val(descripcion);
-            break;
-        }
-
-        default: {
-            $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="descripción" />`).val(descripcion);
-        }
+    if (obligatorias[categoria]) {
+        obligatorias[categoria].forEach(car => {
+            const subID = $subcategoria.val();
+            const $campo = crearCampo(car.nombre, true, car.tipo, subID);
+            $caracteristicasObligatorias.append($campo);
+        });
     }
+});
 
-    $colDesc.append($inputDesc);
-    $row.append($colNombre, $colDesc);
+// Cambiar placeholder si cambia subcategoría
+$subcategoria.on("change", function () {
+    const subID = $(this).val();
+    const nuevoPlaceholder = getPlaceholderTalla(subID);
 
-    if (!esObligatorio) {
-        const $btnEliminar = $("<button>")
-            .attr("type", "button")
-            .addClass("btn btn-outline-danger btn-sm eliminarCaracteristica")
-            .text("Eliminar");
+    $caracteristicasObligatorias.find("input").each(function () {
+        const $nombreInput = $(this).closest(".caracteristica-group").find("input[name='caracteristica_nombre[]']");
+        if ($nombreInput.val() === "Tallas disponibles") {
+            $(this).attr("placeholder", nuevoPlaceholder);
+        }
+    });
+});
 
-        const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
-        $row.append($colEliminar);
-    }
-
-    return $row;
-}
-
-
-$btnAgregarEditar.on("click", async function () {
-
-
+// Agregar campo extra en editar
+$btnAgregar.on("click", async function () {
     if (extrasEditarCount >= 3) return;
 
     const { value: tipoCampo } = await Swal.fire({
@@ -485,33 +458,30 @@ $btnAgregarEditar.on("click", async function () {
         confirmButtonText: "Agregar",
         cancelButtonText: "Cancelar",
         customClass: {
-            input: 'swal2-select-bootstrap' // Aplica estilo Bootstrap, o elimínalo si da problemas
+            input: 'swal2-select-bootstrap'
         },
         inputValidator: (value) => {
-            return new Promise((resolve) => {
-                if (!value) {
-                    resolve('Debes seleccionar un tipo de característica');
-                } else {
-                    resolve();
-                }
-            });
+            if (!value) return "Debes seleccionar un tipo de característica";
         }
-
-
     });
-
-
-
 
     if (!tipoCampo) return;
 
     const tipo = tipoCampo === "numero" ? "numero" : "texto";
-    const $campoExtra = crearCampoEditar("", "", false, tipo);
+    const subID = $subcategoria.val();
+    const $campoExtra = crearCampo("", false, tipo, subID);
 
-    $caracteristicasExtrasEditar.append($campoExtra);
+    const $btnEliminar = $("<button>")
+        .attr("type", "button")
+        .addClass("btn btn-outline-danger btn-sm eliminarCaracteristica")
+        .text("Eliminar");
+
+    const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
+    $campoExtra.append($colEliminar);
+
+    $caracteristicasExtras.append($campoExtra);
     extrasEditarCount++;
 });
-
 
 // Eliminar extra
 $(document).on("click", ".eliminarCaracteristica", function () {
@@ -519,9 +489,30 @@ $(document).on("click", ".eliminarCaracteristica", function () {
     extrasEditarCount--;
 });
 
-// Restringir a números
-$(document).on("input", ".capacidad-input, .presion-input, .solo-numero", function () {
-    this.value = this.value.replace(/\D/g, "");
-});
 
+function asignarValorCampo($campo, valor, tipo) {
+    if (tipo === "capacidad") {
+        // input + select unidad
+        const [num, unidad] = valor.split(" ");
+        $campo.find("input.capacidad-input").val(num || "");
+        if (unidad) {
+            $campo.find("select.capacidad-unidad").val(unidad).trigger("change");
+        }
+    } else if (tipo === "presion") {
+        // input + sufijo PSI
+        const num = valor.replace("PSI", "").trim();
+        $campo.find("input.presion-input").val(num);
+    } else if (tipo === "numero") {
+        $campo.find("input.solo-numero").val(valor);
+    } else if (tipo === "tallas") {
+        $campo.find("input[name='caracteristica_descripcion[]']").val(valor);
+    }
+    else if ($campo.find("select.caracteristica-select").length) {
+        // campo con select2
+        $campo.find("select.caracteristica-select").val(valor).trigger("change");
+    } else {
+        // campo input texto normal
+        $campo.find("input[name='caracteristica_descripcion[]']").val(valor);
+    }
 
+}

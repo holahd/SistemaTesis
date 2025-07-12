@@ -59,6 +59,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 </body>
 <script src="./../../../public/js/jquery-3.7.1.min.js"></script>
 <script src="./../../../public/js/bootstrap.bundle.js"></script>
+ <script src="../../public/js/sweetalert2.all.js"></script>
 <!-- Script personalizado -->
 <script src="./../../../public/js/administracion/ventas/cotizaciones_funciones.js"></script>
 <script>

@@ -21,7 +21,7 @@ $(document).ready(function () {
 
                         return `
                             <button 
-                                class="btn btn-outline-warning btn-sm me-1 editar"
+                                class="btn btn-outline-dark btn-sm me-1 editar"
                                 title="Editar lote"
                                 data-producto="${data.producto}"
                                 data-num-lote="${data.numLote}"

@@ -14,10 +14,10 @@ switch ($_GET["op"]) {
 
         $email = $_POST['email'];
         $productos = json_decode($_POST['productos'], true);
-        $idCot = $cotizacion->registrarCotizacion($email); 
+        $idCot = $cotizacion->registrarCotizacion($email);
 
         if (!$idCot) {
-            echo json_encode(['status' => 'error', 'message' => 'Error al registrar la cotización'.$idCot]);
+            echo json_encode(['status' => 'error', 'message' => 'Error al registrar la cotización' . $idCot]);
             exit;
         }
 
@@ -51,7 +51,7 @@ switch ($_GET["op"]) {
 
         echo json_encode($data);
         break;
-    
+
     case 'listarEnviados':
         $res = $cotizacion->listar("enviado");
         $data = array();
@@ -66,7 +66,7 @@ switch ($_GET["op"]) {
 
         echo json_encode($data);
         break;
-    
+
     case 'listarConfirmados':
         $res = $cotizacion->listar("vendido");
         $data = array();
@@ -81,8 +81,8 @@ switch ($_GET["op"]) {
 
         echo json_encode($data);
         break;
-    
-    
+
+
 
     case 'listarDetalle':
 
@@ -103,7 +103,7 @@ switch ($_GET["op"]) {
 
         break;
 
-        case 'listarDetalleEnviado':
+    case 'listarDetalleEnviado':
 
         $res = $cotizacion->listar_detalle_enviado($_POST['id']);
         $data = array();
@@ -125,50 +125,50 @@ switch ($_GET["op"]) {
 
 
 
-        case 'listarDetalleVendido':
+    case 'listarDetalleVendido':
 
-        
-    $id = $_POST['id'];
 
-    // 1. Obtener detalles vendidos
-    $resDetalle = $cotizacion->listar_detalle_vendido($id);
-    $detalles = [];
+        $id = $_POST['id'];
 
-    while ($reg = $resDetalle->fetch_object()) {
-        $detalles[] = array(
-            "id" => $reg->detalle_id,
-            "producto" => $reg->producto,
-            "cantidad" => $reg->cantidad,
-            "stock" => $reg->stock_total,
-            "precio" => $reg->pvp,
-            "total" => $reg->total
+        // 1. Obtener detalles vendidos
+        $resDetalle = $cotizacion->listar_detalle_vendido($id);
+        $detalles = [];
+
+        while ($reg = $resDetalle->fetch_object()) {
+            $detalles[] = array(
+                "id" => $reg->detalle_id,
+                "producto" => $reg->producto,
+                "cantidad" => $reg->cantidad,
+                "stock" => $reg->stock_total,
+                "precio" => $reg->pvp,
+                "total" => $reg->total
+            );
+        }
+
+
+        // 2. Obtener datos del cliente
+        $resCliente = $cotizacion->listar_datos_cliente($id);
+        $cliente = null;
+
+        if ($row = $resCliente->fetch_object()) {
+            $cliente = array(
+                "nombre" => $row->nombre_cliente,
+                "correo" => $row->email_cliente,
+                "telefono" => $row->telefono_cliente,
+                "direccion" => $row->direccion_cliente,
+                "cedula" => $row->cedula_cliente
+                // agrega más campos si los tienes
+            );
+        }
+
+
+        // 3. Unir en una sola respuesta
+        $respuesta = array(
+            "detalles" => $detalles,
+            "cliente" => $cliente
         );
-    }
 
-
-    // 2. Obtener datos del cliente
-    $resCliente = $cotizacion->listar_datos_cliente($id);
-    $cliente = null;
-
-    if ($row = $resCliente->fetch_object()) {
-        $cliente = array(
-            "nombre" => $row->nombre_cliente,
-            "correo" => $row->email_cliente,
-            "telefono" => $row->telefono_cliente,
-            "direccion" => $row->direccion_cliente,
-            "cedula" => $row->cedula_cliente
-            // agrega más campos si los tienes
-        );
-    }
-
-
-    // 3. Unir en una sola respuesta
-    $respuesta = array(
-        "detalles" => $detalles,
-        "cliente" => $cliente
-    );
-
-    echo json_encode($respuesta);
+        echo json_encode($respuesta);
 
         break;
 
@@ -183,7 +183,7 @@ switch ($_GET["op"]) {
         $data = array();
 
         while ($reg = $res->fetch_object()) {
-            $data[] = array("producto" => $reg->nombre); 
+            $data[] = array("producto" => $reg->nombre);
         }
 
         if (empty($data)) {
@@ -195,31 +195,39 @@ switch ($_GET["op"]) {
         break;
 
     case 'enviarCotizacion':
-
-        $datos = json_decode(file_get_contents('php://input'), true);
-
-        
-
+        $datos    = json_decode(file_get_contents('php://input'), true);
         $productos = $datos['productos'];
+        $idCot     = $datos['cotizacion_id'];
+        $usuarioId = $_SESSION['usuario_id'];
 
-        $idCot = $datos['cotizacion_id'];
 
         foreach ($productos as $producto) {
-            $idProducto = $producto['id'];
-            $precio = $producto['precio_final'];
-            $subtotal = $producto['subtotal'];
-
-            $cotizacion->colocar_precio($idProducto, $precio, $subtotal);
+            $cotizacion->colocar_precio(
+                $producto['id'],
+                $producto['precio_final'],
+                $producto['subtotal']
+            );
         }
 
-        $cotizacion->cambio_estado($_SESSION['usuario_id'], $idCot, 'enviado');
 
-        echo json_encode(enviarCorreo($datos));
+        $resultadoMail = enviarCorreo($datos);
+
+        if (!empty($resultadoMail['success']) && $resultadoMail['success'] === true) {
+
+            $cotizacion->cambio_estado($usuarioId, $idCot, 'enviado');
+        } else {
+
+            error_log("Error al enviar cotización #{$idCot}: " . ($resultadoMail['mensaje'] ?? 'Sin detalle'));
+        }
+
+
+        echo json_encode($resultadoMail);
         break;
-    
+
+
     case 'confirmarVenta':
-        
-        $confirmar = $cotizacion -> confirmar_datos_cot(
+
+        $confirmar = $cotizacion->confirmar_datos_cot(
             $_POST['cotizacion_id'],
             $_POST['nombre'],
             $_POST['identificacion'],
@@ -231,13 +239,28 @@ switch ($_GET["op"]) {
         if (!$confirmar) {
             echo json_encode(['status' => 'error', 'message' => 'Error al confirmar la cotización']);
             exit;
-        }
-        else {
+        } else {
             $cotizacion->cambio_estado($_SESSION['usuario_id'], $_POST['cotizacion_id'], 'vendido');
             echo json_encode(['status' => 'ok', 'message' => 'Cotización confirmada con éxito']);
         }
 
 
+        break;
+
+    case 'correoStockInsuficiente':
+    $datos = json_decode(file_get_contents('php://input'), true);
+    $idCot = $datos['cotizacion_id'];
+    $productos = $datos['productos'];    // array de nombres
+    $correo    = $datos['correo'];
+
+    // 1) Enviar correo de rechazo
+    $resultado = enviarCorreoStockInsuficiente($correo, $idCot, $productos);
+
+    // 2) Si tuvo éxito, marcar cancelada
+    if (!empty($resultado['success']) && $resultado['success'] === true) {
+        $cotizacion->cambio_estado($_SESSION['usuario_id'], $idCot, 'cancelada');
+    }
+    echo json_encode($resultado);
     break;
-        
+
 }

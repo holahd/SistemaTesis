@@ -122,8 +122,12 @@ $("#form_ajuste_descuentos").submit(function (e) {
     let cambios = false;
 
     // Validar margen de ganancia
-    if (isNaN(margenActual) || margenActual < 0 || margenActual > 100) {
-        alert("El margen de ganancia debe estar entre 0% y 100%");
+    if (isNaN(margenActual) || margenActual < 1 || margenActual > 100) {
+        swal.fire({
+            icon: 'error',
+            title: 'Margen de ganancia inválido',
+            text: 'El margen de ganancia debe ser un número entre 1% y 100%.'
+        });
         return;
     }
 
@@ -137,13 +141,21 @@ $("#form_ajuste_descuentos").submit(function (e) {
         const descuento = parseFloat($(this).find(".descuento").val());
 
         if (isNaN(cantidad) || cantidad < 1) {
-            alert("Todas las cantidades mínimas deben ser mayores que 0");
+            swal.fire({
+                icon: 'error',
+                title: 'Cantidad mínima inválida',
+                text: 'Todas las cantidades mínimas deben ser números enteros mayores a 0.'
+            });
             umbralValido = false;
             return false;
         }
 
         if (isNaN(descuento) || descuento < 0 || descuento > 100) {
-            alert("Los descuentos deben estar entre 0% y 100%");
+            swal.fire({
+                icon: 'error',
+                title: 'Descuento inválido',
+                text: 'Todos los descuentos deben estar entre 0% y 100%.'
+            });
             umbralValido = false;
             return false;
         }
@@ -165,7 +177,11 @@ $("#form_ajuste_descuentos").submit(function (e) {
     const cantidades = nuevosUmbrales.map(u => u.cantidad);
     const cantidadesUnicas = new Set(cantidades);
     if (cantidades.length !== cantidadesUnicas.size) {
-        alert("No puedes tener umbrales con la misma cantidad mínima");
+        swal.fire({
+            icon: 'error',
+            title: 'Cantidades duplicadas',
+            text: 'Las cantidades mínimas deben ser únicas. Por favor, revisa los valores ingresados.'
+        });
         return;
     }
 
@@ -178,7 +194,11 @@ $("#form_ajuste_descuentos").submit(function (e) {
     if (eliminados.length > 0) cambios = true;
 
     if (!cambios) {
-        alert("No se detectaron cambios.");
+        swal.fire({
+            icon: 'info',
+            title: 'Sin cambios',
+            text: 'No se detectaron cambios en los ajustes de descuentos.'
+        });
         return;
     }
 
@@ -207,14 +227,22 @@ $("#form_ajuste_descuentos").submit(function (e) {
             eliminados: eliminados
         }),
         success: function (response) {
-            alert("¡Cambios guardados exitosamente!");
+            swal.fire({
+                icon: 'success',
+                title: 'Cambios guardados',
+                text: 'Los ajustes de descuentos se han guardado correctamente.'
+            });
             hayCambiosPendientes = false;
             window.parent.postMessage('cambiosGuardados', '*');
             location.reload();
 
         },
         error: function (xhr, status, error) {
-            alert("Error al guardar cambios.");
+            swal.fire({
+                icon: 'error',
+                title: 'Error al guardar',
+                text: 'Hubo un problema al guardar los cambios. Por favor, inténtalo de nuevo más tarde.'
+            });
             console.error(error);
         }
     });

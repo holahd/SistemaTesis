@@ -100,7 +100,12 @@ $(document).ready(function () {
         }
 
         if (lista.length === 0) {
-            alert("No hay productos en la lista.");
+            swal.fire({
+                title: 'Error',
+                text: 'No hay productos en la lista de cotización.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
             return;
         }
 
@@ -114,7 +119,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (respuesta) {
                 if (respuesta.status === 'ok') {
-                    alert("Solicitud de cotización enviada correctamente.");
+                    swal.fire({
+                        title: 'Éxito',
+                        text: 'La cotización ha sido enviada correctamente.',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
 
                     // Limpiar todo
                     localStorage.removeItem("listaCotizacion");
@@ -122,12 +132,22 @@ $(document).ready(function () {
                     $("#correoContacto").val("");
                     actualizarEstadoBoton();
                 } else {
-                    alert("Hubo un error al procesar la cotización.");
+                    swal.fire({
+                        title: 'Error',
+                        text: respuesta.message,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
                     console.error("Error del servidor:", respuesta);
                 }
             },
             error: function (error) {
-                alert("Error al conectar con el servidor.");
+               swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al enviar la cotización. Por favor, inténtalo de nuevo más tarde.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
                 console.error(error);
             }
         });

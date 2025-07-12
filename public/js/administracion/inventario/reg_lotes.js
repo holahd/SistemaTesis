@@ -6,7 +6,7 @@ $('#registrarlote').submit(function (e) {
         console.log(`${key}:`, value);
     }
 
-    alert('Formulario enviado correctamente');
+   
 
     for (let [key, value] of formulario.entries()) {
         console.log(`${key}:`, value);
@@ -61,14 +61,34 @@ $(document).ready(function () {
         success: function (data) {
             const nombres = JSON.parse(data);
 
-
             const $select = $('#producto');
             $select.empty();
-            $select.append('<option selected disabled>Seleccione un producto</option>');
+            $select.append('<option></option>'); // importante para que Select2 muestre el placeholder
 
             nombres.forEach(function (obj) {
                 $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
             });
+
+            // Activar Select2 antes de asignar el valor
+            $select.select2({
+                placeholder: "Seleccione un producto",
+                allowClear: true,
+                width: '100%'
+            });
+
+            const nombreProducto = localStorage.getItem('nombreProducto');
+
+            if (nombreProducto && $select.length) {
+                const optionExiste = $select.find('option[value="' + nombreProducto + '"]').length > 0;
+
+                if (!optionExiste) {
+                    $select.append(`<option value="${nombreProducto}">${nombreProducto}</option>`);
+                }
+
+                $select.val(nombreProducto).trigger('change'); // trigger para que Select2 lo muestre también
+            }
+
+            localStorage.removeItem('nombreProducto');
         },
         error: function (xhr, status, error) {
             console.error('Error al cargar productos:', error);

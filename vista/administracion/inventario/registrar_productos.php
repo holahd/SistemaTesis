@@ -117,11 +117,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
 </body>
 </html>
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/administracion/inventario/reg_productos.js"></script>
+    <script src="../../../public/js/administracion/inventario/características.js"></script>
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
 </body>
 </html>

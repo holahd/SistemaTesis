@@ -32,7 +32,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
 <body class="bg-light">
     <div class="container mt-4">
-       <h3 class="mb-4">Solicitudes de Cotización Enviadas</h3>
+        <h3 class="mb-4">Solicitudes de Cotización Enviadas</h3>
         <div id="cotizaciones-container" class="d-flex flex-column gap-3">
             <!-- Tarjetas se insertan aquí -->
         </div>
@@ -51,7 +51,9 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                     <button type="button" class="btn btn-danger" id="btn-rechazar-stock">Rechazar por falta de stock</button>
                     <button type="button" class="btn btn-success" onclick="confirmarventa()">Confirmar Venta</button>
+                    
 
 
                 </div>
@@ -67,12 +69,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <script src="./../../../public/js/administracion/ventas/cotizaciones_funciones.js"></script>
 <script>
     $(document).ready(function() {
-     cargarCotizaciones(
-  '../../../ajax/cotizacion-serv.php?op=listarEnviados',
-  '#cotizaciones-container',
-  'mostrarDetalleConfirmacion'
-);
+        cargarCotizaciones(
+            '../../../ajax/cotizacion-serv.php?op=listarEnviados',
+            '#cotizaciones-container',
+            'mostrarDetalleConfirmacion'
+        );
 
     });
 </script>
+
 </html>

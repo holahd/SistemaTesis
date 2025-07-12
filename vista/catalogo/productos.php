@@ -79,6 +79,7 @@
 
     <script src="../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../public/js/bootstrap.bundle.js"></script>
+     <script src="../../public/js/sweetalert2.all.js"></script>
     <script src="./../../public/js/catalogo/combosAnidados.js"></script>
     <script src="../../public/js/catalogo/productos.js"></script>
 

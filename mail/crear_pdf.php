@@ -43,7 +43,7 @@ function generarPDF($datos) {
     </head>
     <body>
         <div class="encabezado">
-            <img src="' . $logo . '" alt="Logo">
+            
             <h2>' . $empresa . '</h2>
             <p>Estimado/a cliente, a continuación encontrará el detalle de su cotización.</p>
         </div>

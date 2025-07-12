@@ -263,7 +263,11 @@ $('#buscarProducto').click(function () {
 function buscarProducto() {
     var buscar = $('#barraBusqueda').val();
     if (!buscar) {
-        alert("Por favor, ingresa un término de búsqueda.");
+        swal.fire({
+            icon: 'warning',
+            title: 'Campo vacío',
+            text: 'Por favor, ingresa un término de búsqueda.'
+        });
         return;
     }
 
@@ -364,7 +368,12 @@ $(document).ready(function () {
             $("#subCategoria").text(producto.subcategoria);
             $("#foto").attr("src", "../" + producto.foto);
         } else {
-            alert("No hay producto seleccionado.");
+            swal.fire({
+                icon: 'error',
+                title: 'Producto no encontrado',
+                text: 'No se pudo cargar el producto. Por favor, inténtalo de nuevo'
+                
+            });
             window.location.href = "catalogo.php";
         }
 

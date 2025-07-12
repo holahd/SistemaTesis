@@ -40,7 +40,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         }
 
         .table thead th {
-            background-color:rgb(202, 106, 16);
+            background-color:rgb(33, 37, 41);
             /* oscuro elegante */
             color: #fff;
         }

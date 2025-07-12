@@ -25,7 +25,7 @@ $(document).ready(function () {
                                 if (row.rol === 'admin') {
                                     // Si es admin, no mostramos el botón de eliminar
                                     return `
-                                    <button class="btn btn-outline-warning btn-sm editar" title="Editar usuario"
+                                    <button class="btn btn-outline-dark btn-sm editar" title="Editar usuario"
                                         data-id="${data.usuario_id}"
                                         data-nombre="${row.nombre}"
                                         data-apellido="${row.apellido}"
@@ -41,7 +41,7 @@ $(document).ready(function () {
                                 } else {
                                     // Si no es admin, mostramos todos los botones
                                     return `
-                                    <button class="btn btn-outline-warning btn-sm editar" title="Editar usuario"
+                                    <button class="btn btn-outline-dark btn-sm editar" title="Editar usuario"
                                         data-id="${data.usuario_id}"
                                         data-nombre="${row.nombre}"
                                         data-apellido="${row.apellido}"

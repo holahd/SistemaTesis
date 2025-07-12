@@ -1,7 +1,8 @@
 $('#registroProducto').submit(function (e) {
   e.preventDefault();
 
-
+  const nombre = $('#nombre').val().trim();
+localStorage.setItem('nombreProducto', nombre);
   // Unir capacidad con unidad
   $(".capacidad-input").each(function () {
     const unidad = $(this).closest(".input-group").find(".capacidad-unidad").val();
@@ -50,7 +51,11 @@ $('#registroProducto').submit(function (e) {
           cancelButtonText: 'No, gracias'
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = './../../../../vista/administracion/inventario/registrar_lote.php';
+
+            // guardar el nombre del producto en el localStorage
+            
+
+            window.location.href = '../../../vista/administracion/inventario/registrar_lote.php';
           }
         });
 
@@ -80,7 +85,12 @@ $(document).ready(function () {
       const maxSize = 2 * 1024 * 1024;
 
       if (file && file.size > maxSize) {
-        alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
+        swal.fire({
+          title: 'Error',
+          text: 'El archivo es demasiado grande. El tamaño máximo permitido es 2 MB.',
+          icon: 'error',  
+          confirmButtonText: 'Aceptar'
+        });
         this.value = '';
       } else {
 
@@ -111,128 +121,58 @@ $(document).ready(function () {
 });
 
 const $categoriaSelect = $("#categoria");
+const $subcategoriaSelect = $("#subcategoria");
 const $caracteristicasObligatoriasDiv = $("#caracteristicasObligatorias");
 const $caracteristicasExtrasDiv = $("#caracteristicasExtras");
 const $btnAgregar = $("#agregarCaracteristica");
 let extrasCount = 0;
 
-// Estructura de campos obligatorios con tipo de validación
-const obligatorias = {
-  1: [
-    { nombre: "Tipo de agente", tipo: "texto" },
-    { nombre: "Capacidad", tipo: "capacidad" },
-    { nombre: "Color", tipo: "texto" },
-    { nombre: "Presión", tipo: "presion" }
-  ],
-  2: [
-    { nombre: "Tallas disponibles", tipo: "tallas" },
-    { nombre: "Material", tipo: "texto" },
-    { nombre: "Color", tipo: "texto" },
-    { nombre: "Tipo de protección", tipo: "texto" }
-  ]
-};
-
-// Función para crear campos dinámicos
-function crearCampo(nombre = "", esObligatorio = false, tipo = "texto") {
-  const $group = $("<div>").addClass("row mb-2 caracteristica-group align-items-center");
-
-  const $colNombre = $("<div>").addClass("col-md-5").append(
-    $("<input>")
-      .attr("type", "text")
-      .addClass("form-control")
-      .attr("placeholder", "nombre")
-      .attr("tabindex", "-1")
-      .css("pointer-events", "none")
-      .attr("name", "caracteristica_nombre[]")
-      .val(nombre)
-      .prop("readonly", esObligatorio)
-  );
-
-  const $colDescripcion = $("<div>").addClass("col-md-5");
-  let $inputDesc;
-
-  switch (tipo) {
-    case "capacidad":
-      $inputDesc = $(`
-        <div class="input-group">
-          <input type="text" class="form-control capacidad-input" name="caracteristica_descripcion[]" placeholder="Ej: 10" />
-          <select class="form-select input-group-text capacidad-unidad">
-            <option value="kg">kg</option>
-            <option value="litros">litros</option>
-          </select>
-        </div>
-      `);
-      break;
-
-    case "presion":
-      $inputDesc = $(`
-        <div class="input-group">
-          <input type="text" class="form-control presion-input" name="caracteristica_descripcion[]" placeholder="Ej: 150" />
-          <span class="input-group-text">PSI</span>
-        </div>
-      `);
-      break;
-
-    case "numero":
-      $inputDesc = $(`<input type="text" class="form-control solo-numero" name="caracteristica_descripcion[]" placeholder="Ingrese valor numérico" />`);
-      break;
-
-    case "tallas":
-      $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="Ej: S, M, L" />`);
-      break;
-
-    default:
-      $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="descripción" />`);
-  }
-
-  $colDescripcion.append($inputDesc);
-  $group.append($colNombre, $colDescripcion);
-  return $group;
-}
-
-// Mostrar campos obligatorios según categoría
+// Cuando cambie categoría, mostrar campos obligatorios
 $categoriaSelect.on("change", function () {
   const categoria = $(this).val();
   $caracteristicasObligatoriasDiv.empty();
 
   if (obligatorias[categoria]) {
     obligatorias[categoria].forEach(car => {
-      const $campo = crearCampo(car.nombre, true, car.tipo);
+      const subID = $subcategoriaSelect.val();
+      const $campo = crearCampo(car.nombre, true, car.tipo, subID);
       $caracteristicasObligatoriasDiv.append($campo);
     });
   }
 });
 
-// Agregar campo extra con tipo por SweetAlert
+// Cambiar placeholder de tallas si cambia subcategoría
+$subcategoriaSelect.on("change", function () {
+  const subID = $(this).val();
+  const nuevoPlaceholder = getPlaceholderTalla(subID);
+
+  $caracteristicasObligatoriasDiv.find("input").each(function () {
+    const $nombreInput = $(this).closest(".caracteristica-group").find("input[name='caracteristica_nombre[]']");
+    if ($nombreInput.val() === "Tallas disponibles") {
+      $(this).attr("placeholder", nuevoPlaceholder);
+    }
+  });
+});
+
+// Agregar campo extra
 $btnAgregar.on("click", async function () {
-  if (extrasCount >= 3) return;
+  if (extrasEditarCount >= 3) return;
 
   const { value: tipoCampo } = await Swal.fire({
-    title: "Tipo de característica",
-    input: "select",
-    inputOptions: {
-      texto: "Texto",
-      numero: "Número"
-    },
-    inputPlaceholder: "Selecciona tipo",
-    showCancelButton: true,
-    confirmButtonText: "Agregar",
-    cancelButtonText: "Cancelar",
-    customClass: {
-      input: 'swal2-select-bootstrap' // Aplica estilo Bootstrap al select
-    },
-    inputValidator: (value) => {
-      if (!value) {
-        return "Debes seleccionar un tipo de característica";
-      }
-    }
+    // ... tu configuración Swal ...
   });
 
   if (!tipoCampo) return;
 
   const tipo = tipoCampo === "numero" ? "numero" : "texto";
+  const subID = $subcategoria.val();
+  const $campoExtra = crearCampo("", false, tipo, subID);
 
-  const $campoExtra = crearCampo("", false, tipo);
+  // Aquí forzamos que solo el nombre sea editable
+  $campoExtra.find("input[name='caracteristica_nombre[]']").prop("readonly", false);
+  // El valor puede quedar editable o no, según lo que quieras:
+  // Editable:
+  $campoExtra.find("input[name='caracteristica_descripcion[]']").prop("readonly", false);
 
   const $btnEliminar = $("<button>")
     .attr("type", "button")
@@ -242,18 +182,13 @@ $btnAgregar.on("click", async function () {
   const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
   $campoExtra.append($colEliminar);
 
-  $caracteristicasExtrasDiv.append($campoExtra);
-  extrasCount++;
+  $caracteristicasExtras.append($campoExtra);
+  extrasEditarCount++;
 });
 
 
-// Eliminar característica extra
+// Eliminar campo extra
 $(document).on("click", ".eliminarCaracteristica", function () {
   $(this).closest(".caracteristica-group").remove();
   extrasCount--;
-});
-
-// Restringir entrada solo a números
-$(document).on("input", ".capacidad-input, .presion-input, .solo-numero", function () {
-  this.value = this.value.replace(/\D/g, "");
 });

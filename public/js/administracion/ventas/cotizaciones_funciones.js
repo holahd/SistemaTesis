@@ -85,7 +85,7 @@ function abrirDetalle(id, email) {
               </tbody>
             </table>
           </div>
-          <input type="hidden" id="cotizacion_id_oculto" value="${id}">
+          <input type="hidden" id="cotizacion_id" value="${id}">
           <div class="mt-3">
             <label class="form-label">Correo electrónico del cliente:</label>
             <div id="correo"><strong>${email}</strong></div>
@@ -190,14 +190,14 @@ function enviarCotizacion() {
   if (errores.length > 0) {
     Swal.fire({
       icon: 'warning',
-      title: 'Errores en los precios',
+      title: 'Errores en los datos',
       html: '<ul style="text-align:left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>'
     });
     return;
   }
 
   const email = $('#correo').text().trim();
-  const cotizacionId = $('#cotizacion_id_oculto').val();
+  const cotizacionId = $('#cotizacion_id').val();
   // Confirmar antes de enviar
   Swal.fire({
     title: '¿Enviar cotización?',
@@ -223,6 +223,9 @@ function enviarCotizacion() {
           const r = JSON.parse(response);
           if (r.success) {
             Swal.fire('Éxito', 'La cotización fue enviada correctamente.', 'success');
+            $('#modalDetalle').modal('hide');
+            // recargar la página para actualizar el listado
+            location.reload();
           } else {
             Swal.fire('Error', 'No se pudo enviar el correo: ' + r.error, 'error');
           }
@@ -235,6 +238,65 @@ function enviarCotizacion() {
     }
   });
 }
+
+// Cuando pulsan "Rechazar por falta de stock"
+$(document).on('click', '#btn-rechazar-stock', function() {
+  const cotizacionId = $('#cotizacion_id').val();
+  const $c = $('#correo');
+const email = ($c.is('input, textarea') ? $c.val() : $c.text()).trim();
+
+
+  // Recolectar productos con stock insuficiente
+  const productosSinStock = [];
+  $('#detalle-modal-body table tbody tr').each(function() {
+    const $fila = $(this);
+    const cantidad = parseInt($fila.find('td:eq(1)').text());
+    const stock    = parseInt($fila.find('td:eq(2)').text());
+    if (cantidad > stock) {
+      productosSinStock.push($fila.find('td:eq(0)').text());
+    }
+  });
+
+  if (productosSinStock.length === 0) {
+    return Swal.fire('Sin incidencia', 'No hay productos con stock insuficiente.', 'info');
+  }
+
+  Swal.fire({
+    title: 'Confirmar rechazo',
+    html: `Se notificará al cliente que no hay stock de:<br><strong>${productosSinStock.join(', ')}</strong><br>y se cancelará la cotización.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, notificar y cancelar'
+  }).then(({ isConfirmed }) => {
+    if (!isConfirmed) return;
+    // Llamada AJAX
+    $.ajax({
+      url: '../../../ajax/cotizacion-serv.php?op=correoStockInsuficiente',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        cotizacion_id: cotizacionId,
+        correo: email,
+        productos: productosSinStock
+      }),
+      success(response) {
+        const r = typeof response === 'string' ? JSON.parse(response) : response;
+        if (r.success) {
+          Swal.fire('Notificado','El cliente ha sido informado y la cotización cancelada.','success');
+          $('#modalDetalle').modal('hide');
+          // recargar la página para actualizar el listado
+          location.reload();
+         
+        } else {
+          Swal.fire('Error','No se pudo notificar: '+r.error,'error');
+        }
+      },
+      error() {
+        Swal.fire('Error','Falló la conexión con el servidor.','error');
+      }
+    });
+  });
+});
 
 
 function mostrarDetalleConfirmacion(id, correo) {
@@ -284,7 +346,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <input type="text" class="form-control" id="direccion" required>
         </div>
         <div class="mb-2"><label class="form-label">Correo</label>
-          <input type="email" class="form-control" id="correo" value="${correo}" required>
+          <input type="email" class="form-control" id="correo" name="correo" value="${correo}" required>
         </div>
         <div class="mb-2"><label class="form-label">Teléfono</label>
           <input type="text" class="form-control solo-numeros" id="telefono" required>
