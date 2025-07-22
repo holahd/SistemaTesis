@@ -17,6 +17,11 @@ function guardarEstadoInicial(margen, umbrales) {
 // Marcar que hay cambios cuando se modifican valores
 $(document).on('input change', '#margen_ganancia, .cantidad_minima, .descuento', function () {
     if (!hayCambiosPendientes) {
+        // Verificar si el margen de ganancia ha cambiado
+        const margenActual = parseFloat($("#margen_ganancia").val());
+        if (isNaN(margenActual) || margenActual < 1 || margenActual > 100) {
+            return;
+        } // No marcar cambios si el margen es inválido
         hayCambiosPendientes = true;
         window.parent.postMessage('cambiosPendientes', '*');
     }
@@ -25,7 +30,13 @@ $(document).on('input change', '#margen_ganancia, .cantidad_minima, .descuento',
 
 // Cuando se agrega o elimina umbral
 $(document).on('click', '#agregar_threshold, .eliminar_threshold', function () {
+
     if (!hayCambiosPendientes) {
+        const contenedor = $('#contenedor_thresholds');
+        const count = contenedor.find('.threshold-item').length;
+        if (count >= MAX_THRESHOLDS) {
+            return;
+        }// No marcar cambios si se intenta agregar más de 5 umbrales
         hayCambiosPendientes = true;
         window.parent.postMessage('cambiosPendientes', '*');
     }
@@ -94,12 +105,12 @@ $("#agregar_threshold").click(function () {
     const count = contenedor.find('.threshold-item').length;
 
     if (count >= MAX_THRESHOLDS) {
-       Swal.fire({
-        icon: 'warning',
-        title: 'Límite alcanzado',
-        text: 'Has alcanzado el número máximo de 5 umbrales.',
-        confirmButtonText: 'Aceptar'
-    });
+        Swal.fire({
+            icon: 'warning',
+            title: 'Límite alcanzado',
+            text: 'Has alcanzado el número máximo de 5 umbrales.',
+            confirmButtonText: 'Aceptar'
+        });
         return;
     }
 
@@ -165,10 +176,14 @@ $("#form_ajuste_descuentos").submit(function (e) {
 
         nuevosUmbrales.push({ id, cantidad, descuento });
 
-        const original = estadoInicial.umbrales.find(u => u.id === id);
-        if (!original || original.cantidad !== cantidad || original.descuento !== descuento) {
+        const original = estadoInicial.umbrales.find(u => parseInt(u.id) === parseInt(id));
+
+        if (!original ||
+            parseInt(original.cantidad) !== parseInt(cantidad) ||
+            parseFloat(original.descuento).toFixed(2) !== parseFloat(descuento).toFixed(2)) {
             cambios = true;
         }
+
     });
 
     if (!umbralValido) return;
@@ -212,40 +227,58 @@ $("#form_ajuste_descuentos").submit(function (e) {
     }
 
     if (advertencia !== "") {
-        advertencia = "Advertencias:\n" + advertencia + "\n¿Deseas continuar?";
-        if (!confirm(advertencia)) return;
+        Swal.fire({
+            title: 'Advertencias',
+            html: advertencia,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                enviarDatos();
+            }
+            // si cancela, no hace nada, solo retorna y se detiene
+        });
+    } else {
+        // No hay advertencias, enviar directamente
+        enviarDatos();
     }
 
-    // Enviar al backend
-    $.ajax({
-        url: '../../ajax/umbral-serv.php?op=guardar',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            margen_ganancia: margenActual,
-            umbrales: nuevosUmbrales,
-            eliminados: eliminados
-        }),
-        success: function (response) {
-            swal.fire({
-                icon: 'success',
-                title: 'Cambios guardados',
-                text: 'Los ajustes de descuentos se han guardado correctamente.'
-            });
-            hayCambiosPendientes = false;
-            window.parent.postMessage('cambiosGuardados', '*');
-            location.reload();
-
-        },
-        error: function (xhr, status, error) {
-            swal.fire({
-                icon: 'error',
-                title: 'Error al guardar',
-                text: 'Hubo un problema al guardar los cambios. Por favor, inténtalo de nuevo más tarde.'
-            });
-            console.error(error);
-        }
-    });
+    function enviarDatos() {
+        $.ajax({
+            url: '../../ajax/umbral-serv.php?op=guardar',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                margen_ganancia: margenActual,
+                umbrales: nuevosUmbrales,
+                eliminados: eliminados
+            }),
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Cambios guardados',
+                    text: 'Los ajustes de descuentos se han guardado correctamente.',
+                    confirmButtonText: 'Aceptar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        hayCambiosPendientes = false;
+                        window.parent.postMessage('cambiosGuardados', '*');
+                        window.location.reload(); // recarga el iframe
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al guardar',
+                    text: 'Hubo un problema al guardar los cambios. Por favor, inténtalo de nuevo más tarde.'
+                });
+                console.error(error);
+            }
+        });
+    }
 });
 
 

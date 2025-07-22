@@ -361,51 +361,70 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
 
 
 function eliminarProducto(id, nombre) {
-    if (confirm('¿Seguro que deseas descontinuar el producto "' + nombre + '"?')) {
-        $.post('../../../ajax/catalogo-serv.php?op=eliminar', { codigo: id }, function (respuesta) {
-            respuesta = JSON.parse(respuesta);
-            swal.fire({
-                title: 'Éxito',
-                text: respuesta.mensaje,
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
+    Swal.fire({
+        title: '¿Descontinuar producto?',
+        text: '¿Seguro que deseas descontinuar el producto "' + nombre + '"?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, descontinuar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('../../../ajax/catalogo-serv.php?op=eliminar', { codigo: id }, function (respuesta) {
+                respuesta = JSON.parse(respuesta);
+                Swal.fire({
+                    title: 'Éxito',
+                    text: respuesta.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
+                $('#tablaProductos').DataTable().ajax.reload(null, false);
+            }).fail(function () {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo descontinuar el producto. Inténtalo más tarde.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             });
-            $('#tablaProductos').DataTable().ajax.reload(null, false);
-        }).fail(function () {
-            swal.fire({
-                title: 'Error',
-                text: 'No se pudo descontinuar el producto. Inténtalo más tarde.',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-        });
-    }
+        }
+    });
 }
 
 
 
 function restaurarProducto(id, nombre) {
-    if (confirm(`¿Seguro que deseas restaurar el producto "${nombre}"?`)) {
-        $.post('../../../ajax/catalogo-serv.php?op=restaurar', { codigo: id }, function (respuesta) {
-            respuesta = JSON.parse(respuesta);
-            swal.fire({
-                title: 'Éxito',
-                text: respuesta.mensaje,
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            });
+    Swal.fire({
+        title: '¿Restaurar producto?',
+        text: `¿Seguro que deseas restaurar el producto "${nombre}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, restaurar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('../../../ajax/catalogo-serv.php?op=restaurar', { codigo: id }, function (respuesta) {
+                respuesta = JSON.parse(respuesta);
+                Swal.fire({
+                    title: 'Éxito',
+                    text: respuesta.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
 
-            $('#tablaProductos').DataTable().ajax.reload(null, false);
-        }).fail(function () {
-            swal.fire({
-                title: 'Error',
-                text: 'No se pudo restaurar el producto. Inténtalo más tarde.',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
+                $('#tablaProductos').DataTable().ajax.reload(null, false);
+            }).fail(function () {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo restaurar el producto. Inténtalo más tarde.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             });
-        });
-    }
+        }
+    });
 }
+
 
 const $categoria = $("#categoria");
 const $subcategoria = $("#subcategoria");

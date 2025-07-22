@@ -52,7 +52,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <div class="modal-footer">
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-danger" id="btn-rechazar-stock">Rechazar por falta de stock</button>
+                        
                         <button type="button" class="btn btn-success" onclick="enviarCotizacion()">Enviar Cotización</button>
                     </div>
 

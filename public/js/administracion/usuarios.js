@@ -117,34 +117,60 @@ $(document).ready(function () {
     // Evento para eliminar usuario
     $(document).on('click', '.eliminar', function () {
         let email = $(this).data('email');
-        if (confirm('¿Seguro que deseas eliminar al usuario con email ' + email + '?')) {
-            $.post('../../ajax/administrador.php?op=eliminar', { email: email }, function (respuesta) {
 
-                let datos = JSON.parse(respuesta);
+        Swal.fire({
+            title: '¿Eliminar usuario?',
+            text: '¿Seguro que deseas eliminar al usuario con email ' + email + '?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('../../ajax/administrador.php?op=eliminar', { email: email }, function (respuesta) {
+                    let datos = JSON.parse(respuesta);
 
-                alert(datos.mensaje);
-                location.reload();
-            });
-        }
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Mensaje',
+                        text: datos.mensaje,
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                });
+            }
+        });
     });
+
 
     // Evento para resetear contraseña
     $(document).on('click', '.resetear', function () {
         let email = $(this).data('email');
-        if (confirm('¿Restablecer la contraseña del usuario con email ' + email + '?')) {
+        Swal.fire({
+            title: '¿Restablecer contraseña?',
+            text: '¿Deseas restablecer la contraseña del usuario con email ' + email + '?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, restablecer',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('../../ajax/administrador.php?op=reestablecerContrasena', { email: email }, function (respuesta) {
+                    let datos = JSON.parse(respuesta);
 
+                    Swal.fire({
+                        icon: 'success', // puedes usar datos.estado === 'error' ? 'error' : 'success' si el backend lo envía
+                        title: 'Resultado',
+                        text: datos.mensaje,
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            }
+        });
 
-
-
-
-            $.post('../../ajax/administrador.php?op=reestablecerContrasena', { email: email }, function (respuesta) {
-
-                let datos = JSON.parse(respuesta);
-
-                alert(datos.mensaje);
-
-            });
-        }
     });
 });
 
@@ -157,8 +183,8 @@ function PonerValoresenCampos(id, nombre, apellido, email, rol) {
     $('#nombre').val(nombre);
     $('#apellido').val(apellido);
     $('#correo').val(email);
- const modal = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
-  
+    const modal = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
+
     if (rol === 'admin') {
         // Si no existe la opción "admin", agregarla temporalmente
         if ($('#rol option[value="admin"]').length === 0) {
@@ -179,7 +205,7 @@ function PonerValoresenCampos(id, nombre, apellido, email, rol) {
     }
 
 
-modal.show();
+    modal.show();
 }
 
 $('#formEditarUsuario').submit(function (e) {

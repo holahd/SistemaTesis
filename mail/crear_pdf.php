@@ -6,7 +6,7 @@ function generarPDF($datos) {
     $fecha = date("d/m/Y H:i");
     $telefono = "+593 99 999 9999";
     $empresa = "FireSafe"; // nombre de la empresa
-    $logo = realpath(__DIR__ . '/../public/img/administrador/Pyro_emblem_RED.png');
+    
 
 
     // Construir la tabla de productos
@@ -25,6 +25,10 @@ function generarPDF($datos) {
             <td>$' . number_format($subtotal, 2) . '</td>
         </tr>';
     }
+
+    $IVA = $total * 15/100;
+    $totalIva = $total + ($total * 15/100); // Agregar IVA del 15%
+
 
     $html = '
     <html>
@@ -60,13 +64,11 @@ function generarPDF($datos) {
             <tbody>' . $tabla . '</tbody>
         </table>
 
-        <p class="total">Total a pagar: $' . number_format($total, 2) . '</p>
+        <p class="total">Subtotal: $' . number_format($total, 2) . '</p>
+        <p class="total">IVA: $'. number_format($IVA, 2) . '</p>
+        <p class="total">Total a pagar: $' . number_format($totalIva, 2) . '</p>
 
-        <p style="font-size: 15px; color: #b22222; font-weight: bold;">
-  ⚠️ Nota importante: Los precios indicados <u>no incluyen IVA</u>. El valor final puede variar según la normativa tributaria vigente.
-</p>
-
-
+        
         <div class="despedida">
             <p>Gracias por su interés. Para más información o para confirmar la compra, contáctenos al <strong>' . $telefono . '</strong>.</p>
         </div>

@@ -57,8 +57,8 @@ function abrirDetalle(id, email) {
                   <th>Producto</th>
                   <th>Cantidad solicitada</th>
                   <th>Stock disponible</th>
-                  <th>Precio de compra</th>
-                  <th>Precio final (unidad)</th>
+                  <th>Precio de compra unitario</th>
+                  <th>P.V.P unitario</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,11 +172,7 @@ function enviarCotizacion() {
       errores.push(`El precio del producto "${nombre}" parece demasiado alto. Verifique el valor ingresado.`);
     }
 
-    if (cantidad > stock) {
-      $fila.addClass('table-danger');
-      errores.push(`No hay suficiente stock para el producto "${nombre}". Solicitado: ${cantidad}, disponible: ${stock}.`);
-    }
-
+    
     const subtotal = (cantidad * precioFinal).toFixed(2);
     productos.push({
       producto: nombre,
