@@ -36,10 +36,18 @@
             </div>
             <div class="mt-3">
                 <label for="cantidad" class="form-label">Cantidad:</label>
-                <input type="number" id="cantidad" class="form-control w-50" min="1" value="1">
+                <input type="text" id="cantidad" class="form-control w-50 solo-numeros" min="1" value="" placeholder="ingrese una cantidad">
             </div>
+            <!-- Agregado debajo de "Cantidad:" -->
+            <div class="mt-3" id="contenedorTallas" style="display: none;">
+                <label for="talla" class="form-label">Talla:</label>
+                <select id="talla" class="form-select w-50">
+                    <option value="" disabled selected>Selecciona una talla</option>
+                </select>
+            </div>
+
             <div class="mt-3">
-                
+
                 <button class="btn btn-warning mt-3 btn-add-lista" id="añadirLista">Agregar a la lista</button>
             </div>
         </div>
@@ -48,6 +56,9 @@
     <script src="../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../public/js/bootstrap.js"></script>
     <script src="../../public/js/sweetalert2.all.js"></script>
+
+    <script src="./../../public/js/validaciones.js"></script>
+
     <script src="../../public/js/catalogo/productos.js"></script>
     <script src="../../public/js/catalogo/cotizaciones.js"></script>
 </body>

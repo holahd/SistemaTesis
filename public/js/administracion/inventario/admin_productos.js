@@ -1,5 +1,8 @@
+const mapaProductos = new Map();
+// luego cargar datos ahí
 
 $(document).ready(function () {
+
 
     $('#formulario_edicion').prop('disabled', true);
 
@@ -8,11 +11,37 @@ $(document).ready(function () {
             ajax: {
                 url: '../../../ajax/catalogo-serv.php?op=listarProductos',
                 type: 'POST',
-                dataSrc: ''
+                dataSrc: function (json) {
+                    mapaProductos.clear(); // vaciamos el mapa primero
+                    json.forEach(p => mapaProductos.set(p.producto_id, p)); // indexamos
+                    return json;
+                }
             },
             columns: [
+                { data: 'producto_id', visible: false },
                 { data: 'nombre' },
                 { data: 'descripcion' },
+                {
+                    data: null,
+                    title: 'Stock',
+                    render: function (data, type, row) {
+                        if (row.categoria === "Extintores") {
+                            return `<span class="fw-semibold">${row.stock_total} unidades</span>`;
+                        } else if (row.categoria === "Vestimenta") {
+                            return `
+                <button 
+                    class="btn btn-outline-primary btn-sm ver-tallas"
+                    data-producto_id="${row.producto_id}"
+                    data-nombre="${row.nombre}">
+                    Ver stock por tallas
+                </button>
+            `;
+                        } else {
+                            return `<span class="text-muted">N/A</span>`;
+                        }
+                    }
+                },
+
                 { data: 'categoria' },
                 { data: 'subcategoria' },
                 {
@@ -86,26 +115,101 @@ $(document).ready(function () {
             dom: 'Bfrtip',
             buttons: [
                 {
-                    extend: 'pdfHtml5',
-                    text: '📄 PDF',
-                    orientation: 'landscape',
-                    pageSize: 'A4',
-                    className: 'btn btn-info btn-sm',
-                    exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
-                },
-                {
                     extend: 'excelHtml5',
                     text: '📊 Excel',
-                    className: 'btn btn-success btn-sm',
-                    exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 7] // incluye columna de producto_id (0) y columna stock (3)
+                    },
+                    customize: function (xlsx) {
+                        const sheet = xlsx.xl.worksheets['sheet1.xml'] || xlsx.xl.worksheets[Object.keys(xlsx.xl.worksheets)[0]];
+
+                        $('row', sheet).each(function () {
+                            const $row = $(this);
+                            if ($row.attr('r') === '1') return; // saltar encabezado
+
+                            // Producto ID columna A
+                            const $cellId = $row.find('c[r^="A"]');
+                            const producto_id = $cellId.find('v').text();
+
+                            const producto = mapaProductos.get(producto_id);
+                            if (!producto) return;
+
+                            let textoStock = 'N/A';
+                            if (producto.categoria === "Vestimenta" || producto.categoria_id == 2) {
+                                textoStock = producto.tallas?.length > 0
+                                    ? producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ')
+                                    : 'Sin lotes registrados';
+                            } else if (producto.categoria === "Extintores") {
+                                textoStock = `${producto.stock_total} unidades`;
+                            }
+
+                            const $cellStock = $row.find('c[r^="D"]');
+
+                            const $v = $cellStock.find('v');
+                            const $is = $cellStock.find('is t');
+
+                            if ($v.length) {
+                                $v.text(textoStock);
+                            } else if ($is.length) {
+                                $is.text(textoStock);
+                            } else {
+                                $cellStock.append(`<v>${textoStock}</v>`);
+                            }
+                        });
+                    }
+
+
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '📄 PDF',
+                    orientation: 'portrait',
+                    pageSize: 'A4',
+                    exportOptions: { columns: [0, 1, 2, 3, 4, 5, 7] },
+                    customize: function (doc) {
+                        doc.content[1].table.body.forEach((row, i) => {
+                            if (i === 0) return; // Saltar encabezado
+
+                            const producto_id = row[0].text || row[0]; // puede ser objeto o string
+                            const producto = mapaProductos.get(producto_id);
+                            const categoria = parseInt(producto?.categoria_id);
+                            if (categoria === 2) { // columna 4: categoria_id
+                                if (producto.tallas?.length > 0) {
+                                    let textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ');
+                                    row[3].text = textoStock;
+                                } else {
+                                    row[3].text = 'Sin lotes registrados';
+                                }
+                            }
+
+                        });
+                    }
                 },
                 {
                     extend: 'print',
                     text: '🖨️ Imprimir',
-                    className: 'btn btn-primary btn-sm',
-                    exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    exportOptions: { columns: [0, 1, 2, 3, 4, 5, 7] },
+                    customize: function (win) {
+                        const body = $(win.document.body).find('table tbody tr');
+                        body.each(function (i, tr) {
+                            const tds = $(tr).find('td');
+                            const producto_id = tds.eq(0).text();
+                            const producto = mapaProductos.get(producto_id);
+                            const categoria = parseInt(producto?.categoria_id);
+                            if (categoria === 2) { // columna 4: categoria_id
+                                if (producto.tallas?.length > 0) {
+                                    const textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ');
+                                    tds.eq(3).text(textoStock);
+                                } else {
+                                    tds.eq(3).text('Sin lotes registrados');
+                                }
+                            }
+
+                        });
+                    }
                 }
-            ],
+            ]
+            ,
             columnDefs: [
                 { targets: -1, className: 'text-center', orderable: false, width: "120px" }
             ]
@@ -228,6 +332,38 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on('click', '.ver-tallas', function () {
+        const producto_id = $(this).data('producto_id');
+        const nombre = $(this).data('nombre');
+
+        const producto = mapaProductos.get(producto_id.toString());
+
+        $('#tituloModalTallas').text(`Stock por tallas - ${nombre}`);
+
+        if (!producto || !producto.tallas || producto.tallas.length === 0) {
+            $('#contenedorTallas').html('<p class="text-danger">No hay lotes registrados del producto.</p>');
+        } else {
+            let html = `<div class="row g-2">`;
+            producto.tallas.forEach(item => {
+                html += `
+                <div class="col-6 col-md-4">
+                    <div class="card text-center border-0 shadow-sm bg-light">
+                        <div class="card-body">
+                            <i class="bi bi-tags-fill fs-3 text-primary"></i>
+                            <h6 class="mt-2 mb-0">Talla <strong>${item.talla}</strong></h6>
+                            <b>${item.stock} unidades</b>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            $('#contenedorTallas').html(html);
+        }
+
+        $('#modalTallas').modal('show');
+    });
+
 });
 
 
@@ -426,6 +562,10 @@ function restaurarProducto(id, nombre) {
 }
 
 
+
+
+
+
 const $categoria = $("#categoria");
 const $subcategoria = $("#subcategoria");
 const $caracteristicasObligatorias = $("#caracteristicasObligatorias");
@@ -507,6 +647,7 @@ $(document).on("click", ".eliminarCaracteristica", function () {
     $(this).closest(".caracteristica-group").remove();
     extrasEditarCount--;
 });
+
 
 
 function asignarValorCampo($campo, valor, tipo) {

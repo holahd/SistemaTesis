@@ -8,7 +8,7 @@ const obligatorias = {
         { nombre: "Presión", tipo: "presion" }
     ],
     2: [
-        { nombre: "Tallas disponibles", tipo: "tallas" },
+        
         { nombre: "Material", tipo: "texto" },
         { nombre: "Color", tipo: "texto" },
         { nombre: "Tipo de protección", tipo: "texto" }
@@ -18,16 +18,7 @@ const obligatorias = {
 // función getPlaceholderTalla y crearCampo como te di antes
 
 
-function getPlaceholderTalla(subcategoriaID) {
-    switch (subcategoriaID) {
-        case "8": return "Ej: 7, 8, 9, 10"; // Guantes
-        case "9": return "Ej: 39, 40, 41, 42"; // Calzado
-        case "10": return "Ej: S, M, L, XL"; // Chalecos
-        case "11": return "Ej: Ajustable o M/L"; // Cascos
-        case "12": return "Tamaño único o ajustable"; // Protección ocular
-        default: return "Ej: S, M, L";
-    }
-}
+
 
 function crearCampo(nombre = "", esObligatorio = false, tipo = "texto", subcategoriaID = "") {
     const $group = $("<div>").addClass("row mb-2 caracteristica-group align-items-center");
@@ -83,10 +74,7 @@ function crearCampo(nombre = "", esObligatorio = false, tipo = "texto", subcateg
             $inputDesc = $(`<input type="text" class="form-control solo-numero" name="caracteristica_descripcion[]" placeholder="Ingrese valor numérico" />`);
             break;
 
-        case "tallas":
-            const placeholderTalla = getPlaceholderTalla(subcategoriaID);
-            $inputDesc = $(`<input type="text" class="form-control" name="caracteristica_descripcion[]" placeholder="${placeholderTalla}" />`);
-            break;
+        
 
         default:
             let opciones = [];

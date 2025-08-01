@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dataType: 'json',
         data: {
             UmbralExpiracion: 60,
-            UmbralStock: 15
+            UmbralStock: 25
         },
         success(data) {
             const elim = cargarEliminadas();

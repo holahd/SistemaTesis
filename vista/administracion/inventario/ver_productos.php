@@ -84,6 +84,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <div class="container">
         <h2 class="mb-4 text-center text-primary">Gestión de Productos</h2>
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h4>Productos existentes</h4>
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalReporte">
+                <i class="fas fa-file-pdf"></i> Generar reporte de movimientos
+            </button>
+        </div>
+
 
         <!-- Tabla de Productos -->
         <div class="card shadow-sm border-0">
@@ -91,8 +98,10 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <table id="tablaProductos" class="table table-hover align-middle text-center table-bordered">
                     <thead class="bg-warning text-dark">
                         <tr>
+                            <th>Código</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
+                            <th>Stock</th>
                             <th>Categoría</th>
                             <th>Subcategoría</th>
                             <th>Imagen</th>
@@ -206,10 +215,53 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         </div>
     </div>
 
+    <!-- Modal de tallas por producto -->
+    <div class="modal fade" id="modalTallas" tabindex="-1" aria-labelledby="tituloModalTallas" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content shadow rounded-3">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="tituloModalTallas">Stock por tallas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="contenedorTallas">
+                        <p class="text-muted">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Modal -->
+<div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formReporte" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="fechaInicio" class="form-label">Desde</label>
+          <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+        </div>
+        <div class="mb-3">
+          <label for="fechaFin" class="form-label">Hasta</label>
+          <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Generar PDF</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Scripts -->
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
+    <script src="../../../public/js/jszip.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -217,7 +269,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
     <script src="../../../public/js/administracion/inventario/características.js"></script>
-
+     <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
 </body>
 
 </html>

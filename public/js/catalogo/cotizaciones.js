@@ -15,41 +15,46 @@ $(document).ready(function () {
     actualizarEstadoBoton();
     // 🛒 Añadir a la lista de cotización
     $(document).on("click", "#añadirLista", function () {
-        let id= $("#producto_id").val();
+        let id = $("#producto_id").val();
         let nombre = $("#nombre").text();
         let descripcion = $("#descripcion").html();
         console.log(descripcion);
         let cantidad = $("#cantidad").val();
 
+        let talla = $("#talla").length > 0 ? $("#talla").val() : null;
+
+        if ($("#contenedorTallas").is(":visible") && !talla) {
+            Swal.fire("Falta seleccionar talla", "Por favor, selecciona una talla.", "warning");
+            return;
+        }
         // Obtener la lista actual desde localStorage
         let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let yaExiste = listaProductos.find(p => p.id === id && p.talla === talla);
 
-        // Verificar si el producto ya está en la lista
-        if (!listaProductos.some(p => p.nombre === nombre)) {
-            listaProductos.push({ id ,nombre, descripcion, cantidad });
-
-            // Guardar la lista actualizada en localStorage
-            localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));
-            actualizarEstadoBoton();
-
-
-            $('#alerta').fadeIn();  // Muestra la alerta de manera gradual
-
-
-            setTimeout(function () {
-                $('#alerta').fadeOut();
-            }, 3000);
-
-
+        if (yaExiste) {
+            yaExiste.cantidad = parseInt(yaExiste.cantidad) + parseInt(cantidad);
         } else {
-
-            $('#alerta2').fadeIn();  // Muestra la alerta de manera gradual
-
-            // Después de 3 segundos, desaparecerá (puedes ajustar el tiempo si lo deseas)
-            setTimeout(function () {
-                $('#alerta2').fadeOut();  // Desvanece la alerta de manera gradual
-            }, 3000);  // 3000 ms = 3 segundos
+            listaProductos.push({ id, nombre, descripcion, cantidad, talla });
         }
+
+
+
+
+
+        // Guardar la lista actualizada en localStorage
+        localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));
+        actualizarEstadoBoton();
+
+
+        $('#alerta').fadeIn();  // Muestra la alerta de manera gradual
+
+
+        setTimeout(function () {
+            $('#alerta').fadeOut();
+        }, 3000);
+
+
+
 
         // Verificamos que estamos en un iframe y si el iframe puede acceder al DOM del padre
         if (window.parent && window.parent.document) {
@@ -83,11 +88,12 @@ $(document).ready(function () {
             listaProductos.forEach((p, index) => {
                 listaHTML += `<li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>${p.nombre}</strong> - ${p.descripcion.replace(/\n/g, "<br>")}
+                                    <strong>${p.nombre}</strong> - ${p.descripcion.replace(/\n/g, "<br>")}` +
+                                    (p.talla ? `<br><span class="badge bg-secondary">Talla: ${p.talla}</span>` : "") + `
                                     <br> Cantidad:
                                     <div class="input-group input-group-sm mt-2 cantidad-control" data-index="${index}">
                                         <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>
-                                        <input type="text" class="form-control text-center cantidad-input" value="${p.cantidad}" readonly>
+                                        <input type="text" class="form-control text-center cantidad-input solo-numeros" value="${p.cantidad}">
                                         <button class="btn btn-outline-secondary btn-increase" type="button">+</button>
                                     </div>
                                 </div>
@@ -137,7 +143,7 @@ $(document).ready(function () {
 
         $("#listaModal").modal("hide");
 
-       $("#product-frame").attr("src", "resumen.php");
+        $("#product-frame").attr("src", "resumen.php");
 
 
     });
@@ -186,6 +192,35 @@ $(document).ready(function () {
             listaProductos[index].cantidad = cantidadActual - 1;
             localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));
             $("#verLista").trigger("click"); // Refresca el modal
+        }
+    });
+
+
+    // Guardar cantidad mientras escribe (pero no refrescar modal aún)
+    $(document).on("input", ".cantidad-input", function () {
+        let index = $(this).closest(".cantidad-control").data("index");
+        let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let nuevaCantidad = $(this).val();
+
+        // Solo actualizar el dato sin recargar modal
+        if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+            listaProductos[index].cantidad = parseInt(nuevaCantidad);
+            localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));
+        }
+    });
+
+    // Al salir del campo, ahora sí refrescamos
+    $(document).on("blur", ".cantidad-input", function () {
+        let index = $(this).closest(".cantidad-control").data("index");
+        let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let nuevaCantidad = $(this).val();
+
+        if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+            // ok, ya está actualizado
+            $("#verLista").trigger("click"); // refrescar solo al final
+        } else {
+            // restaurar valor anterior si el usuario deja vacío
+            $(this).val(listaProductos[index].cantidad);
         }
     });
 

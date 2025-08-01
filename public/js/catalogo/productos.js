@@ -12,7 +12,7 @@ $(document).ready(function () {
 
                 respuesta.forEach(function (respuesta) {
 
-                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0) {
+                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0 || respuesta.tallas.some(talla => parseInt(talla.stock) > 0) && respuesta.descontinuado === "no") {
                         var tarjetaHTML = `
                     <div class="col-md-4 mb-3">
                         <div class="card">
@@ -33,12 +33,12 @@ $(document).ready(function () {
                     </div>
                 `;
 
-                        
+
                         $('#product-list').append(tarjetaHTML);
                     }
                 });
 
-                
+
                 $(".ver-mas").click(function (e) {
 
                     // Guardar datos en localStorage
@@ -51,7 +51,7 @@ $(document).ready(function () {
                         foto: $(this).data("foto")
                     }));
 
-                   
+
                     window.location.href = "detalle_producto.php";
                 });
 
@@ -113,7 +113,7 @@ function filtroTarjetasCategoria(categoria) {
 
 
 
-                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0) {
+                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0 || respuesta.tallas.some(talla => parseInt(talla.stock) > 0) && respuesta.descontinuado === "no") {
                         var tarjetaHTML = `
                 <div class="col-md-4 mb-3">
                     <div class="card">
@@ -134,7 +134,7 @@ function filtroTarjetasCategoria(categoria) {
                 </div>
             `;
 
-                        
+
                         $('#product-list').append(tarjetaHTML);
                     } else {
                         return;
@@ -144,9 +144,9 @@ function filtroTarjetasCategoria(categoria) {
                 }
             });
 
-            
+
             $(".ver-mas").click(function (e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 localStorage.setItem("producto", JSON.stringify({
                     producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
@@ -157,7 +157,7 @@ function filtroTarjetasCategoria(categoria) {
                     foto: $(this).data("foto")
                 }));
 
-               
+
                 window.location.href = "detalle_producto.php";
             });
 
@@ -189,8 +189,8 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                 if (respuesta.categoria === categoria && respuesta.subcategoria === subcategoria || subcategoria === "Seleccione una subcategoría" && respuesta.categoria === categoria) {
 
 
-                    if (respuesta.descontinuado==="no" && respuesta.stock_total > 0) {
-                    var tarjetaHTML = `
+                    if (respuesta.descontinuado === "no" && respuesta.stock_total > 0 || respuesta.tallas.some(talla => parseInt(talla.stock) > 0) && respuesta.descontinuado === "no") {
+                        var tarjetaHTML = `
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
@@ -201,7 +201,7 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                             <p class="card-text"><strong>Categoría:</strong> ${respuesta.categoria}</p>
                             <p class="card-text"><strong>Sub Categoría:</strong> ${respuesta.subcategoria}</p>
                              <a href="detalle_producto.php" class="btn btn-primary ver-mas" 
-                                      data-id="${respuesta.producto_id}"
+                                      data-producto_id="${respuesta.producto_id}"
                                    data-nombre="${respuesta.nombre}" 
                                    data-descripcion="${respuesta.descripcion}"
                                  
@@ -213,16 +213,17 @@ function filtroTarjetasSubCategoria(categoria, subcategoria) {
                 </div>
             `;
 
-                    
-                    $('#product-list').append(tarjetaHTML);
-                }} else {
+
+                        $('#product-list').append(tarjetaHTML);
+                    }
+                } else {
                     return;
                 }
             });
 
-           
+
             $(".ver-mas").click(function (e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 localStorage.setItem("producto", JSON.stringify({
                     producto_id: $(this).data("producto_id"),
                     nombre: $(this).data("nombre"),
@@ -286,13 +287,14 @@ function buscarProducto() {
         return;
     }
 
-    productList.innerHTML = ""; 
+    productList.innerHTML = "";
 
     $.ajax({
         url: '../../ajax/catalogo-serv.php?op=buscar',
         type: 'POST',
         data: { buscar: buscar },
         success: function (respuesta) {
+            $('#barraBusqueda').val("");
             try {
                 respuesta = JSON.parse(respuesta);
             } catch (e) {
@@ -301,8 +303,8 @@ function buscarProducto() {
             }
 
             respuesta.forEach(function (respuesta) {
-                if (respuesta.descontinuado==="no" && respuesta.stock_total > 0) {
-                var tarjetaHTML = `
+                if (respuesta.descontinuado === "no" && respuesta.stock_total > 0 || respuesta.tallas.some(talla => parseInt(talla.stock) > 0) && respuesta.descontinuado === "no") {
+                    var tarjetaHTML = `
                     <div class="col-md-4 mb-3">
                         <div class="card">
                             <img src="../../img/${respuesta.foto}" class="card-img-top" alt="${respuesta.nombre}">
@@ -321,8 +323,9 @@ function buscarProducto() {
                         </div>
                     </div>
                 `;
-                productList.innerHTML += tarjetaHTML;
-        }});
+                    productList.innerHTML += tarjetaHTML;
+                }
+            });
 
 
             const verMasBtns = iframeDoc.querySelectorAll(".ver-mas");
@@ -358,21 +361,64 @@ $(document).ready(function () {
     if ($('#detalleProducto').length > 0) {
 
 
+        // Validacion para cantidad evitando que el campo se quede siempre vacío permitiendo cambiar el valor 1
+
+        $("#cantidad").on("blur", function () {
+            const valor = $(this).val();
+            if (valor === "" || isNaN(valor) || parseInt(valor) < 1) {
+                $(this).val(1);
+            }
+        });
+
+
         let producto = JSON.parse(localStorage.getItem("producto"));
 
         if (producto) {
-            $("#producto_id").val(producto.producto_id); 
+            $("#producto_id").val(producto.producto_id);
             $("#nombre").text(producto.nombre);
             $("#descripcion").html(producto.descripcion.replace(/\n/g, "<br>"));
             $("#categoria").text(producto.categoria);
             $("#subCategoria").text(producto.subcategoria);
             $("#foto").attr("src", "../" + producto.foto);
+
+
+            const subcategoriasVestimenta = [
+                "Guantes",
+                "Calzado de seguridad",
+                "Chalecos",
+                "Cascos",
+                "Protección ocular"
+            ];
+
+            if (subcategoriasVestimenta.includes(producto.subcategoria)) {
+                $("#contenedorTallas").show();
+
+                $.ajax({
+                    url: '../../ajax/catalogo-serv.php?op=obtenerTallas',
+                    type: 'POST',
+                    data: { producto_id: producto.producto_id },
+                    success: function (respuesta) {
+                        const tallas = JSON.parse(respuesta);
+                        $("#talla").empty().append('<option disabled selected>Selecciona una talla</option>');
+                        tallas.forEach(function (t) {
+                            $("#talla").append(`<option value="${t.talla}">${t.talla}</option>`);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error al obtener tallas:", status, error);
+                        $("#talla").empty().append('<option disabled selected>Error al cargar</option>');
+                    }
+                });
+
+            }
+
+
         } else {
             swal.fire({
                 icon: 'error',
                 title: 'Producto no encontrado',
                 text: 'No se pudo cargar el producto. Por favor, inténtalo de nuevo'
-                
+
             });
             window.location.href = "catalogo.php";
         }

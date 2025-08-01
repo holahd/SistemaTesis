@@ -37,7 +37,7 @@ function enviarCorreo($datos)
         $mail->addAddress($datos['correo']);
         $mail->isHTML(true);
         $mail->Subject = $datos['asunto'];
-        $mail->Body    = getEmailBody($datos);
+        $mail->Body    = getEmailBody($datos ['nombre']);
 
         // PDF opcional
         $pdfPath = generarPDF($datos);
@@ -53,14 +53,14 @@ function enviarCorreo($datos)
     }
 }
 
-function enviarCorreoStockInsuficiente($correo, $cotId, array $productos)
+function enviarCorreoStockInsuficiente($correo, $cotId, array $productos, $nombre)
 {
     $mail = getConfiguredMailer();
     try {
         $mail->addAddress($correo);
         $mail->isHTML(true);
         $mail->Subject = "Cotización #{$cotId} cancelada por falta de stock";
-        $mail->Body    = getEmailBodyStockInsuficiente($correo, $cotId, $productos);
+        $mail->Body    = getEmailBodyStockInsuficiente($nombre, $cotId, $productos);
         $mail->AddEmbeddedImage('./../public/img/administrador/Pyro_emblem_RED.png', 'logoCID');
 
         $mail->send();

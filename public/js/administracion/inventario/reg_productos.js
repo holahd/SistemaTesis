@@ -46,6 +46,7 @@ localStorage.setItem('nombreProducto', nombre);
         swal.fire({
           title: 'Producto registrado correctamente',
           icon: 'success',
+          text: 'Desea registrar un lote para este producto?',
           showCancelButton: true,
           confirmButtonText: 'Sí, registrar lote',
           cancelButtonText: 'No, gracias'

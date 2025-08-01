@@ -2,7 +2,7 @@ $('#form_registro').submit(function (e) {
     e.preventDefault();
     var formulario = new FormData(this);
 
-    if (!esEmailValido('#email')) {
+    if (esEmailValido('#email')) {
         swal.fire({
             title: 'Error',
             text: 'El email ingresado no es válido.',

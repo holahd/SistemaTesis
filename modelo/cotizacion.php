@@ -7,17 +7,17 @@ class Cotizacion
 
     public function __construct() {}
 
-    public function registrarCotizacion($email)
+    public function registrarCotizacion($email, $nombre, $telefono)
     {
         // Paso 1: Insertar la cotización (op 2)
-        $sqlInsert = "CALL sp_cotizacion(2, 0, '$email', NULL, NULL, NULL);";
+        $sqlInsert = "CALL sp_cotizacion(2, 0, '$email','$nombre', '$telefono', NULL, NULL, NULL);";
         $result = ejecutarConsultaSP($sqlInsert);
         $row = $result->fetch_assoc();
         return $row['cotizacion_id'];
     }
 
 
-    public function registrarDetalle($cotizacion_id, $producto_id, $cantidad)
+    public function registrarDetalle($cotizacion_id, $producto_id, $cantidad, $talla = null)
     {
         $sql = "CALL sp_detalle_cotizacion(
         2,
@@ -25,8 +25,10 @@ class Cotizacion
         $cotizacion_id,
         $producto_id,
         $cantidad,
+        
         NULL,
-        NULL
+        NULL,
+        " . ($talla ? "'$talla'" : "NULL") . "
     );";
         return ejecutarConsultaSP($sql);
     }
@@ -41,33 +43,33 @@ class Cotizacion
     public function listar($estado)
     {
 
-        $sql = "CALL sp_cotizacion(5, 0, ' ', NULL, '$estado', NULL);";
+        $sql = "CALL sp_cotizacion(5, 0, ' ','','', NULL, '$estado', NULL);";
         return ejecutarConsultaSP($sql);
     }
-
+ 
     public function listar_detalle($idCot)
     {
-        $sql = "CALL sp_cotizacion(6, $idCot, ' ', NULL, 'espera', NULL);";
+        $sql = "CALL sp_cotizacion(6, $idCot, ' ','','',NULL, 'espera', NULL);";
         return ejecutarConsultaSP($sql);
     }
 
     public function cambio_estado($idVen, $idcot, $estado)
     {
 
-        $sql = "CALL sp_cotizacion(3, $idcot, ' ', NULL, '$estado', $idVen);";
+        $sql = "CALL sp_cotizacion(3, $idcot, ' ','','', NULL, '$estado', $idVen);";
         return ejecutarConsultaSP($sql);
     }
 
     public function colocar_precio($id, $precio, $sTotal)
     {
-        $sql = "CALL sp_detalle_cotizacion(3, $id, NULL , NULL, NULL , $precio, $sTotal);";
+        $sql = "CALL sp_detalle_cotizacion(3, $id, NULL , NULL, NULL , $precio, $sTotal, NULL);";
         return ejecutarConsultaSP($sql);
     }
 
 
     public function listar_detalle_enviado($id)
     {
-        $sql = "CALL sp_detalle_cotizacion(1, NULL, $id , NULL, NULL , NULL, NULL);";
+        $sql = "CALL sp_detalle_cotizacion(1, NULL, $id , NULL, NULL , NULL, NULL, NULL);";
         return ejecutarConsultaSP($sql);
     }
 
@@ -82,12 +84,12 @@ class Cotizacion
 
     public function listar_detalle_vendido($id)
     {
-        $sql = "CALL sp_detalle_cotizacion(1, NULL, $id , NULL, NULL , NULL, NULL);";
+        $sql = "CALL sp_detalle_cotizacion(1, NULL, $id , NULL, NULL , NULL, NULL, NULL);";
         return ejecutarConsultaSP($sql);
     }
     public function listar_datos_cliente($id)
     {
-         $sql = "CALL sp_cotizacion(1, $id, NULL , NULL, NULL , NULL);";
+         $sql = "CALL sp_cotizacion(1, $id, NULL ,'','', NULL, NULL , NULL);";
         return ejecutarConsultaSP($sql);
     }
 }

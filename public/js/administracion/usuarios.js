@@ -232,10 +232,12 @@ $('#formEditarUsuario').submit(function (e) {
                     text: respuesta.mensaje,
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    location.reload();
                 });
 
 
-                location.reload();
+
 
 
 

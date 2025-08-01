@@ -10,14 +10,12 @@ $productos = new productos();
 
 switch ($_GET["op"]) {
     case 'listarProductos':
-
-
-        $res = $productos->listar();
+        $res = $productos->listar(); // llamada al SP con op=1
 
         $data = array();
 
         while ($reg = $res->fetch_object()) {
-            $data[] = array(
+            $producto = array(
                 "producto_id" => $reg->producto_id,
                 "nombre" => $reg->nombre,
                 "descripcion" => $reg->descripcion,
@@ -29,12 +27,26 @@ switch ($_GET["op"]) {
                 "foto" => $reg->imagen,
                 "stock_total" => $reg->stock_total
             );
+
+            // Si es vestimenta, agregamos el detalle de tallas
+            if ($reg->categoria_id == 2) { // Vestimenta
+                $resTallas = $productos->stockTallas($reg->producto_id); // esto llama al antiguo case 7
+                $tallas = array();
+                while ($t = $resTallas->fetch_object()) {
+                    $tallas[] = array(
+                        "talla" => $t->talla,
+                        "stock" => $t->stock
+                    );
+                }
+                $producto['tallas'] = $tallas;
+            }
+
+            $data[] = $producto;
         }
 
-
         echo json_encode($data);
-
         break;
+
 
     case 'categorias':
         $res = $productos->listarCategorias();
@@ -126,26 +138,44 @@ switch ($_GET["op"]) {
         break;
 
     case 'buscar':
-
         $busqueda = $_POST['buscar'];
         $res = $productos->buscar($busqueda);
 
         $data = array();
 
         while ($reg = $res->fetch_object()) {
-            $data[] = array(
+            $producto = array(
                 "producto_id" => $reg->producto_id,
                 "nombre" => $reg->nombre,
                 "descripcion" => $reg->descripcion,
                 "categoria" => $reg->categoria,
                 "subcategoria" => $reg->subcategoria,
-                "foto" => $reg->imagen
+                "categoria_id" => $reg->categoria_id,
+                "subcategoria_id" => $reg->subcategoria_id,
+                "descontinuado" => $reg->descontinuado,
+                "foto" => $reg->imagen,
+                "stock_total" => $reg->stock_total
             );
-        }
 
+            // Vestimenta con tallas
+            if ($reg->categoria_id == 2) {
+                $resTallas = $productos->stockTallas($reg->producto_id);
+                $tallas = array();
+                while ($t = $resTallas->fetch_object()) {
+                    $tallas[] = array(
+                        "talla" => $t->talla,
+                        "stock" => $t->stock
+                    );
+                }
+                $producto['tallas'] = $tallas;
+            }
+
+            $data[] = $producto;
+        }
 
         echo json_encode($data);
         break;
+
 
     case 'editar':
 
@@ -197,16 +227,16 @@ switch ($_GET["op"]) {
         );
 
         if ($res['ok']) {
-                    $respuesta['mensaje'] = 'Producto actualizado correctamente';
-                    $respuesta['tipo'] = 1;
-                } else {
-                    if ($res['error'] == 1062) {
-                        $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
-                    } else {
-                        $respuesta['mensaje'] = 'Error al editar producto.';
-                    }
-                    $respuesta['tipo'] = 0;
-                }
+            $respuesta['mensaje'] = 'Producto actualizado correctamente';
+            $respuesta['tipo'] = 1;
+        } else {
+            if ($res['error'] == 1062) {
+                $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
+            } else {
+                $respuesta['mensaje'] = 'Error al editar producto.';
+            }
+            $respuesta['tipo'] = 0;
+        }
 
         echo json_encode($respuesta);
         break;
@@ -241,6 +271,21 @@ switch ($_GET["op"]) {
         }
 
         echo json_encode($respuesta);
+        break;
+
+    case 'obtenerTallas':
+        $producto_id = $_POST['producto_id'];
+        $res = $productos->obtenerTallas($producto_id);
+
+        $data = array();
+        while ($reg = $res->fetch_object()) {
+            $data[] = array(
+                "talla" => $reg->talla,
+
+            );
+        }
+
+        echo json_encode($data);
         break;
 
     default:

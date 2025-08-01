@@ -60,7 +60,7 @@ $(document).ready(function () {
         processData: false,
         success: function (data) {
             const nombres = JSON.parse(data);
-
+            window.listaProductos = nombres; 
             const $select = $('#producto');
             $select.empty();
             $select.append('<option></option>'); // importante para que Select2 muestre el placeholder
@@ -95,3 +95,35 @@ $(document).ready(function () {
         }
     });
 });
+
+
+// Evento que responde al cambio del producto seleccionado
+$('#producto').on('change', function () {
+  const seleccionado = $(this).val();
+  const producto = window.listaProductos.find(p => p.producto === seleccionado);
+
+  if (!producto) return;
+
+  // Mostrar campo de caducidad solo si es extintor
+  if (producto.categoria === 'Extintores') {
+    $('#caducidadContainer').removeClass('d-none');
+  } else {
+    $('#caducidadContainer').addClass('d-none');
+    $('#fechaCaducidad').val('');
+  }
+
+  // Mostrar campo de talla si es vestimenta
+  if (producto.categoria === 'Vestimenta') {
+    if ($('#tallaContainer').length === 0) {
+      $('#precioUnidad').closest('.mb-3').before(`
+        <div class="mb-3" id="tallaContainer">
+          <label for="talla" class="form-label">Talla</label>
+          <input type="text" class="form-control" id="talla" name="talla" placeholder="Ej: S, M, L, 42, etc">
+        </div>
+      `);
+    }
+  } else {
+    $('#tallaContainer').remove();
+  }
+});
+

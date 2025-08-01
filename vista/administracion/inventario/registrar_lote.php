@@ -152,20 +152,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         <input type="text" class="form-control" id="proveedor" name="proveedor" required>
       </div>
 
-      <!-- ¿Es perecible? -->
-      <div class="slider-toggle mb-3">
-        <label class="switch">
-          <input type="checkbox" id="esPerecible" name="esPerecible">
-          <span class="slider"></span>
-        </label>
-        <label class="form-label ms-2 fw-bold">¿Es perecible?</label>
-      </div>
 
-      <!-- Fecha de caducidad -->
-      <div class="mb-3">
-        <label for="fechaCaducidad" class="form-label">Fecha de caducidad</label>
-        <input type="date" class="form-control" id="fechaCaducidad" name="fechaCaducidad" disabled>
-      </div>
+      <!-- Fecha de caducidad (solo para extintores) -->
+<div class="mb-3 d-none" id="caducidadContainer">
+  <label for="fechaCaducidad" class="form-label">Fecha de caducidad</label>
+  <input type="date" class="form-control" id="fechaCaducidad" name="fechaCaducidad">
+</div>
+
 
       <!-- Precio por unidad -->
       <div class="mb-3">
@@ -185,13 +178,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     </form>
   </div>
 
-  <script>
-    // Esto es opcional: activar campo de caducidad si el check está marcado
-    document.getElementById('esPerecible').addEventListener('change', function() {
-      const caducidad = document.getElementById('fechaCaducidad');
-      caducidad.disabled = !this.checked;
-    });
-  </script>
+ 
 
 </body>
 

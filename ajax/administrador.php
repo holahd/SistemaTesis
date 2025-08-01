@@ -92,6 +92,13 @@ switch ($_GET["op"]) {
 
     case 'editar':
 
+        if (!isset($_POST['rol'])) {
+
+            $_POST['rol'] = 'admin'; // Si no se envía rol, asignar 0 (sin rol)
+         } // Convertir rol a numérico
+        
+
+
         $res = $usuarios->editar($_POST['usuario_id'], $_POST['nombre'], $_POST['apellido'], $_POST['correo'], $_POST['rol']);
 
         if ($res['ok']) {

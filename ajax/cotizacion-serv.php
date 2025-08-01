@@ -13,8 +13,10 @@ switch ($_GET["op"]) {
     case 'solicitar':
 
         $email = $_POST['email'];
+        $nombre = $_POST['nombre'];
+        $telefono = $_POST['telefono'];
         $productos = json_decode($_POST['productos'], true);
-        $idCot = $cotizacion->registrarCotizacion($email);
+        $idCot = $cotizacion->registrarCotizacion($email, $nombre, $telefono);
 
         if (!$idCot) {
             echo json_encode(['status' => 'error', 'message' => 'Error al registrar la cotización' . $idCot]);
@@ -26,8 +28,9 @@ switch ($_GET["op"]) {
         foreach ($productos as $p) {
             $producto_id = $p['id'];
             $cantidad = $p['cantidad'];
+            $talla = isset($p['talla']) ? $p['talla'] : null;
 
-            $ok = $cotizacion->registrarDetalle($idCot, $producto_id, $cantidad);
+            $ok = $cotizacion->registrarDetalle($idCot, $producto_id, $cantidad, $talla);
             if (!$ok) {
                 $exito = false;
                 break;
@@ -45,6 +48,8 @@ switch ($_GET["op"]) {
             $data[] = array(
                 "cotizacion_id" => $reg->cotizacion_id,
                 "correo" => $reg->email_cliente,
+                "nombre" => $reg->nombre_cliente,
+                "telefono" => $reg->telefono_cliente,
                 "productos_solicitados" => $reg->productos_solicitados
             );
         }
@@ -60,6 +65,8 @@ switch ($_GET["op"]) {
             $data[] = array(
                 "cotizacion_id" => $reg->cotizacion_id,
                 "correo" => $reg->email_cliente,
+                "nombre" => $reg->nombre_cliente,
+                "telefono" => $reg->telefono_cliente,
                 "productos_solicitados" => $reg->productos_solicitados
             );
         }
@@ -75,6 +82,8 @@ switch ($_GET["op"]) {
             $data[] = array(
                 "cotizacion_id" => $reg->cotizacion_id,
                 "correo" => $reg->email_cliente,
+                "nombre" => $reg->nombre_cliente,
+                "telefono" => $reg->telefono_cliente,
                 "productos_solicitados" => $reg->productos_solicitados
             );
         }
@@ -95,7 +104,8 @@ switch ($_GET["op"]) {
                 "producto" => $reg->producto,
                 "cantidad" => $reg->cantidad_solicitada,
                 "stock" => $reg->stock_total,
-                "precio" => $reg->precio_unitario_crudo
+                "precio" => $reg->precio_unitario_crudo,
+                "talla" => $reg->talla 
             );
         }
 
@@ -115,7 +125,8 @@ switch ($_GET["op"]) {
                 "cantidad" => $reg->cantidad,
                 "stock" => $reg->stock_total,
                 "precio" => $reg->pvp,
-                "total" => $reg->total
+                "total" => $reg->total,
+                "talla" => $reg->talla 
             );
         }
 
@@ -141,7 +152,8 @@ switch ($_GET["op"]) {
                 "cantidad" => $reg->cantidad,
                 "stock" => $reg->stock_total,
                 "precio" => $reg->pvp,
-                "total" => $reg->total
+                "total" => $reg->total,
+                "talla" => $reg->talla 
             );
         }
 
@@ -193,7 +205,7 @@ switch ($_GET["op"]) {
         }
 
         break;
-
+ 
     case 'enviarCotizacion':
         $datos    = json_decode(file_get_contents('php://input'), true);
         $productos = $datos['productos'];
@@ -252,9 +264,10 @@ switch ($_GET["op"]) {
     $idCot = $datos['cotizacion_id'];
     $productos = $datos['productos'];    // array de nombres
     $correo    = $datos['correo'];
+    $nombre    = $datos['nombre'];
 
     // 1) Enviar correo de rechazo
-    $resultado = enviarCorreoStockInsuficiente($correo, $idCot, $productos);
+    $resultado = enviarCorreoStockInsuficiente($correo, $idCot, $productos, $nombre);
 
     // 2) Si tuvo éxito, marcar cancelada
     if (!empty($resultado['success']) && $resultado['success'] === true) {

@@ -85,6 +85,9 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <iframe id="contentFrame" src="elegir_reg.php" style="width: 100%; height: 85vh; border: none;"></iframe>
 
+   
+
+
     <script src="../../../public/js/bootstrap.js"></script>
     <script>
         function cambiarPagina(element, url) {
@@ -97,6 +100,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
             element.classList.add('active');
         }
     </script>
+     <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
 </body>
 
 </html>

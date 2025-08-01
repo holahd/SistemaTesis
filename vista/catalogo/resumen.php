@@ -49,7 +49,20 @@
     <div class="mb-3">
         <label for="correoContacto" class="form-label">Correo de contacto</label>
         <input type="email" id="correoContacto" class="form-control" placeholder="cliente@ejemplo.com" required>
+
     </div>
+
+    <div class="mb-3">
+        <label for="nombreCliente" class="form-label">Nombre del cliente</label>
+        <input type="text" id="nombreCliente" class="form-control" placeholder="Ej: Juan Pérez" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="telefonoCliente" class="form-label">Teléfono de contacto</label>
+        <input type="text" id="telefonoCliente" class="form-control solo-numeros" placeholder="Ej: 0999999999" required>
+    </div>
+
+
 
     <button id="enviarCotizacion" class="btn btn-primary">Enviar solicitud de cotización</button>
 

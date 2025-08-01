@@ -40,7 +40,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         }
 
         .table thead th {
-            background-color:rgb(33, 37, 41);
+            background-color: rgb(33, 37, 41);
             /* oscuro elegante */
             color: #fff;
         }
@@ -64,6 +64,13 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 
     <div class="container">
         <h2 class="mb-4 text-center text-primary">Gestión de Lotes</h2>
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h4>Productos existentes</h4>
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalReporte">
+                <i class="fas fa-file-pdf"></i> Generar reporte de movimientos
+            </button>
+        </div>
+
 
         <!-- Tabla de Lotes -->
         <div class="card shadow-sm border-0">
@@ -77,6 +84,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                             <th>Fecha ingreso</th>
                             <th>Proveedor</th>
                             <th>Caducidad</th>
+                            <th>Talla</th>
                             <th>Precio U.</th>
                             <th>Acciones</th>
                         </tr>
@@ -130,15 +138,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                                 <input type="text" class="form-control" id="proveedorEditar" name="proveedorEditar" required>
                             </div>
 
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="esPerecibleEditar" name="esPerecibleEditar">
-                                <label class="form-check-label" for="esPerecibleEditar">¿Es perecible?</label>
+
+                            <!-- Fecha de caducidad (solo para extintores) -->
+                            <div class="mb-3 d-none" id="caducidadContainerEditar">
+                                <label for="fechaCaducidadEditar" class="form-label">Fecha de caducidad</label>
+                                <input type="date" class="form-control" id="fechaCaducidadEditar" name="fechaCaducidadEditar">
                             </div>
 
-                            <div class="mb-3">
-                                <label for="fechaCaducidadEditar" class="form-label">Fecha de caducidad</label>
-                                <input type="date" class="form-control" id="fechaCaducidadEditar" name="fechaCaducidadEditar" disabled>
-                            </div>
+
 
                             <div class="mb-3">
                                 <label for="precioUnitarioEditar" class="form-label">Precio por unidad</label>
@@ -160,12 +167,40 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         </div>
     </div>
 
+ <!-- Modal -->
+<div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="formReporte" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="fechaInicio" class="form-label">Desde</label>
+          <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+        </div>
+        <div class="mb-3">
+          <label for="fechaFin" class="form-label">Hasta</label>
+          <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Generar PDF</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
     <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/validaciones.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_lotes.js"></script>
+    <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
 
     <script>
         // Activar/desactivar campo de caducidad según checkbox

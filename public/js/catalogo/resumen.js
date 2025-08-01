@@ -23,11 +23,17 @@ $(document).ready(function () {
                 html += `
                             <tr data-index="${index}">
                                 <td>${item.nombre}</td>
-                                <td>${item.descripcion.replace(/\n/g, "<br>")}</td>
+                                <td>${item.descripcion.replace(/\n/g, "<br>")}` +
+                    (item.talla ? `<br><span class="badge bg-info text-dark">Talla: ${item.talla}</span>` : "") + `
+                                </td>
                                 <td>
-                                    <div class="d-flex align-items-center justify-content-center">
+                                    <div class="d-flex align-items-center justify-content-center cantidad-control" data-index="${index}">
+
                                         <button class="btn btn-sm btn-secondary btn-restar">-</button>
-                                        <span class="mx-2 cantidad">${item.cantidad}</span>
+                                        <input type="text" 
+                           class="form-control form-control-sm cantidad-input solo-numeros mx-2 text-center" 
+                           value="${item.cantidad}" 
+                           style="width: 60px;" />
                                         <button class="btn btn-sm btn-secondary btn-sumar">+</button>
                                     </div>
                                 </td>
@@ -77,10 +83,14 @@ $(document).ready(function () {
     // Enviar cotización
     $("#enviarCotizacion").click(function () {
         let correo = $("#correoContacto").val().trim();
+
+        let nombre = $("#nombreCliente").val().trim();
+        let telefono = $("#telefonoCliente").val().trim();
+
         let lista = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
 
         if (!correo) {
-           swal.fire({
+            swal.fire({
                 title: 'Error',
                 text: 'Por favor, ingrese un correo electrónico.',
                 icon: 'error',
@@ -88,6 +98,18 @@ $(document).ready(function () {
             });
             return;
         }
+
+
+        if (!nombre || !telefono) {
+            swal.fire({
+                title: 'Error',
+                text: 'Debe ingresar nombre y teléfono.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
 
         if (!esEmailValido(correo)) {
             swal.fire({
@@ -114,6 +136,8 @@ $(document).ready(function () {
             type: 'POST',
             data: {
                 email: correo,
+                nombre: nombre,
+                telefono: telefono,
                 productos: JSON.stringify(lista)
             },
             dataType: 'json',
@@ -130,6 +154,8 @@ $(document).ready(function () {
                     localStorage.removeItem("listaCotizacion");
                     cargarResumen();
                     $("#correoContacto").val("");
+                    $("#nombreCliente").val("");
+                    $("#telefonoCliente").val("");
                     actualizarEstadoBoton();
                 } else {
                     swal.fire({
@@ -142,7 +168,7 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-               swal.fire({
+                swal.fire({
                     title: 'Error',
                     text: 'Hubo un problema al enviar la cotización. Por favor, inténtalo de nuevo más tarde.',
                     icon: 'error',
@@ -153,4 +179,33 @@ $(document).ready(function () {
         });
 
     });
+
+    // Guardar la cantidad mientras escribe (no refresca todavía)
+    $(document).on("input", ".cantidad-input", function () {
+        let index = $(this).closest(".cantidad-control").data("index");
+        let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let nuevaCantidad = $(this).val();
+
+        if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+            listaProductos[index].cantidad = parseInt(nuevaCantidad);
+            localStorage.setItem("listaCotizacion", JSON.stringify(listaProductos));
+        }
+    });
+
+    // Validar y refrescar al salir del campo
+    $(document).on("blur", ".cantidad-input", function () {
+        let index = $(this).closest(".cantidad-control").data("index");
+        let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
+        let nuevaCantidad = $(this).val();
+
+        if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+            $("#verLista").trigger("click"); // Refrescar tabla
+        } else {
+            $(this).val(listaProductos[index].cantidad); // Restaurar valor anterior
+        }
+    });
+
+
+
+
 });

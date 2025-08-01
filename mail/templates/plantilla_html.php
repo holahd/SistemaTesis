@@ -1,9 +1,8 @@
 <?php
-function getEmailBody()
+function getEmailBody($clienteNombre)
 {
-
-    $telefono = "+593 99 999 9999"; // tu número de contacto
-    $empresa = "FireSafe"; // nombre de tu empresa
+    $telefono = "+593 99 999 9999";
+    $empresa = "FireSafe";
 
     return '
     <html>
@@ -12,20 +11,23 @@ function getEmailBody()
           
           <div style="text-align: center; margin-bottom: 20px;">
             <img src="cid:logoCID" alt="Logo de la empresa" style="max-width: 150px;">
-
             <h2 style="margin: 10px 0 0 0; color: #333;">' . $empresa . '</h2>
           </div>
 
           <p style="font-size: 16px; color: #333;">
-            Estimado/a <strong>' . htmlspecialchars("cliente") . '</strong>,
+            ¡Hola <strong>' . htmlspecialchars($clienteNombre) . '</strong>!
           </p>
 
           <p style="font-size: 16px; color: #333;">
-            Gracias por solicitar una cotización con nosotros. Adjunto a este correo encontrará el documento con el detalle de los artículos solicitados.
+            Gracias por solicitar una cotización con nosotros. Hemos preparado tu oferta con atención a los detalles que nos compartiste.
           </p>
 
           <p style="font-size: 16px; color: #333;">
-            Si tiene preguntas o desea confirmar la compra de los productos, no dude en contactarnos al siguiente número:
+            Descubre el archivo adjunto y revisa los productos que seleccionaste. Estamos listos para ayudarte si deseas continuar con tu pedido.
+          </p>
+
+          <p style="font-size: 16px; color: #333;">
+            Para confirmar, resolver dudas o ajustar tu cotización, llámanos o escríbenos al:
           </p>
 
           <p style="font-size: 18px; font-weight: bold; color: #0055aa;">
@@ -33,18 +35,17 @@ function getEmailBody()
           </p>
 
           <p style="font-size: 16px; color: #555;">
-            Atentamente,<br>
-            <strong>Equipo de ' . $empresa . '</strong>
+            Un saludo cordial,<br>
+            <strong>El equipo de ' . $empresa . '</strong>
           </p>
 
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;">
 
           <p style="font-size: 12px; color: #999;">
-                Este mensaje fue generado automáticamente por nuestro sistema de cotizaciones. Por favor, no responda a este correo.<br>
-                Si necesita asistencia, contáctenos al número proporcionado.
+            Este mensaje fue generado automáticamente por nuestro sistema de cotizaciones. No responda a este correo.
           </p>
           <p style="font-size: 12px; color: #bbb; margin-top: 5px;">
-                Enviado el ' . date("d/m/Y \a \l\a\s H:i") . '
+            Enviado el ' . date("d/m/Y \a \l\a\s H:i") . '
           </p>
         </div>
       </body>
@@ -52,11 +53,11 @@ function getEmailBody()
     ';
 }
 
+
 function getEmailBodyStockInsuficiente($clienteNombre, $cotId, array $productos) {
     $telefono = "+593 99 999 9999";
     $empresa  = "FireSafe";
 
-    // Construye la lista de productos faltantes
     $itemsHtml = '';
     foreach ($productos as $p) {
         $itemsHtml .= "<tr>
@@ -75,11 +76,11 @@ function getEmailBodyStockInsuficiente($clienteNombre, $cotId, array $productos)
           </div>
 
           <p style="font-size: 16px; color: #333;">
-            Estimado/a cliente
+            Estimado/a <strong>' . htmlspecialchars($clienteNombre) . '</strong>,
           </p>
 
           <p style="font-size: 16px; color: #333;">
-            Tu solicitud de cotización <strong>#' . $cotId . '</strong> ha sido <strong style="color:#d9534f;">cancelada</strong> porque no hay stock suficiente de los siguientes productos:
+            Tu solicitud de cotización <strong>#' . $cotId . '</strong> no pudo ser procesada debido a falta de stock en los siguientes productos:
           </p>
 
           <table style="width:100%;border-collapse:collapse;margin-top:10px;">
@@ -94,7 +95,7 @@ function getEmailBodyStockInsuficiente($clienteNombre, $cotId, array $productos)
           </table>
 
           <p style="font-size: 16px; color: #333; margin-top:20px;">
-            Lamentamos las molestias. Si tienes dudas o deseas alternativas, contáctanos al:
+            Lamentamos los inconvenientes. Si deseas asesoría o conocer productos similares, contáctanos al:
           </p>
 
           <p style="font-size: 18px; font-weight: bold; color: #0055aa;">
@@ -102,14 +103,14 @@ function getEmailBodyStockInsuficiente($clienteNombre, $cotId, array $productos)
           </p>
 
           <p style="font-size: 16px; color: #555;">
-            Atentamente,<br>
+            Un saludo cordial,<br>
             <strong>Equipo de ' . $empresa . '</strong>
           </p>
 
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;">
 
           <p style="font-size: 12px; color: #999;">
-            Este mensaje fue generado automáticamente. Por favor, no respondas a este correo.
+            Este mensaje fue generado automáticamente. No respondas a este correo.
           </p>
           <p style="font-size: 12px; color: #bbb; margin-top: 5px;">
             Enviado el ' . date("d/m/Y \a \l\a\s H:i") . '

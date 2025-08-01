@@ -14,6 +14,7 @@ $(document).ready(function () {
                 { data: 'fechaIngreso' },
                 { data: 'proveedor' },
                 { data: 'fechaCaducidad' },
+                { data: 'talla'},
                 { data: 'precioUnitario' },
                 {
                     data: null,
@@ -29,6 +30,7 @@ $(document).ready(function () {
                                 data-fecha-ingreso="${data.fechaIngreso}"
                                 data-proveedor="${data.proveedor}"
                                 data-fecha-caducidad="${data.fechaCaducidad}"
+                                data-talla="${data.talla}"
                                 data-precio-unitario="${data.precioUnitario}"
                                 data-lote_id="${data.lote_id}"
                                 >
@@ -84,10 +86,11 @@ $(document).ready(function () {
         let fechaIngreso = $(this).data('fechaIngreso');
         let proveedor = $(this).data('proveedor');
         let fechaCaducidad = $(this).data('fechaCaducidad');
+        let talla = $(this).data('talla');
         let precioUnitario = $(this).data('precioUnitario');
         let lote_id = $(this).data('lote_id');
 
-        PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, precioUnitario, lote_id);
+        PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, talla, precioUnitario, lote_id);
 
     });
 
@@ -124,6 +127,7 @@ $(document).ready(function () {
                         confirmButtonText: 'Aceptar'
                     }).then(() => {
                         $('#registrarlote').trigger('reset');
+                        $('#modalEditarLote').modal('hide');
                     });
 
                     $('#formEditarLote').trigger('reset');
@@ -152,7 +156,7 @@ $(document).ready(function () {
 
 
 // Cargar valores en campos del formulario
-function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, precioUnitario, lote_id) {
+function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveedor, fechaCaducidad, talla ,precioUnitario, lote_id) {
     $('#fromularioEdicionLote').prop('disabled', false);
     $('#numeroLoteEditar').val(numLote);
     $('#unidadesEditar').val(cantidad);
@@ -166,6 +170,7 @@ function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveed
         $('#fechaCaducidadEditar').val('');
         $('#esPerecibleEditar').prop('checked', false).trigger('change');
     }
+    $('#tallaEditar').val(talla);
     $('#precioUnitarioEditar').val(precioUnitario);
     $('#lote_id').val(lote_id);
 
@@ -181,7 +186,7 @@ function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveed
             success: function (data) {
                 const nombres = JSON.parse(data);
 
-
+                window.listaProductosEditar = nombres;
                 const $select = $('#productoEditar');
                 $select.empty();
                 $select.append('<option selected disabled>Seleccione un producto</option>');
@@ -190,6 +195,7 @@ function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveed
                     $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
                 });
                 $('#productoEditar').val(producto);
+                 $select.val(producto).trigger('change');
             },
             error: function (xhr, status, error) {
                 console.error('Error al cargar productos:', error);
@@ -199,3 +205,33 @@ function PonerValoresenCampos(producto, numLote, cantidad, fechaIngreso, proveed
     modal.show();
 
 }
+
+$('#productoEditar').on('change', function () {
+    const seleccionado = $(this).val();
+    const producto = window.listaProductosEditar.find(p => p.producto === seleccionado);
+
+    if (!producto) return;
+
+    // Mostrar/ocultar fecha de caducidad
+    if (producto.categoria === 'Extintores') {
+        $('#caducidadContainerEditar').removeClass('d-none');
+    } else {
+        $('#caducidadContainerEditar').addClass('d-none');
+        $('#fechaCaducidadEditar').val('');
+    }
+
+    // Mostrar/ocultar campo de talla
+    if (producto.categoria === 'Vestimenta') {
+        if ($('#tallaContainerEditar').length === 0) {
+            $('#precioUnitarioEditar').closest('.mb-3').before(`
+                <div class="mb-3" id="tallaContainerEditar">
+                    <label for="tallaEditar" class="form-label">Talla</label>
+                    <input type="text" class="form-control" id="tallaEditar" name="tallaEditar" placeholder="Ej: S, M, L, 42, etc">
+                </div>
+            `);
+        }
+    } else {
+        $('#tallaContainerEditar').remove();
+    }
+});
+

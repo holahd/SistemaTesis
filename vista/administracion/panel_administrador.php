@@ -16,6 +16,23 @@ if (!isset($_SESSION['nombre']) || !isset($_SESSION['rol'])) {
     <link href="../../public/css/bootstrap.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.main-content {
+  flex-grow: 1;
+  height: 100vh;
+  overflow: hidden;
+}
+
         body {
             display: flex;
             margin: 0;

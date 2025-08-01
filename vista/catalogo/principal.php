@@ -3,9 +3,9 @@
 
 <head>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo</title>
@@ -43,49 +43,59 @@
                 <img src="../../public/img/catalogo/Pyro_emblem_RED.png" title="Logo" alt="Logo" class="img-fluid" width="64" height="64" id="logo">
 
             </div>
- 
+
             <!-- Título centrado -->
             <h1 class="text-center" style="font-size: 20px;">FireSafe - Catálogo de seguridad contra incendios</h1>
 
+
+
             <!-- Barra de búsqueda y filtros -->
-            <div class="d-flex">
+            <!-- Barra de búsqueda, lista y login -->
+            <div class="d-flex align-items-center">
                 <input type="text" id="barraBusqueda" name="barraBusqueda" class="form-control me-2" placeholder="Buscar productos...">
                 <button class="btn btn-primary me-2" id="buscarProducto">Buscar</button>
-                <button class="btn btn-primary" id="verLista">
-                
-                    <i class="fas fa-clipboard-list"></i> 
+                <button class="btn btn-primary me-2" id="verLista">
+                    <i class="fas fa-clipboard-list"></i>
                 </button>
+                <a href="./../administracion/login.html" class="btn btn-outline-light btn-sm" title="Acceso administrativo">
+                    <i class="fas fa-lock"></i>
+                </a>
             </div>
+
         </div>
     </div>
 
     <div class="modal fade" id="listaModal" tabindex="-1" aria-labelledby="listaModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="listaModalLabel">Lista de cotización</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <ul id="listaCotizacion" class="list-group">
-                    <!-- Aquí se insertarán los productos -->
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" id="cotizarAhora">Cotizar ahora</button>
-                <button type="button" class="btn btn-danger" id="vaciarLista">Vaciar lista</button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="listaModalLabel">Lista de cotización</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="listaCotizacion" class="list-group">
+                        <!-- Aquí se insertarán los productos -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="cotizarAhora">Cotizar ahora</button>
+                    <button type="button" class="btn btn-danger" id="vaciarLista">Vaciar lista</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- iframe para mostrar productos -->
     <div class="container mt-4">
         <iframe id="product-frame" src="productos.php"></iframe>
     </div>
+
+
+
     <script src="../../public/js/sweetalert2.all.js"></script>
     <script src="../../public/js/jquery-3.7.1.min.js"></script>
+    <script src="../../public/js/validaciones.js"></script>
     <script src="../../public/js/bootstrap.bundle.js"></script>
     <script src="../../public/js/catalogo/productos.js"></script>
     <script src="../../public/js/catalogo/cotizaciones.js"></script>

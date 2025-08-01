@@ -15,17 +15,23 @@ switch ($_GET["op"]) {
         $cantidad = $_POST["cantidad"];
         $fechIng = $_POST["fechaIngreso"];
         $fechCad = isset($_POST["fechaCaducidad"]) ? $_POST["fechaCaducidad"] : null;
+        $talla = isset($_POST["talla"]) ? $_POST["talla"] : null; 
         $proveedor = $_POST["proveedor"];
         $precio = $_POST["precioUnitario"];
 
         if (isset($_POST["fechaCaducidad"])) {
             $fechCad = empty($fechCad) ? null : $fechCad;
         }
+        if (isset($_POST["talla"])) {
+            $talla = $_POST["talla"];
+        } else {
+            $talla = null; // Si no se envía talla, se establece como null
+        }
 
-        $res = $lotes->registrar($Producto, $numLot, $cantidad, $fechIng, $fechCad, $proveedor, $precio);
+        $res = $lotes->registrar($Producto, $numLot, $cantidad, $fechIng, $fechCad, $talla, $proveedor, $precio);
 
 
-        
+
         if ($res['ok']) {
             $respuesta['mensaje'] = 'lote registrado correctamente';
             $respuesta['tipo'] = 1;
@@ -41,7 +47,7 @@ switch ($_GET["op"]) {
 
         echo json_encode($respuesta);
         break;
- 
+
     case 'listar':
         $res = $lotes->listar();
         $data = array();
@@ -51,9 +57,10 @@ switch ($_GET["op"]) {
                 "lote_id" => $reg->lote_id,
                 "producto" => $reg->producto,
                 "numLote" => $reg->numero_lote,
-                "cantidad" => $reg->cantidad, 
+                "cantidad" => $reg->cantidad,
                 "fechaIngreso" => $reg->fecha_ingreso,
                 "fechaCaducidad" => $reg->fecha_caducidad,
+                "talla" => $reg->talla,
                 "proveedor" => $reg->proveedor,
                 "precioUnitario" => $reg->precio_unit
             );
@@ -68,16 +75,22 @@ switch ($_GET["op"]) {
         $numLot = $_POST["numeroLoteEditar"];
         $cantidad = $_POST["unidadesEditar"];
         $fechIng = $_POST["fechaIngresoEditar"];
-        $fechCad = isset($_POST["fechaCaducidadEditar"])? $_POST["fechaCaducidadEditar"] : null;
+        $fechCad = isset($_POST["fechaCaducidadEditar"]) ? $_POST["fechaCaducidadEditar"] : null;
         $proveedor = $_POST["proveedorEditar"];
         $precio = $_POST["precioUnitarioEditar"];
 
         if (isset($_POST["fechaCaducidadEditar"])) {
             $fechCad = empty($fechCad) ? null : $fechCad;
         }
-       
 
-        $res = $lotes->editar($loteId, $Producto, $numLot, $cantidad, $fechIng, $fechCad, $proveedor, $precio);
+        if (isset($_POST["tallaEditar"])) {
+            $talla = $_POST["tallaEditar"];
+        } else {
+            $talla = null; // Si no se envía talla, se establece como null
+        }
+
+
+        $res = $lotes->editar($loteId, $Producto, $numLot, $cantidad, $fechIng, $fechCad, $talla, $proveedor, $precio);
 
 
         if ($res['ok']) {
@@ -87,7 +100,7 @@ switch ($_GET["op"]) {
             if ($res['error'] == 1062) {
                 $respuesta['mensaje'] = 'El numero de lote ingresado ya está registrado.';
             } else {
-                $respuesta['mensaje'] = 'Error al editar lote';
+                $respuesta['mensaje'] = 'Error al editar lote' . $res['error'];
             }
             $respuesta['tipo'] = 0;
         }
@@ -113,7 +126,11 @@ switch ($_GET["op"]) {
         $data = array();
 
         while ($reg = $res->fetch_object()) {
-            $data[] = array("producto" => $reg->nombre); 
+            $data[] = array(
+                "producto" => $reg->producto,
+                "subcategoria" => $reg->subcategoria,
+                "categoria" => $reg->categoria
+            );
         }
 
         if (empty($data)) {

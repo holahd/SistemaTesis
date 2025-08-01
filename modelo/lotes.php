@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require('../config/conexion.php');
 
@@ -8,9 +11,11 @@ class Lotes {
       
     }
 
-    public function registrar($productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $proveedor, $precioUnit) {
+    public function registrar($productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $talla, $proveedor, $precioUnit) {
         
         $fechaCadSQL = empty($fechaCad) ? 'NULL' : "'$fechaCad'";
+        $tallaSQL = empty($talla) ? 'NULL' : "'$talla'";
+
         $sql = "CALL sp_lote(
             2,
             00, 
@@ -19,19 +24,21 @@ class Lotes {
             $cantidad, 
             '$fechaIngreso', 
             '$proveedor', 
-            $fechaCadSQL, 
+            $fechaCadSQL,
+            $tallaSQL, 
             $precioUnit
         );";
         return ejecutarConsultaSPConError($sql);
     }
 
     public function listar() {
-        $sql = "CALL sp_lote(1, 0, '', 0, 0, '2000-01-01', '', NULL, 0);";
+        $sql = "CALL sp_lote(1, 0, '', 0, 0, '2000-01-01', '', NULL, '', 0);";
         return ejecutarConsultaSP($sql);
     }
 
-    public function editar( $id,$productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $proveedor, $precioUnit) {
+    public function editar( $id,$productoNombre, $numLote, $cantidad, $fechaIngreso, $fechaCad, $talla,$proveedor, $precioUnit) {
         $fechaCadSQL = empty($fechaCad) ? 'NULL' : "'$fechaCad'";
+        $tallaSQL = empty($talla) ? 'NULL' : "'$talla'";
         $sql = "CALL sp_lote(
             3,
             $id,  
@@ -40,18 +47,19 @@ class Lotes {
             $cantidad, 
             '$fechaIngreso', 
             '$proveedor', 
-            $fechaCadSQL, 
+            $fechaCadSQL,
+            $tallaSQL, 
             $precioUnit
         );";
         return ejecutarConsultaSPConError($sql);
     } 
 
     public function eliminar($loteId) {
-        $sql = "CALL sp_lote(4,  '', $loteId, 0, '2000-01-01', '', NULL, 0);";
+        $sql = "CALL sp_lote(4,  '', $loteId, 0, '2000-01-01', '', NULL, '', 0);";
         return ejecutarConsultaSP($sql);
     }
 	public function listarNombresProductos() {
-    $sql = "CALL sp_lote(5,00,'', 0, 0, '2000-01-01', '', NULL, 0);";
+    $sql = "CALL sp_lote(5,00,'', 0, 0, '2000-01-01', '', NULL, '', 0);";
     return ejecutarConsultaSP($sql);
 }
 

@@ -17,10 +17,12 @@ function cargarCotizaciones(url, containerId, botonCallback) {
               <div>
                 <h5 class="card-title mb-1">Cotización #${cot.cotizacion_id}</h5>
                 <p class="card-text mb-0">${cot.productos_solicitados}</p>
+                <p class="card-text text-muted mb-0"><small>${cot.nombre}</small></p>
                 <p class="card-text text-muted mb-0"><small>${cot.correo}</small></p>
+                
               </div>
               <button class="btn btn-primary mt-2 mt-md-0"
-                onclick="${botonCallback}(${cot.cotizacion_id}, '${encodeURIComponent(cot.correo)}')">
+                onclick="${botonCallback}(${cot.cotizacion_id}, '${encodeURIComponent(cot.correo)}', '${encodeURIComponent(cot.nombre)}', '${encodeURIComponent(cot.telefono)}')">
                 Revisar
               </button>
             </div>
@@ -37,8 +39,10 @@ function cargarCotizaciones(url, containerId, botonCallback) {
 
 
 
-function abrirDetalle(id, email) {
+function abrirDetalle(id, email, nombre, telefono) {
   email = decodeURIComponent(email);
+  nombre = decodeURIComponent(nombre);
+  telefono = decodeURIComponent(telefono);
   $(document).ready(function () {
     $.ajax({
       url: '../../../ajax/cotizacion-serv.php?op=listarDetalle',
@@ -67,7 +71,8 @@ function abrirDetalle(id, email) {
         detalle.forEach((item, index) => {
           tabla += `
             <tr>
-              <td>${item.producto}</td>
+              <td>${item.producto}
+               ${item.talla ? `<br><span class="badge bg-secondary">Talla: ${item.talla}</span>` : ""}</td>
               <td>${item.cantidad}</td>
               <td>${item.stock}</td>
               <td>$${item.precio}</td>
@@ -87,8 +92,25 @@ function abrirDetalle(id, email) {
           </div>
           <input type="hidden" id="cotizacion_id" value="${id}">
           <div class="mt-3">
-            <label class="form-label">Correo electrónico del cliente:</label>
-            <div id="correo"><strong>${email}</strong></div>
+            <div class="card p-3 mb-3 shadow-sm">
+  <h5 class="mb-3">Datos del Cliente</h5>
+  
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">Nombre del cliente:</div>
+    <div class="col-sm-8"><strong id="nombre">${nombre}</strong></div>
+  </div>
+
+  <div class="row mb-2">
+    <div class="col-sm-4 text-muted">Correo electrónico del cliente:</div>
+    <div class="col-sm-8"><strong id="correo">${email}</strong></div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4 text-muted">Teléfono del cliente:</div>
+    <div class="col-sm-8"><strong id="telefono">${telefono}</strong></div>
+  </div>
+</div>
+
           </div>
         `;
 
@@ -147,7 +169,7 @@ function enviarCotizacion() {
     const $fila = $(this);
     const nombre = $fila.find('td:eq(0)').text();
     const cantidad = parseInt($fila.find('td:eq(1)').text());
-    const stock = parseInt($fila.find('td:eq(2)').text());
+    
     const precioBase = parseFloat($fila.find('input.precio_final').data('precio'));
     const precioFinalStr = $fila.find('input.precio_final').val();
     const precioFinal = parseFloat(precioFinalStr);
@@ -172,7 +194,7 @@ function enviarCotizacion() {
       errores.push(`El precio del producto "${nombre}" parece demasiado alto. Verifique el valor ingresado.`);
     }
 
-    
+
     const subtotal = (cantidad * precioFinal).toFixed(2);
     productos.push({
       producto: nombre,
@@ -194,6 +216,8 @@ function enviarCotizacion() {
 
   const email = $('#correo').text().trim();
   const cotizacionId = $('#cotizacion_id').val();
+  const nombre = $('#nombre').text().trim();
+
   // Confirmar antes de enviar
   Swal.fire({
     title: '¿Enviar cotización?',
@@ -213,15 +237,18 @@ function enviarCotizacion() {
           correo: email,
           asunto: 'Cotización solicitada',
           cotizacion_id: cotizacionId,
+          nombre: nombre,
           productos: productos
         }),
         success: function (response) {
           const r = JSON.parse(response);
           if (r.success) {
-            Swal.fire('Éxito', 'La cotización fue enviada correctamente.', 'success');
-            $('#modalDetalle').modal('hide');
-            // recargar la página para actualizar el listado
-            location.reload();
+            Swal.fire('Éxito', 'La cotización fue enviada correctamente.', 'success')
+              .then(() => {
+                $('#modalDetalle').modal('hide');
+                // recargar la página para actualizar el listado
+                location.reload();
+              });
           } else {
             Swal.fire('Error', 'No se pudo enviar el correo: ' + r.error, 'error');
           }
@@ -236,18 +263,18 @@ function enviarCotizacion() {
 }
 
 // Cuando pulsan "Rechazar por falta de stock"
-$(document).on('click', '#btn-rechazar-stock', function() {
+$(document).on('click', '#btn-rechazar-stock', function () {
   const cotizacionId = $('#cotizacion_id').val();
   const $c = $('#correo');
-const email = ($c.is('input, textarea') ? $c.val() : $c.text()).trim();
+  const email = ($c.is('input, textarea') ? $c.val() : $c.text()).trim();
 
 
   // Recolectar productos con stock insuficiente
   const productosSinStock = [];
-  $('#detalle-modal-body table tbody tr').each(function() {
+  $('#detalle-modal-body table tbody tr').each(function () {
     const $fila = $(this);
     const cantidad = parseInt($fila.find('td:eq(1)').text());
-    const stock    = parseInt($fila.find('td:eq(2)').text());
+    const stock = parseInt($fila.find('td:eq(2)').text());
     if (cantidad > stock) {
       productosSinStock.push($fila.find('td:eq(0)').text());
     }
@@ -278,25 +305,27 @@ const email = ($c.is('input, textarea') ? $c.val() : $c.text()).trim();
       success(response) {
         const r = typeof response === 'string' ? JSON.parse(response) : response;
         if (r.success) {
-          Swal.fire('Notificado','El cliente ha sido informado y la cotización cancelada.','success');
+          Swal.fire('Notificado', 'El cliente ha sido informado y la cotización cancelada.', 'success');
           $('#modalDetalle').modal('hide');
           // recargar la página para actualizar el listado
           location.reload();
-         
+
         } else {
-          Swal.fire('Error','No se pudo notificar: '+r.error,'error');
+          Swal.fire('Error', 'No se pudo notificar: ' + r.error, 'error');
         }
       },
       error() {
-        Swal.fire('Error','Falló la conexión con el servidor.','error');
+        Swal.fire('Error', 'Falló la conexión con el servidor.', 'error');
       }
     });
   });
 });
 
 
-function mostrarDetalleConfirmacion(id, correo) {
+function mostrarDetalleConfirmacion(id, correo, nombre, telefono) {
   correo = decodeURIComponent(correo);
+  nombre = decodeURIComponent(nombre);
+  telefono = decodeURIComponent(telefono);
 
   $.ajax({
     url: '../../../ajax/cotizacion-serv.php?op=listarDetalleEnviado',
@@ -320,7 +349,8 @@ function mostrarDetalleConfirmacion(id, correo) {
       detalle.forEach(d => {
         contenido += `
           <tr>
-            <td>${d.producto}</td>
+            <td>${d.producto}
+               ${d.talla ? `<br><span class="badge bg-secondary">Talla: ${d.talla}</span>` : ""}</td>
             <td>${d.cantidad}</td>
             <td>${d.stock}</td>
             <td>$${d.precio}</td>           
@@ -333,7 +363,7 @@ function mostrarDetalleConfirmacion(id, correo) {
       <form id="form-confirmacion">
         <input type="hidden" id="cotizacion_id" value="${id}">
         <div class="mb-2"><label class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" required>
+          <input type="text" class="form-control" id="nombre" value="${nombre}" required>
         </div>
         <div class="mb-2"><label class="form-label">Cédula</label>
           <input type="text" class="form-control solo-numeros" id="identificacion" required>
@@ -345,7 +375,7 @@ function mostrarDetalleConfirmacion(id, correo) {
           <input type="email" class="form-control" id="correo" name="correo" value="${correo}" required>
         </div>
         <div class="mb-2"><label class="form-label">Teléfono</label>
-          <input type="text" class="form-control solo-numeros" id="telefono" required>
+          <input type="text" class="form-control solo-numeros" id="telefono" value="${telefono}" required>
         </div>
       </form>
       `;
@@ -438,7 +468,7 @@ function confirmarventa() {
 }
 
 
-function mostrarDetalleVendida(id, correo) {
+function mostrarDetalleVendida(id, correo, nombre, telefono) {
   correo = decodeURIComponent(correo);
 
   $.ajax({
@@ -463,7 +493,8 @@ function mostrarDetalleVendida(id, correo) {
         const total = (prod.precio * prod.cantidad).toFixed(2);
         tabla += `
           <tr>
-            <td>${prod.producto}</td>
+            <td>${prod.producto}
+               ${prod.talla ? `<br><span class="badge bg-secondary">Talla: ${prod.talla}</span>` : ""}</td>
             <td>${prod.cantidad}</td>
             <td>$${prod.precio}</td>
             <td>$${total}</td>

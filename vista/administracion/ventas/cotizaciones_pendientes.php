@@ -33,6 +33,19 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <body class="bg-light">
     <div class="container mt-4">
         <h3 class="mb-4">Solicitudes de Cotización Pendientes</h3>
+        <div class="mb-4">
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input
+                    type="text"
+                    id="filtroBusqueda"
+                    class="form-control border-start-0"
+                    placeholder="Buscar por número, cliente, correo o producto...">
+            </div>
+        </div>
+
         <div id="cotizaciones-container" class="d-flex flex-column gap-3">
             <!-- Tarjetas se insertan aquí -->
         </div>
@@ -52,7 +65,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                 <div class="modal-footer">
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        
+
                         <button type="button" class="btn btn-success" onclick="enviarCotizacion()">Enviar Cotización</button>
                     </div>
 
@@ -73,6 +86,19 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         cargarCotizaciones('../../../ajax/cotizacion-serv.php?op=listarPendientes', '#cotizaciones-container', 'abrirDetalle');
     });
 </script>
+<script>
+    $(document).ready(function() {
+        $('#filtroBusqueda').on('input', function() {
+            const texto = $(this).val().toLowerCase();
+
+            $('#cotizaciones-container .card').each(function() {
+                const contenido = $(this).text().toLowerCase();
+                $(this).toggle(contenido.includes(texto));
+            });
+        });
+    });
+</script>
+
 <script src="./../../../public/js/administracion/correo.js"></script>
 
 </html>
