@@ -11,9 +11,9 @@ switch ($_GET["op"]) {
 
     case 'registrar':
         $Producto = $_POST["producto"];
-        $numLot = $_POST["numeroLote"];
+        $numLot = 1;
         $cantidad = $_POST["cantidad"];
-        $fechIng = $_POST["fechaIngreso"];
+        $fechIng = date('Y-m-d');
         $fechCad = isset($_POST["fechaCaducidad"]) ? $_POST["fechaCaducidad"] : null;
         $talla = isset($_POST["talla"]) ? $_POST["talla"] : null; 
         $proveedor = $_POST["proveedor"];
@@ -72,9 +72,9 @@ switch ($_GET["op"]) {
     case 'editar':
         $loteId = $_POST["lote_id"];
         $Producto = $_POST["productoEditar"];
-        $numLot = $_POST["numeroLoteEditar"];
+        $numLot = 1;
         $cantidad = $_POST["unidadesEditar"];
-        $fechIng = $_POST["fechaIngresoEditar"];
+        $fechIng = date('Y-m-d');
         $fechCad = isset($_POST["fechaCaducidadEditar"]) ? $_POST["fechaCaducidadEditar"] : null;
         $proveedor = $_POST["proveedorEditar"];
         $precio = $_POST["precioUnitarioEditar"];

@@ -20,7 +20,21 @@ $(document).ready(function () {
             columns: [
                 { data: 'producto_id', visible: false },
                 { data: 'nombre' },
-                { data: 'descripcion' },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+
+                        // Botón para ver ficha técnica
+                        return `
+                <button 
+                    class="btn btn-outline-success btn-sm ver-ficha"
+                    title="Ver ficha técnica"
+                    data-descripcion="${row.descripcion}">
+                    <i class="bi bi-file-earmark-fill"></i>
+                </button>
+            `;
+                    }
+                },
                 {
                     data: null,
                     title: 'Stock',
@@ -137,7 +151,7 @@ $(document).ready(function () {
                             let textoStock = 'N/A';
                             if (producto.categoria === "Vestimenta" || producto.categoria_id == 2) {
                                 textoStock = producto.tallas?.length > 0
-                                    ? producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ')
+                                    ? producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(',\n ')
                                     : 'Sin lotes registrados';
                             } else if (producto.categoria === "Extintores") {
                                 textoStock = `${producto.stock_total} unidades`;
@@ -170,20 +184,26 @@ $(document).ready(function () {
                         doc.content[1].table.body.forEach((row, i) => {
                             if (i === 0) return; // Saltar encabezado
 
-                            const producto_id = row[0].text || row[0]; // puede ser objeto o string
+                            const producto_id = row[0].text || row[0];
                             const producto = mapaProductos.get(producto_id);
                             const categoria = parseInt(producto?.categoria_id);
-                            if (categoria === 2) { // columna 4: categoria_id
+                            if (categoria === 2) {
                                 if (producto.tallas?.length > 0) {
-                                    let textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ');
-                                    row[3].text = textoStock;
+                                    const textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join('\n');
+
+                                    // Aplicar salto de línea usando un objeto con preserveLeadingSpaces
+                                    row[3] = {
+                                        text: textoStock,
+                                        preserveLeadingSpaces: true
+                                    };
                                 } else {
-                                    row[3].text = 'Sin lotes registrados';
+                                    row[3] = { text: 'Sin lotes registrados' };
                                 }
                             }
-
                         });
                     }
+
+
                 },
                 {
                     extend: 'print',
@@ -198,15 +218,15 @@ $(document).ready(function () {
                             const categoria = parseInt(producto?.categoria_id);
                             if (categoria === 2) { // columna 4: categoria_id
                                 if (producto.tallas?.length > 0) {
-                                    const textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join(', ');
-                                    tds.eq(3).text(textoStock);
+                                    const textoStock = producto.tallas.map(t => `talla ${t.talla}: ${t.stock}`).join('<br>');
+                                    tds.eq(3).html(textoStock); // usamos html en lugar de text
                                 } else {
                                     tds.eq(3).text('Sin lotes registrados');
                                 }
                             }
-
                         });
                     }
+
                 }
             ]
             ,
@@ -261,32 +281,25 @@ $(document).ready(function () {
         restaurarProducto(id, nombre);
     });
 
+    $(document).on('click', '.ver-ficha', function () {
+        let descripcion = $(this).data('descripcion');
+
+        verFicha(descripcion);
+    });
+
 
     $('#formEditarProducto').submit(function (e) {
         e.preventDefault();
 
 
 
-        // Unir unidad a capacidad
-        $(".capacidad-input").each(function () {
-            const unidad = $(this).closest(".input-group").find(".capacidad-unidad").val();
-            this.value = `${this.value} ${unidad}`;
-        });
 
-        // Agregar PSI
-        $(".presion-input").each(function () {
-            if (!this.value.includes("PSI")) {
-                this.value += " PSI";
-            }
-        });
 
 
         var formulario = new FormData(this);
 
 
-        for (let [key, value] of formulario.entries()) {
-            console.log(`${key}:`, value);
-        }
+
 
         $.ajax({
             url: '../../../ajax/catalogo-serv.php?op=editar',
@@ -371,7 +384,7 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
     $('#formulario_edicion').prop('disabled', false);
     $('#producto_id').val(producto_id);
     $('#nombre').val(nombre);
-    $('#descripcion').val(descripcion);
+    $('#ruta_ficha_pdf').val(descripcion);
     $('#imagen_producto').attr('src', "../../../img/" + imagen);
     $('#ruta_imagen').val(imagen);
 
@@ -400,9 +413,6 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
             });
 
 
-            $categoria.val(categoria_id).trigger('change');
-
-
             let formulario = new FormData();
             formulario.append('categoria_id', categoria_id);
 
@@ -423,60 +433,8 @@ function PonerValoresenCampos(producto_id, nombre, descripcion, categoria_id, su
                     });
 
 
+                    $categoria.val(categoria_id);
                     $subcategoria.val(subcategoria_id);
-
-                    // Procesar características desde descripción
-                    const lineas = descripcion.split("\n").filter(Boolean);
-
-                    $caracteristicasObligatorias.empty();
-                    $caracteristicasExtras.empty();
-                    extrasEditarCount = 0;
-
-                    const obligatoriasCategoria = obligatorias[categoria_id] || [];
-
-                    console.log("Descripción cruda:", descripcion);
-                    console.log("Líneas detectadas:", lineas);
-
-                    lineas.forEach(linea => {
-                        const partes = linea.split(":");
-                        if (partes.length < 2) return;
-
-                        const nombreCampo = partes[0].trim();
-                        const valorCampo = partes.slice(1).join(":").trim();
-
-                        const campoObligatorio = obligatoriasCategoria.find(obj => obj.nombre.toLowerCase() === nombreCampo.toLowerCase());
-
-                        if (campoObligatorio) {
-                            const $campo = crearCampo(campoObligatorio.nombre, true, campoObligatorio.tipo, subcategoria_id);
-                            asignarValorCampo($campo, valorCampo, campoObligatorio.tipo);
-                            $caracteristicasObligatorias.append($campo);
-                        } else if (extrasEditarCount < 3) {
-                            const tipoExtra = isNaN(parseFloat(valorCampo)) ? "texto" : "numero";
-                            const $campoExtra = crearCampo(nombreCampo, false, tipoExtra, subcategoria_id);
-
-                            asignarValorCampo($campoExtra, valorCampo, tipoExtra);
-
-                            // --- Agregar botón de eliminar igual que en el add handler ---
-                            const $btnEliminar = $("<button>")
-                                .attr("type", "button")
-                                .addClass("btn btn-outline-danger btn-sm eliminarCaracteristica")
-                                .text("Eliminar");
-
-                            const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
-                            $campoExtra.append($colEliminar);
-                            // -------------------------------------------------------------
-
-                            $caracteristicasExtras.append($campoExtra);
-                            extrasEditarCount++;
-                        }
-
-
-                        console.log("Procesando línea:", linea);
-                        console.log("Nombre detectado:", nombreCampo);
-                        console.log("Valor detectado:", valorCampo);
-
-                    });
-
 
 
 
@@ -561,118 +519,22 @@ function restaurarProducto(id, nombre) {
     });
 }
 
+function verFicha(descripcion) {
 
-
-
-
-
-const $categoria = $("#categoria");
-const $subcategoria = $("#subcategoria");
-const $caracteristicasObligatorias = $("#caracteristicasObligatorias");
-const $caracteristicasExtras = $("#caracteristicasExtras");
-const $btnAgregar = $("#agregarCaracteristica");
-
-let extrasEditarCount = 0;
-
-// Mostrar campos obligatorios (como en registrar)
-$("#categoria").on("change", function () {
-    const categoria = $(this).val();
-    $caracteristicasObligatorias.empty();
-
-    if (obligatorias[categoria]) {
-        obligatorias[categoria].forEach(car => {
-            const subID = $subcategoria.val();
-            const $campo = crearCampo(car.nombre, true, car.tipo, subID);
-            $caracteristicasObligatorias.append($campo);
-        });
-    }
-});
-
-// Cambiar placeholder si cambia subcategoría
-$subcategoria.on("change", function () {
-    const subID = $(this).val();
-    const nuevoPlaceholder = getPlaceholderTalla(subID);
-
-    $caracteristicasObligatorias.find("input").each(function () {
-        const $nombreInput = $(this).closest(".caracteristica-group").find("input[name='caracteristica_nombre[]']");
-        if ($nombreInput.val() === "Tallas disponibles") {
-            $(this).attr("placeholder", nuevoPlaceholder);
-        }
-    });
-});
-
-// Agregar campo extra en editar
-$btnAgregar.on("click", async function () {
-    if (extrasEditarCount >= 3) return;
-
-    const { value: tipoCampo } = await Swal.fire({
-        title: "Tipo de característica",
-        input: "select",
-        inputOptions: {
-            texto: "Texto",
-            numero: "Número"
-        },
-        inputPlaceholder: "Selecciona tipo",
-        showCancelButton: true,
-        confirmButtonText: "Agregar",
-        cancelButtonText: "Cancelar",
-        customClass: {
-            input: 'swal2-select-bootstrap'
-        },
-        inputValidator: (value) => {
-            if (!value) return "Debes seleccionar un tipo de característica";
-        }
-    });
-
-    if (!tipoCampo) return;
-
-    const tipo = tipoCampo === "numero" ? "numero" : "texto";
-    const subID = $subcategoria.val();
-    const $campoExtra = crearCampo("", false, tipo, subID);
-
-    const $btnEliminar = $("<button>")
-        .attr("type", "button")
-        .addClass("btn btn-outline-danger btn-sm eliminarCaracteristica")
-        .text("Eliminar");
-
-    const $colEliminar = $("<div>").addClass("col-md-2 text-end").append($btnEliminar);
-    $campoExtra.append($colEliminar);
-
-    $caracteristicasExtras.append($campoExtra);
-    extrasEditarCount++;
-});
-
-// Eliminar extra
-$(document).on("click", ".eliminarCaracteristica", function () {
-    $(this).closest(".caracteristica-group").remove();
-    extrasEditarCount--;
-});
-
-
-
-function asignarValorCampo($campo, valor, tipo) {
-    if (tipo === "capacidad") {
-        // input + select unidad
-        const [num, unidad] = valor.split(" ");
-        $campo.find("input.capacidad-input").val(num || "");
-        if (unidad) {
-            $campo.find("select.capacidad-unidad").val(unidad).trigger("change");
-        }
-    } else if (tipo === "presion") {
-        // input + sufijo PSI
-        const num = valor.replace("PSI", "").trim();
-        $campo.find("input.presion-input").val(num);
-    } else if (tipo === "numero") {
-        $campo.find("input.solo-numero").val(valor);
-    } else if (tipo === "tallas") {
-        $campo.find("input[name='caracteristica_descripcion[]']").val(valor);
-    }
-    else if ($campo.find("select.caracteristica-select").length) {
-        // campo con select2
-        $campo.find("select.caracteristica-select").val(valor).trigger("change");
-    } else {
-        // campo input texto normal
-        $campo.find("input[name='caracteristica_descripcion[]']").val(valor);
-    }
-
+    window.open(`../../${descripcion}`, '_blank');
 }
+
+document.getElementById('ficha_pdf').addEventListener('change', function () {
+    const archivo = this.files[0];
+
+    if (archivo && archivo.size > 2 * 1024 * 1024) { // 2MB
+        swal.fire({
+            title: 'Error',
+            text: 'El archivo PDF no puede ser mayor a 2MB.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+        this.value = ''; // Limpia el campo
+    }
+});
+

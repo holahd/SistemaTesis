@@ -106,8 +106,8 @@ html, body {
 
         .sidebar .footer {
             text-align: center;
-            font-size: 0.8rem;
-            color: #6c757d;
+            font-size: 1rem;
+            color: #fafafaff;
             padding: 10px;
         }
 

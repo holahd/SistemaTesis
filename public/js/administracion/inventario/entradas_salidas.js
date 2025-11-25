@@ -1,32 +1,59 @@
-$('#formReporte').on('submit', function (e) {
-  e.preventDefault();
 
-  const fechaInicio = $('#fechaInicio').val();
-  const fechaFin = $('#fechaFin').val();
+  $('#formReporte').on('submit', function (e) {
+    e.preventDefault();
 
-  if (fechaInicio > fechaFin) {
-    Swal.fire('Fechas inválidas', 'La fecha de inicio no puede ser mayor que la fecha final.', 'warning');
-    return;
-  }
+    const formData = $('#formReporte').serializeArray();
+
+    
+
+    if (fechaInicio > fechaFin) {
+      Swal.fire('Fechas inválidas', 'La fecha de inicio no puede ser mayor que la fecha final.', 'warning');
+      return;
+    }
+
+    $.ajax({
+      url: '../../../ajax/reporte-serv.php?op=entradasSalidas',
+      method: 'POST',
+      data: $.param(formData),
+      success: function (response) {
+        if (response === 'ok') {
+          $('#modalReporte').modal('hide');
+          window.open('./../../../pdfReporte/reporte_pdf.php', '_blank');
+        } else {
+          Swal.fire('Sin registros', 'No se encontraron movimientos en ese rango de fechas.', 'info');
+        }
+      },
+      error: function () {
+        Swal.fire('Error', 'Hubo un problema al generar el reporte.', 'error');
+      }
+    });
+  });
 
   $.ajax({
-    
-    url: '../../../ajax/reporte-serv.php?op=entradasSalidas',
+    url: '../../../ajax/lotes-serv.php?op=listarproductos',
     method: 'POST',
-    data: { fechaInicio, fechaFin },
-    success: function (response) {
-      if (response === 'ok') {
+    contentType: false,
+    processData: false,
+    success: function (data) {
+      const nombres = JSON.parse(data);
+      window.listaProductos = nombres;
+      const $select = $('#nombreProducto');
+      $select.empty();
+      $select.append('<option></option>');
 
-        $('#modalReporte').modal('hide');
-       window.open('./../../../pdfReporte/reporte_pdf.php', '_blank');
+      nombres.forEach(function (obj) {
+        $select.append(`<option value="${obj.producto}">${obj.producto}</option>`);
+      });
 
-
-      } else {
-        Swal.fire('Sin registros', 'No se encontraron movimientos en ese rango de fechas.', 'info');
-      }
+      $select.select2({
+        placeholder: "Seleccione un producto",
+        allowClear: true,
+        width: '100%'
+      });
     },
-    error: function () {
-      Swal.fire('Error', 'Hubo un problema al generar el reporte.', 'error');
+    error: function (xhr, status, error) {
+      console.error('Error al cargar productos:', error);
     }
   });
-});
+
+

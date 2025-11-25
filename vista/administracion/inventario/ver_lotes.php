@@ -12,11 +12,12 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
 <!DOCTYPE html>
 <html lang="es">
 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Lotes</title>
-
+    <script src="../../../public/js/jquery-3.7.1.min.js"></script>
     <link href="../../../public/css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../public/css/datatables.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -65,8 +66,8 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
     <div class="container">
         <h2 class="mb-4 text-center text-primary">Gestión de Lotes</h2>
         <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-            <h4>Productos existentes</h4>
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalReporte">
+            <h4>Lotes registrados</h4>
+            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalReporte" hidden>
                 <i class="fas fa-file-pdf"></i> Generar reporte de movimientos
             </button>
         </div>
@@ -81,7 +82,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                             <th>Producto</th>
                             <th>Lote</th>
                             <th>Unidades</th>
-                            <th>Fecha ingreso</th>
+                            <th>Fecha de registro</th>
                             <th>Proveedor</th>
                             <th>Caducidad</th>
                             <th>Talla</th>
@@ -118,20 +119,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                                 </select>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="numeroLoteEditar" class="form-label">Número de lote</label>
-                                <input type="text" class="form-control solo-numeros" id="numeroLoteEditar" name="numeroLoteEditar" required>
-                            </div>
+                           
 
                             <div class="mb-3">
                                 <label for="unidadesEditar" class="form-label">Unidades</label>
                                 <input type="text" class="form-control solo-numeros" id="unidadesEditar" name="unidadesEditar" required>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="fechaIngresoEditar" class="form-label">Fecha de ingreso</label>
-                                <input type="date" class="form-control" id="fechaIngresoEditar" name="fechaIngresoEditar" required>
-                            </div>
+                            
 
                             <div class="mb-3">
                                 <label for="proveedorEditar" class="form-label">Proveedor</label>
@@ -167,40 +162,48 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         </div>
     </div>
 
- <!-- Modal -->
-<div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form id="formReporte" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="fechaInicio" class="form-label">Desde</label>
-          <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+    <!-- Modal -->
+    <div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="formReporte" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="producto" class="form-label">Producto (opcional)</label>
+                        <select id="nombreProducto" name="nombreProducto" class="form-select">
+                            <option value="">-- Todos los productos --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Desde</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Hasta</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Generar PDF</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-          <label for="fechaFin" class="form-label">Hasta</label>
-          <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Generar PDF</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
 
 
-    <script src="../../../public/js/jquery-3.7.1.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+       <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/validaciones.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_lotes.js"></script>
-    <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
+ 
 
     <script>
         // Activar/desactivar campo de caducidad según checkbox

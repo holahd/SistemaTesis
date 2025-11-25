@@ -78,64 +78,66 @@ switch ($_GET["op"]) {
 
         break;
 
-    case 'registrarProducto':
+   case 'registrarProducto':
 
+    if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] === 0) {
+        $nombreArchivo = time() . "_" . basename($_FILES["foto"]["name"]);
+        $rutaDestino = "../public/img/" . $nombreArchivo;
+        $rutaBD = "../public/img/" . $nombreArchivo;
 
-        if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] === 0) {
-            $nombreArchivo = time() . "_" . basename($_FILES["foto"]["name"]);
-            $rutaDestino = "../public/img/" . $nombreArchivo;
-            $rutaBD = "../public/img/" . $nombreArchivo;
+        if (move_uploaded_file($_FILES["foto"]["tmp_name"], $rutaDestino)) {
 
-            $caracteristicasTexto = '';
-            $caracteristicas = [];
-            $nombreArr = $_POST['caracteristica_nombre'] ?? [];
-            $descArr = $_POST['caracteristica_descripcion'] ?? [];
+            exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
 
-            if (move_uploaded_file($_FILES["foto"]["tmp_name"], $rutaDestino)) {
+            // Subida del PDF de ficha técnica
+            $rutaFicha = null;
+            if (isset($_FILES["ficha_pdf"]) && $_FILES["ficha_pdf"]["error"] === 0) {
+                $nombreFicha = time() . "_" . basename($_FILES["ficha_pdf"]["name"]);
+                $rutaFichaDestino = "../public/files/fichas/" . $nombreFicha;
 
-                exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
-
-
-
-                for ($i = 0; $i < count($nombreArr); $i++) {
-                    $nombre = trim($nombreArr[$i]);
-                    $desc = trim($descArr[$i]);
-                    if ($nombre !== '' && $desc !== '') {
-                        $caracteristicas[] = "$nombre: $desc";
-                    }
-                    $caracteristicasTexto = implode("\n", $caracteristicas);
-                }
-
-                $res = $productos->insertar(
-                    $_POST['nombre'],
-                    $caracteristicasTexto,
-                    $_POST['subcategoria'],
-                    $rutaBD
-
-                );
-
-                if ($res['ok']) {
-                    $respuesta['mensaje'] = 'Producto registrado correctamente';
-                    $respuesta['tipo'] = 1;
+                if (move_uploaded_file($_FILES["ficha_pdf"]["tmp_name"], $rutaFichaDestino)) {
+                    exec('icacls "' . $rutaFichaDestino . '" /grant IIS_IUSRS:(F)');
+                    $rutaFicha = $rutaFichaDestino;
                 } else {
-                    if ($res['error'] == 1062) {
-                        $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
-                    } else {
-                        $respuesta['mensaje'] = 'Error al registrar producto.';
-                    }
+                    $respuesta['mensaje'] = 'Error al subir la ficha técnica.';
                     $respuesta['tipo'] = 0;
+                    echo json_encode($respuesta);
+                    break;
                 }
+            }
+
+            // Insertar producto con la ruta del PDF en "caracteristicas"
+            $res = $productos->insertar(
+                $_POST['nombre'],
+                $rutaFicha,
+                $_POST['subcategoria'],
+                $rutaBD
+                 // ← se guarda en la columna "caracteristicas"
+            );
+
+            if ($res['ok']) {
+                $respuesta['mensaje'] = 'Producto registrado correctamente';
+                $respuesta['tipo'] = 1;
             } else {
-                $respuesta['mensaje'] = 'Error al mover la imagen.';
+                if ($res['error'] == 1062) {
+                    $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
+                } else {
+                    $respuesta['mensaje'] = 'Error al registrar producto.';
+                }
                 $respuesta['tipo'] = 0;
             }
         } else {
-            $respuesta['mensaje'] = 'No se recibió ninguna imagen.';
+            $respuesta['mensaje'] = 'Error al mover la imagen.';
             $respuesta['tipo'] = 0;
         }
+    } else {
+        $respuesta['mensaje'] = 'No se recibió ninguna imagen.';
+        $respuesta['tipo'] = 0;
+    }
 
-        echo json_encode($respuesta);
-        break;
+    echo json_encode($respuesta);
+    break;
+
 
     case 'buscar':
         $busqueda = $_POST['buscar'];
@@ -178,69 +180,79 @@ switch ($_GET["op"]) {
 
 
     case 'editar':
+ file_put_contents("debug.log", print_r($_FILES, true));
 
-        $rutaBD = null;
-
-
-        $imagenActual = isset($_POST['ruta_imagen']) ? $_POST['ruta_imagen'] : null;
-        $caracteristicasTexto = '';
-        $caracteristicas = [];
-        $nombreArr = $_POST['caracteristica_nombre'] ?? [];
-        $descArr = $_POST['caracteristica_descripcion'] ?? [];
-
-        if (isset($_FILES["input_imagen"]) && $_FILES["input_imagen"]["error"] === UPLOAD_ERR_OK) {
-            $nombreArchivo = time() . "_" . basename($_FILES["input_imagen"]["name"]);
-            $rutaDestino = "../public/img/" . $nombreArchivo;
-            $rutaBD = $rutaDestino;
-
-            if (move_uploaded_file($_FILES["input_imagen"]["tmp_name"], $rutaDestino)) {
-
-                exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
+    $rutaBD = $_POST['ruta_imagen'] ?? null;
+    $caracteristicasPDF = $_POST['ruta_ficha_pdf'] ?? null;
 
 
-                if (!empty($imagenActual) && file_exists($imagenActual)) {
-                    unlink($imagenActual);
-                }
-            } else {
-                $respuesta['mensaje'] = 'Error al mover la imagen.';
-                $respuesta['tipo'] = 0;
-                echo json_encode($respuesta);
-                exit;
+    // Subida de nueva imagen (opcional)
+    if (isset($_FILES["input_imagen"]) && $_FILES["input_imagen"]["error"] === UPLOAD_ERR_OK) {
+        $nombreArchivo = time() . "_" . basename($_FILES["input_imagen"]["name"]);
+        $rutaDestino = "../public/img/" . $nombreArchivo;
+        $rutaBD = $rutaDestino;
+
+        if (move_uploaded_file($_FILES["input_imagen"]["tmp_name"], $rutaDestino)) {
+            exec('icacls "' . $rutaDestino . '" /grant IIS_IUSRS:(F)');
+
+            // Eliminar imagen anterior si existe
+            if (!empty($_POST['ruta_imagen']) && file_exists($_POST['ruta_imagen'])) {
+                unlink($_POST['ruta_imagen']);
             }
-        }
-
-        for ($i = 0; $i < count($nombreArr); $i++) {
-            $nombre = trim($nombreArr[$i]);
-            $desc = trim($descArr[$i]);
-            if ($nombre !== '' && $desc !== '') {
-                $caracteristicas[] = "$nombre: $desc";
-            }
-            $caracteristicasTexto = implode("\n", $caracteristicas);
-        }
-
-        $res = $productos->actualizar(
-            $_POST['producto_id'],
-            $_POST['nombre'],
-            $caracteristicasTexto,
-            $_POST['subcategoria'],
-            $rutaBD
-        );
-
-        if ($res['ok']) {
-            $respuesta['mensaje'] = 'Producto actualizado correctamente';
-            $respuesta['tipo'] = 1;
         } else {
-            if ($res['error'] == 1062) {
-                $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
-            } else {
-                $respuesta['mensaje'] = 'Error al editar producto.';
-            }
+            $respuesta['mensaje'] = 'Error al mover la imagen.';
             $respuesta['tipo'] = 0;
+            echo json_encode($respuesta);
+            exit;
         }
+    }
 
-        echo json_encode($respuesta);
-        break;
+    // Subida de nueva ficha técnica (opcional)
+    if (isset($_FILES["ficha_pdf"]) && $_FILES["ficha_pdf"]["error"] === 0) {
+        $nombreFicha = time() . "_" . basename($_FILES["ficha_pdf"]["name"]);
+        $rutaFichaDestino = "../public/files/fichas/" . $nombreFicha;
 
+        if (move_uploaded_file($_FILES["ficha_pdf"]["tmp_name"], $rutaFichaDestino)) {
+            exec('icacls "' . $rutaFichaDestino . '" /grant IIS_IUSRS:(F)');
+            
+            // Eliminar la anterior si existe
+            if (!empty($caracteristicasPDF) && file_exists($caracteristicasPDF)) {
+                unlink($caracteristicasPDF);
+            }
+
+            $caracteristicasPDF = $rutaFichaDestino;
+        } else {
+            $respuesta['mensaje'] = 'Error al subir la ficha técnica.';
+            $respuesta['tipo'] = 0;
+            echo json_encode($respuesta);
+            exit;
+        }
+    }
+
+    // Actualizar el producto
+    $res = $productos->actualizar(
+        $_POST['producto_id'],
+        $_POST['nombre'],
+        $caracteristicasPDF,
+        $_POST['subcategoria'],
+        $rutaBD
+        
+    );
+
+    if ($res['ok']) {
+        $respuesta['mensaje'] = 'Producto actualizado correctamente';
+        $respuesta['tipo'] = 1;
+    } else {
+        if ($res['error'] == 1062) {
+            $respuesta['mensaje'] = 'El nombre del producto ingresado ya está registrado.';
+        } else {
+            $respuesta['mensaje'] = 'Error al editar producto.';
+        }
+        $respuesta['tipo'] = 0;
+    }
+
+    echo json_encode($respuesta);
+    break;
 
 
     case 'eliminar':

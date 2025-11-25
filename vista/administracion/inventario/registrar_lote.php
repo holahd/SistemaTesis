@@ -128,23 +128,14 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         </select>
       </div>
 
-      <!-- Número de lote -->
-      <div class="mb-3">
-        <label for="numeroLote" class="form-label">Número de lote</label>
-        <input type="text" class="form-control solo-numeros" id="numeroLote" name="numeroLote" required>
-      </div>
-
+      
       <!-- Unidades -->
       <div class="mb-3">
         <label for="unidades" class="form-label">Unidades</label>
         <input type="text" class="form-control solo-numeros" id="unidades" name="cantidad" min="1" required>
       </div>
 
-      <!-- Fecha de ingreso -->
-      <div class="mb-3">
-        <label for="fechaIngreso" class="form-label">Fecha de ingreso</label>
-        <input type="date" class="form-control" id="fechaIngreso" name="fechaIngreso" required>
-      </div>
+     
 
       <!-- Proveedor -->
       <div class="mb-3">

@@ -27,7 +27,7 @@ function getEmailBody($clienteNombre)
           </p>
 
           <p style="font-size: 16px; color: #333;">
-            Para confirmar, resolver dudas o ajustar tu cotización, llámanos o escríbenos al:
+            Para confirmar o resolver dudas, llámanos o escríbenos al:
           </p>
 
           <p style="font-size: 18px; font-weight: bold; color: #0055aa;">

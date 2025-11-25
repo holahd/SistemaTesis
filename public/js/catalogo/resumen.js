@@ -22,10 +22,10 @@ $(document).ready(function () {
             lista.forEach((item, index) => {
                 html += `
                             <tr data-index="${index}">
-                                <td>${item.nombre}</td>
-                                <td>${item.descripcion.replace(/\n/g, "<br>")}` +
-                    (item.talla ? `<br><span class="badge bg-info text-dark">Talla: ${item.talla}</span>` : "") + `
+                                <td>${item.nombre}` +
+                    (item.talla ? `<br><span class="badge bg-secondary">Talla: ${item.talla}</span>` : "") + `
                                 </td>
+                                
                                 <td>
                                     <div class="d-flex align-items-center justify-content-center cantidad-control" data-index="${index}">
 

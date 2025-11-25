@@ -221,19 +221,32 @@ switch ($_GET["op"]) {
             );
         }
 
-
+ 
         $resultadoMail = enviarCorreo($datos);
 
         if (!empty($resultadoMail['success']) && $resultadoMail['success'] === true) {
 
-            $cotizacion->cambio_estado($usuarioId, $idCot, 'enviado');
+            $cotizacion->cambio_estado($usuarioId, $idCot, 'enviado', $resultadoMail['pdfPath']);
+
+            $respuesta = [
+                'success' => true,
+                'message' => 'Cotización enviada con éxito',
+                'pdfPath' => $resultadoMail['pdfPath']
+            ];
+
         } else {
 
             error_log("Error al enviar cotización #{$idCot}: " . ($resultadoMail['mensaje'] ?? 'Sin detalle'));
+
+            $respuesta = [
+                'success' => false,
+                'message' => 'Error al enviar la cotización: ' . ($resultadoMail['error'] ?? 'Sin detalle')
+            ];
         }
 
 
-        echo json_encode($resultadoMail);
+
+        echo json_encode($respuesta);
         break;
 
 
@@ -252,7 +265,7 @@ switch ($_GET["op"]) {
             echo json_encode(['status' => 'error', 'message' => 'Error al confirmar la cotización']);
             exit;
         } else {
-            $cotizacion->cambio_estado($_SESSION['usuario_id'], $_POST['cotizacion_id'], 'vendido');
+            $cotizacion->cambio_estado($_SESSION['usuario_id'], $_POST['cotizacion_id'], 'vendido', null);
             echo json_encode(['status' => 'ok', 'message' => 'Cotización confirmada con éxito']);
         }
 
@@ -271,9 +284,23 @@ switch ($_GET["op"]) {
 
     // 2) Si tuvo éxito, marcar cancelada
     if (!empty($resultado['success']) && $resultado['success'] === true) {
-        $cotizacion->cambio_estado($_SESSION['usuario_id'], $idCot, 'cancelada');
+        $cotizacion->cambio_estado($_SESSION['usuario_id'], $idCot, 'cancelada', null);
     }
     echo json_encode($resultado);
     break;
+
+    case 'rutaCotizacion':
+        $idCot = $_POST['idcot'];
+        $ruta = $cotizacion->rutaCotizacion($idCot);
+        $status = 'ok';
+        while ($row = $ruta->fetch_object()) {
+            $pdfPath = $row->pdfCot;
+        }
+
+        if (!$pdfPath) {
+            $status = 'error';
+        }
+        echo json_encode(['status' => $status,'pdfPath' => $pdfPath]);
+        break;
 
 }

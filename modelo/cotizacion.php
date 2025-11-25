@@ -53,11 +53,18 @@ class Cotizacion
         return ejecutarConsultaSP($sql);
     }
 
-    public function cambio_estado($idVen, $idcot, $estado)
+    public function cambio_estado($idVen, $idcot, $estado, $pdfPath)
     {
+        $pdfPath = $pdfPath ? $pdfPath : "NULL";  
 
         $sql = "CALL sp_cotizacion(3, $idcot, ' ','','', NULL, '$estado', $idVen);";
+
+        if ($pdfPath !== "NULL")
+        ejecutarConsultaSP("CALL sp_guardarPdf( 1, $idcot, '$pdfPath');");
+
         return ejecutarConsultaSP($sql);
+
+        
     }
 
     public function colocar_precio($id, $precio, $sTotal)
@@ -92,6 +99,16 @@ class Cotizacion
          $sql = "CALL sp_cotizacion(1, $id, NULL ,'','', NULL, NULL , NULL);";
         return ejecutarConsultaSP($sql);
     }
+
+
+    public function rutaCotizacion($idcot){
+
+        $sql = "CALL sp_guardarPdf( 2, $idcot, NULL);";
+
+        return ejecutarConsultaSP($sql);
+
+    }
+
 }
 
 

@@ -87,7 +87,7 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         echo "<div class='welcome-container'>";
         echo  "<img src='../../public/img/administrador/Pyro_emblem_RED.png' alt='Logo de la Página' class='logo'>";
         echo "<h1 class='title'>¡Bienvenido, encargado de ventas!</h1>";
-        echo "<p class='subtitle'>Gestiona las solicitudes de cotización y envíalasa los clientes.</p>";
+        echo "<p class='subtitle'>Gestiona las solicitudes de cotización y envíalas a los clientes.</p>";
     } 
     ?>
     </div>

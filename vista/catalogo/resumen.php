@@ -36,7 +36,7 @@
         <thead class="table-secondary">
             <tr>
                 <th>Producto</th>
-                <th>Descripción</th>
+               
                 <th style="width: 160px;">Cantidad</th>
                 <th style="width: 100px;">Acciones</th>
             </tr>

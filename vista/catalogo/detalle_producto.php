@@ -28,10 +28,11 @@
         </div>
         <div class="col-md-6">
             <h2 id="nombre">Nombre del Producto</h2>
-            <p id="descripcion" class="text-muted">Descripción detallada del producto con sus características principales.</p>
-
+            <div class="d-flex align-items-center mb-3">
+            <button id="verFicha" class="btn btn-success">Ver Ficha técnica</button>
+            </div>
             <div class="d-flex">
-                <span class="badge bg-info me-2" id="categoria">Categoría</span>
+                <span class="badge bg-success me-2" id="categoria">Categoría</span>
                 <span class="badge bg-dark" id="subCategoria">Subcategoría</span>
             </div>
             <div class="mt-3">

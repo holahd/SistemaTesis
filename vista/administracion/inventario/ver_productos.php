@@ -152,17 +152,12 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
                             <!-- Características obligatorias -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Características del Producto</label>
-                                <div id="caracteristicasObligatorias" class="mb-2"></div>
+                                 <input type ="file" class="form-control" id="ficha_pdf" name="ficha_pdf" accept=".pdf" >
+                                 <input type="hidden" name="ruta_ficha_pdf" id="ruta_ficha_pdf" value="">
+
                             </div>
 
-                            <!-- Características adicionales -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Características adicionales (máx. 3)</label>
-                                <div id="caracteristicasExtras" class="mb-2"></div>
-                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="agregarCaracteristica">
-                                    <i class="bi bi-plus-circle"></i> Agregar característica
-                                </button>
-                            </div>
+
 
                             <!-- Imagen actual -->
                             <div class="mb-3 text-center">
@@ -232,44 +227,52 @@ if (!isset($_SESSION['acceso_permitido']) || $_SESSION['acceso_permitido'] !== t
         </div>
     </div>
 
-     <!-- Modal -->
-<div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form id="formReporte" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="fechaInicio" class="form-label">Desde</label>
-          <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+    <!-- Modal -->
+    <div class="modal fade" id="modalReporte" tabindex="-1" aria-labelledby="modalReporteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="formReporte" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalReporteLabel">Generar reporte de entradas/salidas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombreProducto" class="form-label">Producto (opcional)</label>
+                        <select id="nombreProducto" name="nombreProducto" class="form-select">
+                            <option value="">-- Todos los productos --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaInicio" class="form-label">Desde</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaFin" class="form-label">Hasta</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Generar PDF</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-          <label for="fechaFin" class="form-label">Hasta</label>
-          <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Generar PDF</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Scripts -->
-    <script src="../../../public/js/jquery-3.7.1.min.js"></script>
+    <script src="./../../../public/js/jquery-3.7.1.min.js"></script>
+    
     <script src="../../../public/js/jszip.js"></script>
     <script src="../../../public/js/sweetalert2.all.js"></script>
     <script src="../../../public/js/datatables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../../../public/js/bootstrap.js"></script>
+    <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
     <script src="../../../public/js/administracion/combosAnidados.js"></script>
     <script src="../../../public/js/administracion/inventario/admin_productos.js"></script>
-    <script src="../../../public/js/administracion/inventario/características.js"></script>
-     <script src="./../../../public/js/administracion/inventario/entradas_salidas.js"></script>
+    
+    
 </body>
 
 </html>

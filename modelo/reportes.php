@@ -8,8 +8,10 @@ class reportes {
         
     }
 
-    public function entradaSalida($fechainicio, $fechafin) {
-        $sql = "CALL sp_reporte_auditoria_inv('$fechainicio', '$fechafin');";
+    public function entradaSalida($fechainicio, $fechafin, $productoId) {
+        $productoId = !empty($productoId) ? "'" . $productoId . "'" : "NULL";
+
+        $sql = "CALL sp_reporte_auditoria_inv('$fechainicio', '$fechafin', $productoId);";
         return ejecutarConsultaSP($sql);
     }
 }

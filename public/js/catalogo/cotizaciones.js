@@ -23,10 +23,24 @@ $(document).ready(function () {
 
         let talla = $("#talla").length > 0 ? $("#talla").val() : null;
 
-        if ($("#contenedorTallas").is(":visible") && !talla) {
-            Swal.fire("Falta seleccionar talla", "Por favor, selecciona una talla.", "warning");
+        // Ambas vacías y el producto requiere talla
+        if ($("#contenedorTallas").is(":visible") && !talla && ($("#cantidad").val() === "" || parseInt($("#cantidad").val()) <= 0)) {
+            Swal.fire("Faltan datos", "Selecciona una talla e ingresa una cantidad válida.", "warning");
             return;
         }
+
+        // Solo falta la talla
+        if ($("#contenedorTallas").is(":visible") && !talla) {
+            Swal.fire("Selecciona una talla", "Este producto requiere una talla. Por favor, elige una.", "warning");
+            return;
+        }
+
+        // Solo falta la cantidad
+        if ($("#cantidad").val() === "" || parseInt($("#cantidad").val()) <= 0) {
+            Swal.fire("Cantidad no válida", "Ingresa una cantidad mayor a cero.", "warning");
+            return;
+        }
+
         // Obtener la lista actual desde localStorage
         let listaProductos = JSON.parse(localStorage.getItem("listaCotizacion")) || [];
         let yaExiste = listaProductos.find(p => p.id === id && p.talla === talla);
@@ -88,8 +102,8 @@ $(document).ready(function () {
             listaProductos.forEach((p, index) => {
                 listaHTML += `<li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <strong>${p.nombre}</strong> - ${p.descripcion.replace(/\n/g, "<br>")}` +
-                                    (p.talla ? `<br><span class="badge bg-secondary">Talla: ${p.talla}</span>` : "") + `
+                                    <strong>${p.nombre}</strong>` +
+                    (p.talla ? `<br><span class="badge bg-secondary">Talla: ${p.talla}</span>` : "") + `
                                     <br> Cantidad:
                                     <div class="input-group input-group-sm mt-2 cantidad-control" data-index="${index}">
                                         <button class="btn btn-outline-secondary btn-decrease" type="button">-</button>

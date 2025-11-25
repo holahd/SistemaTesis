@@ -45,9 +45,11 @@ function enviarCorreo($datos)
         $mail->AddEmbeddedImage('./../public/img/administrador/Pyro_emblem_RED.png', 'logoCID');
 
         $mail->send();
-        unlink($pdfPath);
+        
+       
 
-        return ['success' => true];
+
+        return ['success' => true, 'pdfPath' => $pdfPath];
     } catch (Exception $e) {
         return ['success' => false, 'error' => $mail->ErrorInfo];
     }

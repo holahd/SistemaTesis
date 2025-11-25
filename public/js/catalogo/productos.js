@@ -376,7 +376,17 @@ $(document).ready(function () {
         if (producto) {
             $("#producto_id").val(producto.producto_id);
             $("#nombre").text(producto.nombre);
-            $("#descripcion").html(producto.descripcion.replace(/\n/g, "<br>"));
+            if (producto.descripcion) {
+                $("#verFicha")
+                    .text("Ver ficha técnica")
+                    .show()
+                    .off("click")
+                    .on("click", function () {
+                        window.open("../" + producto.descripcion, "_blank");
+                    });
+            } else {
+                $("#verFicha").hide(); // Oculta el botón si no hay PDF
+            }
             $("#categoria").text(producto.categoria);
             $("#subCategoria").text(producto.subcategoria);
             $("#foto").attr("src", "../" + producto.foto);
