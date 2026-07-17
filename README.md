@@ -4,15 +4,15 @@ Este sistema web fue desarrollado como proyecto de grado para la obtención del 
 
 ---
 
-## 🔍 El Problema Real
+## El Problema Real
 PREVENCO coordinaba las áreas de inventario y ventas mediante hojas de cálculo tradicionales. Esto provocaba desorden en la información, errores de escritura, duplicidad de registros, falta de sincronización del stock en tiempo real y riesgos de pérdida de datos históricos. Asimismo, complicaba el seguimiento riguroso de las fechas de mantenimiento y caducidad de los lotes de extintores y equipos de seguridad.
 
-## 💡 La Solución
+## La Solución
 El sistema centraliza las tareas operativas en una única plataforma web, permitiendo la comunicación fluida entre el encargado de inventario y el encargado de ventas. El software no gestiona pasarelas de pago ni logística de envíos; se enfoca estrictamente en la automatización del catálogo público, la gestión avanzada de stock por lotes y un flujo controlado de cotizaciones dinámicas.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 * **Backend:** PHP (Desarrollo estructurado a medida para optimizar el rendimiento del servidor local).
 * **Frontend:** HTML5, CSS3, JavaScript, jQuery y el framework Bootstrap.
 * **Base de Datos:** MySQL (Modelo Entidad-Relación optimizado para la consistencia de datos).
@@ -43,15 +43,19 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 ---
 
-## 📸 Vista Previa del Sistema
+## Vista Previa del Sistema
 
 | Interfaz del Catálogo Público | Panel de Administración Central |
 |---|---|
 | ![Catálogo](screenshots/catalogo_general.jpg) | ![Panel Admin](screenshots/panel_administrador.jpg) |
 
-| Interfaz del Catálogo Público | Panel de Administración Central |
+| Interfaz del producto | Vista previa de la cotizacion |
 |---|---|
-| ![Catálogo](screenshots/catalogo_general.jpg) | ![Panel Admin](screenshots/panel_administrador.jpg) |
+| ![Catálogo](screenshots/descripcion_producto.jpg) | ![Panel Admin](screenshots/solicitud_cotizacion.jpg) |
+
+| Panel de configuracion de margen de ganancia | Vista previa de la gestion de productos|
+|---|---|
+| ![Catálogo](screenshots/panel_configuracion_margen_ganancia.jpg) | ![Panel Admin](gestion_productos.jpg) |
 
 ---
 **Autor:** Xavier Alfredo Vera Guerra  
