@@ -55,7 +55,7 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 | Panel de configuracion de margen de ganancia | Vista previa de la gestion de productos|
 |---|---|
-| ![Catálogo](screenshots/panel_configuracion_margen_ganancia.jpg) | ![Panel Admin](gestion_productos.jpg) |
+| ![Catálogo](screenshots/panel_configuracion_margen_ganancia.jpg) | ![Panel Admin](screenshots/gestion_productos.jpg) |
 
 ---
 **Autor:** Xavier Alfredo Vera Guerra  
