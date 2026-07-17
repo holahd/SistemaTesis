@@ -1,3 +1,7 @@
+🌐 **Español** | [English](README_en.md)
+
+---
+
 # 📋 Sistema Web de Productos de Seguridad Contra Incendios y Control de Vencimiento de Extintores - PREVENCO
 
 Este sistema web fue desarrollado como proyecto de grado para la obtención del título de Tecnólogo en Desarrollo de Software en el Instituto Superior Tecnológico "17 de Julio". La plataforma toma como escenario a la empresa PREVENCO (Ibarra, Ecuador) con el fin de digitalizar, centralizar y optimizar sus flujos de inventario y ventas.
