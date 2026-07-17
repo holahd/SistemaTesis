@@ -21,7 +21,7 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 ---
 
-## 🌟 Módulos y Funcionalidades Destacadas
+## Módulos y Funcionalidades Destacadas
 
 ### 1. Gestión de Inventario Avanzada (Por Lotes y Categorías Dinámicas)
 * **Atributos Dinámicos:** El formulario de registro de productos adapta sus campos según la categoría seleccionada (ej. peso/capacidad para extintores frente a tallas para vestimenta de seguridad).
@@ -31,7 +31,7 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 ### 2. Flujo Automatizado de Cotizaciones y Ventas
 * **Catálogo Público:** Interfaz limpia para el cliente con barras de búsqueda y filtros por categoría/subcategoría que lee directamente el stock real disponible.
-* **Solicitudes en Línea:** Los clientes estructuran su pedido y envían la solicitud ingresando únicamente su correo electrónico de contacto.
+* **Solicitudes en Línea:** Los clientes estructuran su pedido y envían la solicitud ingresando su correo electrónico y su número de teléfono.
 * **Precios Sugeridos Automatizados:** El sistema calcula de forma automática un precio sugerido al público basándose en el porcentaje de ganancia configurado por el Administrador.
 * **Descuentos por Volumen Automáticos:** Aplicación de reglas de negocio dinámicas (ej. reducción automática de un porcentaje si el pedido supera un umbral de unidades determinado).
 * **Cierre del Ciclo:** El encargado de ventas procesa la solicitud, ajusta valores si es necesario y envía un PDF adjunto por correo electrónico. Al confirmarse la compra por vía externa, se valida en el sistema y se resta automáticamente el stock del inventario.
@@ -43,16 +43,11 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 ---
 
-## 📂 Estructura del Repositorio
-* `/db/`: Contiene el archivo `.sql` con la estructura limpia de las tablas y relaciones listas para importar en MySQL.
-* `/assets/`: Recursos estáticos (estilos CSS, librerías JS, jQuery, Bootstrap e imágenes del catálogo).
-* Archivos raíz de la plataforma organizados por módulos administrativos y la vista del catálogo público.
-
----
-
 ## 📸 Vista Previa del Sistema
-*(Para añadir capturas de pantalla, guarda las imágenes en una carpeta llamada `screenshots` dentro de tu repositorio y reemplaza las rutas a continuación)*
 
+| Interfaz del Catálogo Público | Panel de Administración Central |
+|---|---|
+| ![Catálogo](screenshots/catalogo_general.jpg) | ![Panel Admin](screenshots/panel_administrador.jpg) |
 | Interfaz del Catálogo Público | Panel de Administración Central |
 |---|---|
 | ![Catálogo](screenshots/catalogo_general.jpg) | ![Panel Admin](screenshots/panel_administrador.jpg) |
