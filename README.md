@@ -55,7 +55,7 @@ El sistema centraliza las tareas operativas en una única plataforma web, permit
 
 | Interfaz del Catálogo Público | Panel de Administración Central |
 |---|---|
-| ![Catálogo](screenshots/catalogo_preview.png) | ![Panel Admin](screenshots/admin_preview.png) |
+| ![Catálogo](screenshots/catalogo_general.jpg) | ![Panel Admin](screenshots/panel_administrador.jpg) |
 
 ---
 **Autor:** Xavier Alfredo Vera Guerra  
